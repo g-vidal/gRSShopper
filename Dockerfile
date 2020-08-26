@@ -34,13 +34,8 @@ COPY localhost.conf /etc/apache2/sites-enabled/localhost.conf
 
 VOLUME ["/var/www/html"]
 
+ADD https://github.com/Downes/gRSShopper/archive/master.tar.gz /master.tar.gz
+RUN tar xvzf /master.tar.gz -C /var/www --strip-components=1
 
-
-RUN echo "PART TWO ..."; 
-RUN cd /var/www 
-RUN GIT_URL="https://github.com/Downes/gRSShopper/archive/master.zip"; 
-RUN wget --no-check-certificate -O master.zip $GIT_URL; 
-RUN unzip master.zip;
-RUN rm master.zip; \
 
 EXPOSE 80

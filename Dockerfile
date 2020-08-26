@@ -35,12 +35,12 @@ COPY localhost.conf /etc/apache2/sites-enabled/localhost.conf
 VOLUME ["/var/www/html"]
 
 
-echo; echo; echo; \
-echo "PART TWO ..."; echo; \
-cd /var/www \
-GIT_URL="https://github.com/Downes/gRSShopper/archive/master.zip"; \
-wget --no-check-certificate -O master.zip $GIT_URL; \
-unzip master.zip; \
-rm master.zip; \
+
+RUN echo "PART TWO ..."; 
+RUN cd /var/www 
+RUN GIT_URL="https://github.com/Downes/gRSShopper/archive/master.zip"; 
+RUN wget --no-check-certificate -O master.zip $GIT_URL; 
+RUN unzip master.zip;
+RUN rm master.zip; \
 
 EXPOSE 80

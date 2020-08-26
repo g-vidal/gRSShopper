@@ -6,9 +6,9 @@ git clone https://github.com/Downes/gRSShopper.git
 
 cd gRSShopper
 
-docker build -t gRSShopper .
+docker build -t grsshopper .
 
-docker run -v c:/www:/var/www/html -p 80:80 -d gRSShopper /usr/sbin/apache2ctl -D FOREGROUND
+docker run -v /var/www:/var/www/html -p 80:80 -d grsshopper /usr/sbin/apache2ctl -D FOREGROUND
 
 Access http://localhost
 

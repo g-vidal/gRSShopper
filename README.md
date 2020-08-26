@@ -1,3 +1,20 @@
+# Work in progress....  2020-08-26
+
+# Setup
+
+git clone https://github.com/Downes/gRSShopper.git
+
+cd gRSShopper
+
+docker build -t gRSShopper .
+
+docker run -v c:/www:/var/www/html -p 80:80 -d gRSShopper /usr/sbin/apache2ctl -D FOREGROUND
+
+Access http://localhost
+
+
+
+
 gRSShopper
 
 by Stephen Downes

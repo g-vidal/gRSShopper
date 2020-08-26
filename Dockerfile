@@ -22,6 +22,7 @@ RUN \
         libapreq2-dev \
         zip && \
     cpanm DBD::mysql && \
+    cpanm Net::Telnet &&\
     a2enmod cgid && \
     a2enmod rewrite && \
     a2dissite 000-default && \

@@ -45,7 +45,7 @@ if ($@) {
 print " <span style='color:green;'> OK</span>$newline";
 }
 
-use local::lib; # sets up a local lib at ~/perl5
+# use local::lib; # sets up a local lib at ~/perl5
 
 # -----------------------------------------------------
 # Check that all of the required modules can be located
@@ -102,60 +102,45 @@ use the cpan command to load it. The syntax is: <tt> cpan -i &lt;module name&gt;
 
 }
 
+# -------------
+# Test database access (from default config in Dockerfile)
+
+print "<p>Testing database access (from default config in Dockerfile)</p>";
+use DBI;
+
+    	# Make variables easy to read :)
+    	my $dbname = "grsshopper";
+    	my $dbhost = "localhost";
+    	my $usr = "grsshopper_user";
+    	my $pwd = "user_password";
+
+	# Connect to the Database
+  	my $dbh = DBI->connect("DBI:mysql:database=$dbname;host=$dbhost;port=3306",$usr,$pwd);
+
+	# Catch connection error
+	if( ! $dbh ) {
+
+              print "Content-type: text/html\n\n";
+	      print "Database connection error for db '$dbname'. Please contact the site administrator.<br>";   
+
+		# Print error report and exit
+		print "Error String Reported: $DBI::errstr <br>";
+		exit;
+
+	# I'll put more error-checking here
+	} else {
+	
+	        print "<p>Database successfully connected.</p>";
+		eval {
+		#$dbh->do( whatever );
+		#$dbh->{dbh}->do( something else );
+		};
+
+		if( $@ ) {
+			print "Ugg, problem: $@\n";
+		}
+	}
+
 
 
 exit;
-
-
-
-
-sub send_email {
-
-	my $Mailprog = "/usr/sbin/sendmail";
-
-
-	my ($to,$from,$subj,$page,$Mailprog) = @_;
-
-
-         open (MAIL,"|$Mailprog -t") or print "Can't find email program $Mailprog";
-
-
-
-
-						# Set Line Lengths
-
-		print "Test Email: <p><pre>";
-		print "To: $to\nFrom: $from\nSubject: $subj\n$htmlstr\n\n$page"
-			or print "Email format error: $!";
-		print MAIL "To: $to\nFrom: $from\nSubject: $subj\n$htmlstr\n\n$page"
-			or print "Email format error: $!";
-		print "</pre>";
-
-
-
-	close MAIL;
-
-}
-
-sub test_thumbnails {
-
-
-print "Testing thumbnails<p>";
-        # Create a thumbnail from 'test.jpg' as 'test_t.jpg'
-        # using ImageMagick, Imager, GD or Image::Epeg.
-        my $t = new Image::Thumbnail(
-                module     => "Image::Magick",
-                size       => 55,
-                create     => 1,
-                input      => "/var/www/cgi-bin/test.jpg",
-                outputpath => "/var/www/cgi-bin/Riga001_t.jpg",
-                CHAT => 1
-        ) or print "Error: $!";
-
-        print $t->{error};
-        print $t->{warning};
-                print $t->{module};
-                        print $t->{thumb};
-
-print "OK";
-}

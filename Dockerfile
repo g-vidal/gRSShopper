@@ -82,7 +82,7 @@ COPY server_test.cgi /var/www/html/cgi-bin
 RUN chmod 705 /var/www/html/cgi-bin/server_test.cgi
 COPY run-lamp.sh /usr/sbin/
 
-COPY grsshopper.sql /var/www/html/cgi-bin/grsshopper.sql
+COPY sql/grsshopper.sql /var/www/html/cgi-bin/grsshopper.sql
 RUN /bin/bash -c "/usr/bin/mysqld_safe &" && \
   sleep 5 && \
   mysql -u root -e "CREATE DATABASE grsshopper" && \

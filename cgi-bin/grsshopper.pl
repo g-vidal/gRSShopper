@@ -34,7 +34,7 @@ sub load_modules {
 	$!++;							# CGI
 	use CGI;
 	use CGI::Carp qw(fatalsToBrowser);
-      use local::lib; # sets up a local lib at ~/perl5
+   #   use local::lib; # sets up a local lib at ~/perl5
 
 	use CGI::Session;
 	my $query = new CGI;

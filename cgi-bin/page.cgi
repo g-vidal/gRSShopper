@@ -3,7 +3,7 @@
 #    gRSShopper 0.7  Page  0.7  -- gRSShopper administration module
 #    26 April 2017 - Stephen Downes
 
-WORK IN PROGRESS 07 September 2020
+# WORK IN PROGRESS 07 September 2020
 
 
 #    Copyright (C) <2011>  <Stephen Downes, National Research Council Canada>

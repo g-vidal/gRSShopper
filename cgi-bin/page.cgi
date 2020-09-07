@@ -45,6 +45,9 @@
 	my $dirname = dirname(__FILE__);
 	require $dirname . "/grsshopper.pl";
 
+# Load modules
+
+	our ($query,$vars) = &load_modules("page");
 
 
 print "Content-type: text/html\n\n";

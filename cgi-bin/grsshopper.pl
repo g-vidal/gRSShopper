@@ -65,7 +65,7 @@ sub load_modules {
 		use File::stat;
 		use Scalar::Util 'blessed';
 		use Text::ParseWords;
-		use Lingua::EN::Inflect qw ( PL );
+	#	use Lingua::EN::Inflect qw ( PL );
 	}
 
 

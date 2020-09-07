@@ -32,16 +32,7 @@ WORK IN PROGRESS 07 September 2020
 
 	use CGI;
 	use CGI::Carp qw(fatalsToBrowser);
-	my $query = new CGI;
-	my $vars = $query->Vars;
-	my $page_dir = "../";
 
-
-# Load gRSShopper
-
-	use File::Basename;
-	my $dirname = dirname(__FILE__);
-	require $dirname . "/grsshopper.pl";
 
 
 

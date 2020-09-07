@@ -11928,7 +11928,7 @@ package gRSShopper::Site;
 
 
 
-  	my $data_file = $self->{data_dir} . "multisite.txt";
+  	my $data_file = "data/multisite.txt";
 
 		unless (-e $data_file) { $data_file = $ARGV[2]; }    # try a backup option (nneded for cron)
 

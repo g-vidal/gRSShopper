@@ -1,139 +1,65 @@
-# Work in progress....  2020-08-26
+downes/grsshopper
+==========
 
-# Setup
+![docker_logo](https://raw.githubusercontent.com/downes/grsshopper/master/docker_139x115.png)![docker_fauria_logo](https://raw.githubusercontent.com/downes/grsshopper/master/docker_fauria_161x115.png)![grsshopper_logo](https://raw.githubusercontent.com/downes/grsshopper/master/grsshopper.png)
 
-git clone https://github.com/Downes/gRSShopper.git
+[![Docker Pulls](https://img.shields.io/docker/pulls/downes/grsshopper.svg?style=plastic)](https://hub.docker.com/r/downes/grsshopper/)
+[![Docker Build Status](https://img.shields.io/docker/build/downes/grsshopper.svg?style=plastic)](https://hub.docker.com/r/downes/grsshopper/builds/)
+[![](https://images.microbadger.com/badges/image/downes/grsshopper.svg)](https://microbadger.com/images/downes/grsshopper "downes/grsshopper")
 
-cd gRSShopper
-
-docker build -t grsshopper .
-
-docker run -v /var/www:/var/www/html -p 80:80 -d grsshopper /usr/sbin/apache2ctl -D FOREGROUND
-
-Access http://localhost
-
-
-
-
-gRSShopper
-
-by Stephen Downes
+Note: still being set up, these instructions don't work yet
 
 gRSShopper is a tool that aggregates, organizes and distributes resources to support online learning
 
+Docker image is here: https://hub.docker.com/r/downes/grsshopper
+
+To run:
+```
+docker pull downes/grsshopper
+
+docker run --publish 80:80 --detach --name bb3 grsshopper
+```
 
 
---------------------------------------------------
-Installation - works for CPanel on Reclaim Hosting
---------------------------------------------------
+OR, run from thw GitHub repository as follows:
 
-In CPanel, Install Perl Modules:
+Process:
 
-  MIME::Types
-  MIME::Lite::TT::HTML
-  CGI::Session
-  Lingua::EN::Inflect
-  JSON
-  JSON::Parse
-  JSON::XS
-  Net::Facebook::Oauth2
-  XML::OPML
-  REST::Client
-  Net::Twitter::Lite::WithAPIv1_1
-  Digest::SHA1
-  Email::Stuffer
-  vCard
-  Net::OAuth
-  Image::Resize
-  DBD::mysql
-  Mastodon::Client
+```
+git clone  https://github.com/Downes/grsshopper
+```
+
+        (or git pull origin master if reloading the changed repo)
 
 
+```
+cd docker-lamp
 
+docker build --tag downeslamp .
 
+docker run --publish 80:80 --detach --name bb3 downeslamp
+```
 
-Changed nameserver over to ns1.reclaimhosting.com   :)
+Testing the server
 
-In FTP Client or File Manager
-- load cgi-bin files into ../public_html/cgi-bin
-- load html files into ../public_html    
-- make cgi-bin/data folder
+http://localhost  (should show Apache index page)
 
-In CPanel
-- changed permissions of scripts to 0755
-- run https://www.downes.ca/cgi-bin/server_test.cgi
-    This tests the cgi installation. On different hosts you may need to install additional Perl modules
+http://localhost/index.php  (should show PHP index page)
 
-In CPanel/MySQL Databases:
-- Create database
-- Create database user   
-- Add user to database with all privileges  (keep this information, you will need it to fill in the form below)
+http://localhost/cgi-bin/server_test.cgi  (should show Perl test page)     
 
-In PHPMyAdmin
-- import grsshopper-ple.sql into database
+ 
 
-Run http://www.downes.ca/cgi-bin/initialize.cgi
-   and fill in the form
+If Perl CGI isn't running properly, try:
+```
+docker exec -it bb3 /etc/init.d/apache2 reload
+```
 
---------------------------------------------------------------------   
+   (you can't docker exec -it bb3 apache2ctl restart because it crashes the entire container - see https://stackoverflow.com/questions/37523338/how-to-restart-apache2-without-terminating-docker-container )
 
-Some help with the form (*** means 'pick whatever you want'):
+   ( if you crash it, docker start bb3 )
 
-   Site document directory:    ../     
-
-   Site cgi directory is:      ./
-
-
-
-   Database Name			database name, from above
-
-   Database Location			localhost
-
-   Database Username	database user name, from above
-
-   Database Password	database user password, from above
-
-   Language				en
-
-   Site Document Directory		/home/*******/public_html                 (needs to be full filename and directory)
-
-   Site CGI Directory		/home/*******/public_html/cgi-bin
-
-
-   Site Name				********
-
-   Site Tag				  **********
-
-  Site Email Address		*********
-
-  Site Time Zone			America/Toronto
-
-   License				CC-by-NC
-
-   Site Key				**********                                             (take note of this, you need it to run cron)
-
-
-   Administrator Username		**********                                   (You will use these to log into your gRSShopper PLE)
-
-   Administrator Password		***********
-
-- Click 'Multisite'
-
-------------------------------------------------------------
-
-- Remove initialize.cgi
-
-- In ../public_html/assets/js/grsshopper_admin.js
-   -- change www.downes.ca  to your new site URL (bit of a kludge here)
-
------------
-
-- Set up Cron (once a minute)
-/home/********/public_html/cgi-bin/admin.cgi www.downes.ca ^^^^^^^^ /home/******/public_html/cgi-bin/data/multisite.txt >/dev/null 2>&1
-
--- where *********** is your directory
-and ^^^^^^^^^^ is the site key entered in the form above
-
-- To open the PLE, navigate to https://yourservername/cgi-bin/page.cgi?page=PLE&force=yes
-
-(once you publish this page you can just go to https://yourservername/ple.htm  )
+Open a shell inside
+```
+docker exec -i -t bb3 bash
+```

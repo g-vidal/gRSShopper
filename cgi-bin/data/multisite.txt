@@ -1,0 +1,1 @@
+domain.name.ca	grsshopper_database	localhost	grsshopper_database_user	grsshopper_database_password	en	/var/www/html/	/var/www/html/cgi-bin/

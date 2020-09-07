@@ -11290,7 +11290,7 @@ sub mastodon_post {
 
     $tweet = &compose_microcontent($dbh,$table,$id,$tweet,500);
 
-    use Mastodon::Client;
+    # use Mastodon::Client;
 
     my $client = Mastodon::Client->new(
       instance        => $Site->{mas_instance},
@@ -11320,7 +11320,7 @@ sub mastodon_harvest {
   }      # Harvest ONLY if there is a tag
   my $tag = "#".$channel->{channel_tag}; $tag =~ s/##/#/;
 
-	use Mastodon::Client;
+#	use Mastodon::Client;
 
 	my $client = Mastodon::Client->new(
 	  instance        => $Site->{mas_instance},

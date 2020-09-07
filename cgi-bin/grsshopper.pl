@@ -11964,8 +11964,8 @@ package gRSShopper::Site;
 
 	# Initialize if line beginning with site URL can't be found
 	unless ($self->{database}->{name}) { 
-		die "Cannot determine the name of the database to use"; $
-		# self->__initialize("url"); 
+		die "Cannot determine the name of the database to use"; 
+		# $self->__initialize("url"); 
 	} # -------------------------------------------------------------> Initialize url
 
 

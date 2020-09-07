@@ -11926,15 +11926,14 @@ package gRSShopper::Site;
 	# Open the multisite configuration file,
 	# Initialize if file can't be found or opened
 
-
-
   	my $data_file = "data/multisite.txt";
+	unless (-e $data_file) { $data_file = $ARGV[2]; }    # try a backup option (nneded for cron)
 
-		unless (-e $data_file) { $data_file = $ARGV[2]; }    # try a backup option (nneded for cron)
-
-	  open IN,"$data_file" or die qq|Cannot find $data_file to define website parameters. $?
-		  Args: 0 $ARGV[0] 1 $ARGV[1] 2 $ARGV[2] 3 $ARGV[3]|;
-
+	open IN,"$data_file" or die qq|Cannot find multisite.txt or website information in crom task.|; 
+	
+#	    $data_file to define website parameters. $?
+#		  Args: 0 $ARGV[0] 1 $ARGV[1] 2 $ARGV[2] 3 $ARGV[3]|;
+#
 		#$self->__initialize("file");  # -------------------------------------------------------------> Initialize file
 
 
@@ -11944,6 +11943,12 @@ package gRSShopper::Site;
 	my $url_located = 0;
   	while (<IN>) {
 		my $line = $_; $line =~ s/(\s|\r|\n)$//g;
+		( $self->{st_home},
+		  $self->{database}->{name},
+		  $self->{database}->{loc},
+		  $self->{database}->{usr},
+		  $self->{database}->{pwd},
+		  $self->{site_language} ) = split "\t",$line;   # Assign defualts with first line
 		if ($line =~ /^$self->{st_host}/) {
 			( $self->{st_home},
 			  $self->{database}->{name},
@@ -11951,7 +11956,6 @@ package gRSShopper::Site;
 			  $self->{database}->{usr},
 			  $self->{database}->{pwd},
 			  $self->{site_language} ) = split "\t",$line;
-			$url_located = 1;
 			last;
 		}
 	}
@@ -11959,7 +11963,10 @@ package gRSShopper::Site;
 
 
 	# Initialize if line beginning with site URL can't be found
-	unless ($url_located) { die "line beginning with site URL can't be found"; $self->__initialize("url"); } # -------------------------------------------------------------> Initialize url
+	unless ($self->{database}->{name}) { 
+		die "Cannot determine the name of the database to use"; $
+		# self->__initialize("url"); 
+	} # -------------------------------------------------------------> Initialize url
 
 
 	# Assign or override defaults

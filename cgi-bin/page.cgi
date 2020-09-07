@@ -48,6 +48,10 @@
 # Load modules
 
 	our ($query,$vars) = &load_modules("page");
+	
+# Load Site
+	
+	our ($Site,$dbh) = &get_site("page");	
 
 
 print "Content-type: text/html\n\n";

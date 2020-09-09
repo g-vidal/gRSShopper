@@ -87,16 +87,7 @@ if ($missing eq "1") {
   foreach my $module (@missing_list) { print qq|<li>$module</li>|; }
 
   print qq|</ul>		$newline$newline
-		<b>Getting Perl Modules</b>$newline <ul>
-    <li>If you use cPanel there may be a 'Perl Modules' option that installs
-modules for you. Type the name of the module listed here into the form and ask cPanel to install it.
-   See <a href="https://www.interserver.net/tips/kb/install-perl-module-cpanel/">
-https://www.interserver.net/tips/kb/install-perl-module-cpanel/</a>"</li>
-    <li>Use the SSH command to access your server in a terminal window, then
-use the cpan command to load it. The syntax is: <tt> cpan -i &lt;module name&gt; </tt> </li>
-    <li>Download the module and install it manually.</li>
-    </ul>
-		For more information, please see:$newline
+		<b>Getting Perl Modules</b>$newlineFor more information, please see:$newline
 		<a href="http://www.cpan.org/modules/INSTALL.html">http://www.cpan.org/modules/INSTALL.html</a> $newline
 		<a href="http://www.rcbowen.com/imho/perl/modules.html">http://www.rcbowen.com/imho/perl/modules.html</a> $newline|;
 
@@ -141,6 +132,22 @@ use DBI;
 		}
 	}
 
+# -------------
+# Test database access (from default config in Dockerfile)
 
+
+print "<p>Testing user authentication</p>";
+use CGI::Session;
+
+my $session = CGI::Session->new();
+if ($session) { 
+
+   print "Session creation successful <p>";
+
+} else {
+
+   print "Session creation failed. <p>".die CGI::Session->errstr;
+   
+}
 
 exit;

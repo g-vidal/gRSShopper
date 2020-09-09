@@ -23,12 +23,15 @@
 ##########################################################################
 # Servertest.pl
 ##########################################################################
+	use CGI;
 	use CGI::Carp qw(fatalsToBrowser);
-	
 	use CGI::Session;
+	use CGI::Session::Auth;
 
+
+my $query = CGI->new();
 CGI::Session->name("SID");
-my $session = CGI::Session->new();
+my $session = CGI::Session->new($query);
 $session->expire('+1h');
 if ($session) { 
    $CGISESSID = $session->id();

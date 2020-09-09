@@ -45,7 +45,13 @@ $session->flush();
    
    print "Content-type: text/html\n\n";   
       print "Session creation successful: ".$CGISESSID.$newline;
-   print "Cookie save info:$newline";
+   print "Session save info:$newline";
+
+# Retrieving data:
+my $f_name = $session->param('f_name');
+# or
+my $l_name = $session->param(-name=>'l_name');
+print "$f_name $l_name <p>";
 
    my $cookie = $query->cookie( -name   => $session->name,value  => $session->id );
    print $query->header( -cookie=>$cookie );

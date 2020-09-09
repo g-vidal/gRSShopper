@@ -142,7 +142,7 @@ CGI::Session->name("SID");
 my $session = CGI::Session->new();
 if ($session) { 
    $CGISESSID = $session->id();
-   print "Session creation successful: ".$CGISESSID.$newline";
+   print "Session creation successful: ".$CGISESSID.$newline;
    
    print "Cookie save info:$newline";
 

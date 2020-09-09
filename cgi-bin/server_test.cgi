@@ -143,7 +143,8 @@ my $session = CGI::Session->new();
 if ($session) { 
    $CGISESSID = $session->id();
    print "Session creation successful: ".$CGISESSID.$newline;
-   
+   # Send proper HTTP header with cookies:
+   print $session->header();
    print "Cookie save info:$newline";
 
    my $cookie = $query->cookie( -name   => $session->name,value  => $session->id );

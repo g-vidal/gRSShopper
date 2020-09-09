@@ -132,10 +132,7 @@ use DBI;
 		}
 	}
 
-# -------------
-# Test database access (from default config in Dockerfile)
 
 
-print "<p>Testing user authentication</p>";
 
 exit;

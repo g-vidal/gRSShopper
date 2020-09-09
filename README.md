@@ -17,7 +17,7 @@ To run:
 ```
 docker pull downes/grsshopper
 
-docker run --publish 80:80 --detach --name bb3 grsshopper
+docker run --publish 80:80 --detach --name gr1 grsshopper
 ```
 
 

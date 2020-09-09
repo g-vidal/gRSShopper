@@ -33,11 +33,11 @@ git clone  https://github.com/Downes/grsshopper
 
 
 ```
-cd docker-lamp
+cd grsshopper
 
-docker build --tag downeslamp .
+docker build --tag grsshopper .
 
-docker run --publish 80:80 --detach --name bb3 downeslamp
+docker run --publish 80:80 --detach --name gr1 grsshopper
 ```
 
 Testing the server
@@ -52,7 +52,7 @@ http://localhost/cgi-bin/server_test.cgi  (should show Perl test page)
 
 If Perl CGI isn't running properly, try:
 ```
-docker exec -it bb3 /etc/init.d/apache2 reload
+docker exec -it gr1 /etc/init.d/apache2 reload
 ```
 
    (you can't docker exec -it bb3 apache2ctl restart because it crashes the entire container - see https://stackoverflow.com/questions/37523338/how-to-restart-apache2-without-terminating-docker-container )
@@ -61,5 +61,5 @@ docker exec -it bb3 /etc/init.d/apache2 reload
 
 Open a shell inside
 ```
-docker exec -i -t bb3 bash
+docker exec -i -t gr1 bash
 ```

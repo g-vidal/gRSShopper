@@ -24,6 +24,31 @@
 # Servertest.pl
 ##########################################################################
 	use CGI::Carp qw(fatalsToBrowser);
+	
+	use CGI::Session;
+
+CGI::Session->name("SID");
+my $session = CGI::Session->new();
+if ($session) { 
+   $CGISESSID = $session->id();
+
+   # Send proper HTTP header with cookies:
+   print $session->header();
+   print "Content-type: text/html\n\n";   
+      print "Session creation successful: ".$CGISESSID.$newline;
+   print "Cookie save info:$newline";
+
+   my $cookie = $query->cookie( -name   => $session->name,value  => $session->id );
+   print $query->header( -cookie=>$cookie );
+
+} else {
+   print "Content-type: text/html\n\n";
+   print "Session error.<p>";
+}
+
+
+	
+	
 # ---------------------------------
 # Let's see what our environment is
 if (!$ENV{'SERVER_SOFTWARE'}) {
@@ -134,7 +159,7 @@ use DBI;
 	}
 
 # -------------
-# Test database access (from default config in Dockerfile)
+# Test sessions
 print "<p>Testing user authentication</p>";
 use CGI::Session;
 

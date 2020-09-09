@@ -36,9 +36,9 @@ if ($session) {
    # Send proper HTTP header with cookies:
    print $session->header();
    # Storing data in the session:
-$session->param('f_name', 'Sherzod');
+#$session->param('f_name', 'Sherzod');
 # or
-$session->param(-name=>'l_name', -value=>'Ruzmetov');
+#$session->param(-name=>'l_name', -value=>'Ruzmetov');
  
 # Flush the data from memory to the storage driver at least before your
 # program finishes since auto-flushing can be unreliable.

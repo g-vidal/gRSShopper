@@ -137,17 +137,5 @@ use DBI;
 
 
 print "<p>Testing user authentication</p>";
-use CGI::Session;
-
-my $session = CGI::Session->new();
-if ($session) { 
-
-   print "Session creation successful <p>";
-
-} else {
-
-   print "Session creation failed. <p>";
-   
-}
 
 exit;

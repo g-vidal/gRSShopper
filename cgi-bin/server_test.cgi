@@ -138,12 +138,14 @@ use DBI;
 print "<p>Testing user authentication</p>";
 use CGI::Session;
 
+CGI::Session->name("SID");
 my $session = CGI::Session->new();
 if ($session) { 
 
    print "Session creation successful $newline";
    
    print "Cookie save info:$newline";
+
    my $cookie = $query->cookie( -name   => $session->name,value  => $session->id );
    print $query->header( -cookie=>$cookie );
 

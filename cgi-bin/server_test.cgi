@@ -1,5 +1,6 @@
 #!/usr/bin/perl
-
+  print "Content-type: text/html\n\n";
+  
 #    gRSShopper 0.7  Server Test  0.2  -- gRSShopper server test module
 #    26 April 2017 - Stephen Downes
 
@@ -132,6 +133,21 @@ use DBI;
 		}
 	}
 
+# -------------
+# Test database access (from default config in Dockerfile)
+print "<p>Testing user authentication</p>";
+use CGI::Session;
+
+my $session = CGI::Session->new();
+if ($session) { 
+
+   print "Session creation successful <p>";
+
+} else {
+
+   print "Session creation failed. <p>";
+   
+}
 
 
 

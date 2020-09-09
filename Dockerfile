@@ -78,7 +78,7 @@ RUN mkdir /var/www/html/cgi-bin
 RUN a2enconf cgi-enabled 
 
 COPY index.php /var/www/html/
-COPY server_test.cgi /var/www/html/cgi-bin
+COPY cgi-bin/server_test.cgi /var/www/html/cgi-bin
 RUN chmod 705 /var/www/html/cgi-bin/server_test.cgi
 COPY run-lamp.sh /usr/sbin/
 

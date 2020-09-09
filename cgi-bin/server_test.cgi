@@ -1,6 +1,5 @@
 #!/usr/bin/perl
-print "Content-type: text/html\n\n";
-print "<h1>gRSShopper Server Test</h1>";  
+ 
 
 #    gRSShopper 0.7  Server Test  0.2  -- gRSShopper server test module
 #    26 April 2017 - Stephen Downes
@@ -28,13 +27,13 @@ print "<h1>gRSShopper Server Test</h1>";
 # ---------------------------------
 # Let's see what our environment is
 if (!$ENV{'SERVER_SOFTWARE'}) {
-  $newline = "\n";
+  $newline = "\n";$h1 = ""; $h1f="";
 }
 else {
   print "Content-type: text/html\n\n";
-  $newline = "<br>";
+  $newline = "<br>"; $h1 = "<h1>"; $h1f = "</h1>";
  }
-print "gRSShopper web server environment test.".$newline.$newline;
+print $h1."gRSShopper web server environment test.".$h1f.$newline.$newline;
 
 # --------------------------------------
 # Check for the required version of PERL
@@ -142,11 +141,15 @@ use CGI::Session;
 my $session = CGI::Session->new();
 if ($session) { 
 
-   print "Session creation successful <p>";
+   print "Session creation successful $newline";
+   
+   print "Cookie save info:$newline";
+   my $cookie = $query->cookie( -name   => $session->name,value  => $session->id );
+   print $query->header( -cookie=>$cookie );
 
 } else {
 
-   print "Session creation failed. <p>";
+   print "Session creation failed.$newline";
    
 }
 

@@ -29,6 +29,7 @@
 
 CGI::Session->name("SID");
 my $session = CGI::Session->new();
+$session->expire('+1h');
 if ($session) { 
    $CGISESSID = $session->id();
 

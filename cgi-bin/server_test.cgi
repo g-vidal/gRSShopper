@@ -146,7 +146,7 @@ if ($session) {
 
 } else {
 
-   print "Session creation failed. <p>".CGI::Session->errstr;
+   print "Session creation failed. <p>";
    
 }
 

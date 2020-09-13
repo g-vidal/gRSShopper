@@ -26,6 +26,12 @@
 #
 #-------------------------------------------------------------------------------
 
+# Load gRSShopper
+
+	use File::Basename;
+      #use local::lib; # sets up a local lib at ~/perl5
+	my $dirname = dirname(__FILE__);
+	require $dirname . "/grsshopper.pl";
 
 
 # Load CGI
@@ -45,12 +51,7 @@ print $username || $login_window;
 	my $page_dir = "../";
 
 
-# Load gRSShopper
 
-	use File::Basename;
-      #use local::lib; # sets up a local lib at ~/perl5
-	my $dirname = dirname(__FILE__);
-	require $dirname . "/grsshopper.pl";
 
 # Load modules
 

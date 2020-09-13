@@ -34,6 +34,13 @@
 	use CGI::Carp qw(fatalsToBrowser);
 
 	my $query = new CGI;
+	my ($session,$username) = &check_user($query);
+	my $login_window = &show_login($session);
+	
+
+print $username || $login_window;
+
+
 	my $vars = $query->Vars;
 	my $page_dir = "../";
 
@@ -55,12 +62,5 @@
 
 
 
-my $cgi = new CGI;      
-
-my ($session,$username) = &check_user();
-my $login_window = &show_login($session);
-
-
-print $username || $login_window;
 
 exit;

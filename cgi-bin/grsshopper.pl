@@ -9901,7 +9901,7 @@ sub init_login {
 
     # if we came this far, user did submit the login form
     # so let's try to load his/her profile if name/psswds match
-    if ( my $profile = _load_profile($lg_name, $lg_psswd) ) {     
+    if ( my $profile = _load_profile($cgi, $lg_name, $lg_psswd) ) {     
         $session->param("~profile", $profile);
         $session->param("~logged-in", 1);
         $session->clear(["~login-trials"]);
@@ -9918,7 +9918,7 @@ sub init_login {
 
 	# Check password, Load profile from profiles file on new login
 sub _load_profile {
-    my ($lg_name, $lg_psswd) = @_;
+    my ($cgi, $lg_name, $lg_psswd) = @_;
  
     local $/ = "\n";
     

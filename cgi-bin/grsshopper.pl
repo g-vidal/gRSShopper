@@ -9947,6 +9947,7 @@ sub _load_profile {
 	# Create a new profile and store it in the profiles file
 sub _make_profile {
 
+my $cgi = shift;
 print $cgi->header();
 print "<p>Making Profile</p>";    
 print "<p>Name".$cgi->param("lg_name")."<p>";

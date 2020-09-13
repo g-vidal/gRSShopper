@@ -25,45 +25,12 @@
 ##########################################################################
 	use CGI;
 	use CGI::Carp qw(fatalsToBrowser);
-	use CGI::Session;
-	use CGI::Session::Auth;
 
 
-my $query = CGI->new();
-CGI::Session->name("SID");
-my $session = CGI::Session->new($query);
-$session->expire('+1h');
-if ($session) { 
-   $CGISESSID = $session->id();
 
-   # Send proper HTTP header with cookies:
-   print $session->header();
-   # Storing data in the session:
-#$session->param('f_name', 'Sherzod');
-# or
-#$session->param(-name=>'l_name', -value=>'Ruzmetov');
- 
-# Flush the data from memory to the storage driver at least before your
-# program finishes since auto-flushing can be unreliable.
-$session->flush();
    
    print "Content-type: text/html\n\n";   
-      print "Session creation successful: ".$CGISESSID.$newline;
-   print "Session save info:$newline";
 
-# Retrieving data:
-my $f_name = $session->param('f_name');
-# or
-my $l_name = $session->param(-name=>'l_name');
-print "$f_name $l_name <p>";
-
-   my $cookie = $query->cookie( -name   => $session->name,value  => $session->id );
-   print $query->header( -cookie=>$cookie );
-
-} else {
-   print "Content-type: text/html\n\n";
-   print "Session error.<p>";
-}
 
 
 	

@@ -9835,6 +9835,7 @@ sub arrays {
 	# Checks for logout, initializes session, writes cookie
 sub check_user {
 
+    my $cgi = shift;
     my $session = new CGI::Session(undef, $cgi, {Directory=>'/tmp'});
 
     if ($cgi->param("action") eq "logout") {

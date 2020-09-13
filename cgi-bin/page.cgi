@@ -55,4 +55,4 @@
 
 
 print "Content-type: text/html\n\n";
-print "page.cgi loaded ok <p>";
+print "page.cgi reloaded ok <p>";

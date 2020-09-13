@@ -9827,6 +9827,185 @@ sub arrays {
 
 	#   -------------------------------------------------------------------------------------
 	#
+	#   LOGIN FUNCTIONS
+	#   Added 13 September 2020 while putting gRSShopper into containers
+	#
+	#   -------------------------------------------------------------------------------------
+
+	# Checks for logout, initializes session, writes cookie
+sub check_user {
+
+    my $session = new CGI::Session(undef, $cgi, {Directory=>'/tmp'});
+
+    if ($cgi->param("action") eq "logout") {
+        $session->delete();
+        print $cgi->header();
+        print qq|<p>Logged Out</p><a href="test_sess.cgi">Login</a>|;
+        exit;
+    } 
+	#   $session->clear(["~logged-in"]);
+
+    &init_login($session,$cgi);
+
+    #my $cookie = CGI::Cookie->new(CGISESSID => $session->id);
+
+    my $cookie = $cgi->cookie(-name=>CGISESSID,
+	    -value=>$session->id,
+	    -expires=>"Wed, 22 Oct 2025 07:28:00 GMT",
+	    -secure=>1);
+
+    print $cgi->header(-cookie=>$cookie,-charset => 'utf-8');
+
+    return($session,$session->param("username"));
+
+#print "Username: ".$session->param("~logged-in");
+
+}
+
+
+	# Returns user name if logged in, login form otherwise
+	# Use in iframe on web pages 
+sub show_login {
+
+    my $session = shift;
+    # Logged In
+    if ($session->param("~logged-in")) { 
+        return "Username: ".$session->param("~profile")->{username}.qq| [<a href="test_sess.cgi?action=logout">Logout</a>]<p>|;
+    } 
+
+    # Not Logged In
+    else {
+        return qq|
+        <form method="post" action="test_sess.cgi">
+        <input type=text name="lg_name">
+        <input type=password name="lg_password">
+        <input type="submit">
+        </form>
+        |;
+    }
+}
+
+
+	# Initializes session and loads profile if new login
+sub init_login {
+    my ($session, $cgi) = @_; # receive two args
+
+    if ( $session->param("~logged-in") ) {
+        return 1;  # if logged in, don't bother going further
+    }
+ 
+    my $lg_name = $cgi->param("lg_name") or return;
+    my $lg_psswd=$cgi->param("lg_password") or return;
+
+
+    # if we came this far, user did submit the login form
+    # so let's try to load his/her profile if name/psswds match
+    if ( my $profile = _load_profile($lg_name, $lg_psswd) ) {     
+        $session->param("~profile", $profile);
+        $session->param("~logged-in", 1);
+        $session->clear(["~login-trials"]);
+        return 1;
+ 
+    }
+ 
+    # if we came this far, the login/psswds do not match
+    # the entries in the database
+    my $trials = $session->param("~login-trials") || 0;
+    return $session->param("~login-trials", ++$trials);
+}
+
+
+	# Check password, Load profile from profiles file on new login
+sub _load_profile {
+    my ($lg_name, $lg_psswd) = @_;
+ 
+    local $/ = "\n";
+
+    open(PROFILES, '<', "profiles.txt") or die $!;
+    while ( <PROFILES> ) {
+        /^(\n|#)/ and next;
+        chomp;
+        my ($n, $p, $e) = split "\t";       
+        if ( $n eq $lg_name ) {
+            my $encr = &_encrypt_password($lg_psswd);
+            if (&_check_password($lg_psswd,$p)) {
+               my $p_mask = "x" . length($p);
+               return {username=>$n, password=>$p_mask, email=>$e};
+            } 
+        }
+    }
+    close(PROFILE);
+ 
+    # If profile doesn't load, make a new profile
+    &_make_profile($cgi);
+    return undef;
+}
+
+
+	# Create a new profile and store it in the profiles file
+sub _make_profile {
+
+print $cgi->header();
+print "<p>Making Profile</p>";    
+print "<p>Name".$cgi->param("lg_name")."<p>";
+print "<p>Pass".$cgi->param("lg_password")."<p>";
+my $encr_pass = &_encrypt_password($cgi->param("lg_password"));
+print "<p>Encr".$encr_pass."<p>";
+
+    open(PROFILE, '>>', "profiles.txt") or die $!;
+    print PROFILE $cgi->param("lg_name")."\t".$encr_pass."\tstephen@downes.ca\n";
+    close(PROFILE);
+
+
+print qq|<p>Profile made. Now you can <a href="test_sess.cgi">login</a></p>|;
+}
+
+	# Encrypt a password 
+sub _encrypt_password {
+
+    #sudo apt-get install libcrypt-eksblowfish-perl
+    use Crypt::Eksblowfish::Bcrypt qw(bcrypt_hash);
+
+    my $password = shift;
+
+    # Generate a salt if one is not passed
+    my $salt = shift || &_salt(); 
+
+    # Encrypt the password 
+    my $hash = Crypt::Eksblowfish::Bcrypt::bcrypt_hash({ key_nul => 1, cost => 8, salt => $salt, }, $password);
+
+    # Return the salt and the encrypted password
+    return join('-', $salt, Crypt::Eksblowfish::Bcrypt::en_base64($hash));
+}
+
+	# Check if the passwords match
+sub _check_password {
+    my ($plain_password, $hashed_password) = @_;
+    my ($salt) = split('-', $hashed_password, 2);
+    my $test = &_encrypt_password($plain_password, $salt);
+    
+        unless ($test eq $hashed_password) {
+        print "Content-type: text/html\n\n";
+        print "Invalid Login";
+        exit;
+    }
+    return length $salt == 16 && &_encrypt_password($plain_password, $salt) eq $hashed_password;
+}
+
+	# generate a 16 octet more-or-less random salt for blowfish
+sub _salt {
+    my $itoa64 = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    my $salt = '';
+    $salt .= substr($itoa64,int(rand(64)),1) while length($salt) < 16;
+    return $salt;
+}
+
+
+
+	# Login stuff below this line is legacy and will be removed
+
+	#   -------------------------------------------------------------------------------------
+	#
 	#   encryptions and salts
 	#
 	#   -------------------------------------------------------------------------------------

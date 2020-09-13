@@ -9921,7 +9921,8 @@ sub _load_profile {
     my ($lg_name, $lg_psswd) = @_;
  
     local $/ = "\n";
-
+    
+    unless (-e "profiles.txt") { &_make_profile($cgi); return undef; }
     open(PROFILES, '<', "profiles.txt") or die $!;
     while ( <PROFILES> ) {
         /^(\n|#)/ and next;

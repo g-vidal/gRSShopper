@@ -9871,7 +9871,7 @@ sub show_login {
     my $session = shift;
     # Logged In
     if ($session->param("~logged-in")) { 
-        return "Username: ".$session->param("~profile")->{username}.qq| [<a href="//|.//$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|?action=logout">Logout</a>]<p>|;
+        return "Username: ".$session->param("~profile")->{username}.qq| [<a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|?action=logout">Logout</a>]<p>|;
     } 
 
     # Not Logged In

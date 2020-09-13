@@ -54,5 +54,13 @@
 	our ($Site,$dbh) = &get_site("page");	
 
 
-print "Content-type: text/html\n\n";
-print "page.cgi reloaded ok <p>";
+
+my $cgi = new CGI;      
+
+my ($session,$username) = &check_user();
+my $login_window = &show_login($session);
+
+
+print $username || $login_window;
+
+exit;

@@ -9841,7 +9841,7 @@ sub check_user {
     if ($cgi->param("action") eq "logout") {
         $session->delete();
         print $cgi->header();
-        print qq|<p>Logged Out</p><a href="test_sess.cgi">Login</a>|;
+        print qq|<p>Logged Out</p><a href="|.$0.qq|">Login</a>|;
         exit;
     } 
 	#   $session->clear(["~logged-in"]);
@@ -9871,13 +9871,13 @@ sub show_login {
     my $session = shift;
     # Logged In
     if ($session->param("~logged-in")) { 
-        return "Username: ".$session->param("~profile")->{username}.qq| [<a href="test_sess.cgi?action=logout">Logout</a>]<p>|;
+        return "Username: ".$session->param("~profile")->{username}.qq| [<a href="|.$0.qq|?action=logout">Logout</a>]<p>|;
     } 
 
     # Not Logged In
     else {
         return qq|
-        <form method="post" action="test_sess.cgi">
+        <form method="post" action="$0">
         <input type=text name="lg_name">
         <input type=password name="lg_password">
         <input type="submit">

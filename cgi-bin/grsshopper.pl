@@ -217,7 +217,7 @@ sub get_config {
 sub get_person {
 
 	my ($Person,$username,$pstatus) = @_;
-
+print "Getting person: $username <p>";
 
 	if ($Site->{context} eq "cron") { 			# Create cron person, if applicable,
 								# and exit
@@ -261,7 +261,7 @@ sub get_person {
 		}
 	}
 
-	unless (($id) && ($pt)) {		# No Person Info - Return anonymous User
+	unless ($personname) {		# No Person Info - Return anonymous User
 
 		&anonymous(&printlang("No Person Info"));
 		return;

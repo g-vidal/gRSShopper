@@ -9846,9 +9846,11 @@ sub check_user {
 
     print $cgi->header(-cookie=>$cookie,-charset => 'utf-8');
 
+
+#print "Username logged in?: ".$session->param("~logged-in");
+
     return($session,$session->param("username"));
 
-#print "Username: ".$session->param("~logged-in");
 
 }
 

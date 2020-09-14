@@ -9923,11 +9923,12 @@ sub _load_profile {
     my $persondata = &db_get_record($dbh,"person",{person_title=>$lg_name});
     
     unless ($persondata) {		                   # User does not exist
-    	if ($query->param("new")) { &_make_profile(); }    # Make a new one if asked
+    	my $count = &db_count($dbh,"person");
+    	if ($query->param("new") || $count == 0) { &_make_profile(); }    # Make a new one if asked
         print "Content-type: text/html\n\n";               # Or exit
         print "User does not exist";
 	
-	my $count = &db_count($dbh,"person");
+
 	print "There are $count users";
         exit;
     }
@@ -9960,9 +9961,11 @@ sub _load_profile {
 	# Create a new profile and store it in the profiles file
 sub _make_profile {
 
+
 my $cgi = $query;
 print $cgi->header();
-print "<p>Making Profile</p>";    
+print "<p>Making Profile</p>"; 
+exit;
 print "<p>Name".$cgi->param("lg_name")."<p>";
 print "<p>Pass".$cgi->param("lg_password")."<p>";
 my $encr_pass = &_encrypt_password($cgi->param("lg_password"));

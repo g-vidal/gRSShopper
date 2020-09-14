@@ -9938,7 +9938,8 @@ sub init_login {
 	# Check password, Load profile from profiles file on new login
 sub _load_profile {
     my ($cgi, $lg_name, $lg_psswd) = @_;
-    
+print "Content-type" text/html\n\n";    
+print "Trying to l;ogin     $lg_name, $lg_psswd <p>";
     my $persondata = &db_get_record($dbh,"person",{person_title=>$lg_name});
     
     unless ($persondata) {		                   # User does not exist

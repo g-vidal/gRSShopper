@@ -9866,7 +9866,7 @@ sub show_login {
     # Not Logged In
     else {
     
-    &delete_all_rows();
+  #  &delete_all_rows();
     
     	my $count = &db_count($dbh,"person");
 	if ($count == 0) { $count = "Create an Admin Profile"; } 

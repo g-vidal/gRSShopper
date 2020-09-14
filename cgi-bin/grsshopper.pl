@@ -216,7 +216,7 @@ sub get_config {
 	#   Gets login information based on cookie data
 sub get_person {
 
-	my ($dbh,$query,$Person,$pstatus) = @_;
+	my ($Person,$username,$pstatus) = @_;
 
 
 	if ($Site->{context} eq "cron") { 			# Create cron person, if applicable,
@@ -241,18 +241,7 @@ sub get_person {
 
 	}
 
-						# Define Cookie Names
-	my $site_base = &get_cookie_base("a");
-	my $id_cookie_name = $site_base."_person_id";
-	my $title_cookie_name = $site_base."_person_title";
-	my $session_cookie_name = $site_base."_session";
-	my $language_cookie_name = $site_base."_language";
-
-
-
-	my $id = $query->cookie($id_cookie_name);	# Get Person Info from Cookies
-	my $pt = $query->cookie($title_cookie_name);
-	my $sid = $query->cookie($session_cookie_name);
+	# Language, will fix
 	$Site->{lang_user} = $query->cookie($language_cookie_name) || $Site->{lang_user} || "en";
   # print "Cookie data: ID $id Title $pt <br>";
 
@@ -282,7 +271,7 @@ sub get_person {
 						# Get Person Data
 						# Temporary - I should be building a proper Person object here
 
-	my $persondata = &db_get_record($dbh,"person",{person_title=>$pt,person_id=>$id});
+	my $persondata = &db_get_record($dbh,"person",{person_title=>$username});
 	while (my($x,$y) = each %$persondata) {	$Person->{$x} = $y; }
 
 
@@ -9906,6 +9895,9 @@ sub init_login {
 
     # if we came this far, user did submit the login form
     # so let's try to load his/her profile if name/psswds match
+    
+    
+    
     if ( my $profile = _load_profile($cgi, $lg_name, $lg_psswd) ) {     
         $session->param("~profile", $profile);
         $session->param("~logged-in", 1);
@@ -9932,34 +9924,16 @@ sub _load_profile {
     	if ($query->param("action") eq "Create an New Profile" || $count == 0) { &_make_profile(); }    # Make a new one if asked
         print "Content-type: text/html\n\n";               # Or exit
         print "User does not exist";
-	
-
-	print "There are $count users";
         exit;
     }
-	
- 
-    local $/ = "\n";
-    
-    unless (-e "profiles.txt") { &_make_profile($cgi); return undef; }
-    open(PROFILES, '<', "profiles.txt") or die $!;
-    while ( <PROFILES> ) {
-        /^(\n|#)/ and next;
-        chomp;
-        my ($n, $p, $e) = split "\t";       
-        if ( $n eq $lg_name ) {
-            my $encr = &_encrypt_password($lg_psswd);
-            if (&_check_password($lg_psswd,$p)) {
-               my $p_mask = "x" . length($p);
-               return {username=>$n, password=>$p_mask, email=>$e};
-            } 
-        }
+							# User Exists, Check Password
+							
+    if (&_check_password($lg_psswd,$persondata->{person_password)) {
+       my $p_mask = "x" . length($p);
+       return {username=>$n, password=>$p_mask, email=>$e};
     }
-    close(PROFILE);
- 
-    # If profile doesn't load, make a new profile
-    &_make_profile($cgi);
-    return undef;
+
+    exit;   # Failed password, script exits in check_password()
 }
 
 

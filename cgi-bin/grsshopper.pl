@@ -261,7 +261,7 @@ print "Getting person: $username <p>";
 		}
 	}
 
-	unless ($personname) {		# No Person Info - Return anonymous User
+	unless ($username) {		# No Person Info - Return anonymous User
 
 		&anonymous(&printlang("No Person Info"));
 		return;

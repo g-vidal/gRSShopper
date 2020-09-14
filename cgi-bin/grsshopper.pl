@@ -9983,7 +9983,7 @@ sub _make_profile {
 	    
 	# Check in case this is the first user, which must be Admin
 	my $count = &db_count($dbh,"person");
-	if ($count == 0} { $count = "Admin"; } else { $count = "Registered"; }
+	if ($count == 0) { $count = "Admin"; } else { $count = "Registered"; }
 	print "<p>Making $count Profile</p>"; 
 	
 	# Encrypt password

@@ -217,7 +217,7 @@ sub get_config {
 sub get_person {
 
 	my ($Person,$username,$pstatus) = @_;
-print "Getting person: $username <p>";
+
 
 	if ($Site->{context} eq "cron") { 			# Create cron person, if applicable,
 								# and exit
@@ -270,12 +270,11 @@ print "Getting person: $username <p>";
 
 						# Get Person Data
 						# Temporary - I should be building a proper Person object here
-print "Getting person: $username <p>";
+
 	my $persondata = &db_get_record($dbh,"person",{person_title=>$username});
 	while (my($x,$y) = each %$persondata) {	$Person->{$x} = $y; }
 
 
-print "Found ".$Person->{person_id}."-".$Person->{person_title}." <p>";
 	unless ($Person->{person_status} eq "admin") {		# Screen all non-admin from changing person_status
 		$vars->{person_status} = "";
 	}

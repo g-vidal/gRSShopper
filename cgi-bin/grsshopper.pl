@@ -9914,9 +9914,11 @@ sub init_login {
     my $cgi = $query;
     
     if ( $session->param("~logged-in") ) {
-    print "I'm already logged in<p>";
+print "I'm already logged in<p>";
         return 1;  # if logged in, don't bother going further
     }
+print "I'm not logged in<p>";
+print "Got data: ".$cgi->param("lg_name")." and ".$cgi->param("lg_password")."<p>";
  
     my $lg_name = $cgi->param("lg_name") or return;
     my $lg_psswd=$cgi->param("lg_password") or return;
@@ -9931,14 +9933,18 @@ sub init_login {
         $session->param("~profile", $profile);
         $session->param("~logged-in", 1);
         $session->clear(["~login-trials"]);
-        return 1;
-    }
-    
+
     print "Content-type: text/html\n\n";
     print "In init login<p>";
     print "<p>Username logged in?: ".$session->param("~logged-in");
 print "  Username found? ".$session->param("username")."<p>";
 print " Profile ".$session->param("profile")."<p>";
+	
+	
+        return 1;
+    }
+    
+
  
     # if we came this far, the login/psswds do not match
     # the entries in the database

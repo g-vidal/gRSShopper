@@ -270,7 +270,7 @@ sub get_person {
 
 						# Get Person Data
 						# Temporary - I should be building a proper Person object here
-
+print "Getting person: $username <p>";
 	my $persondata = &db_get_record($dbh,"person",{person_title=>$username});
 	while (my($x,$y) = each %$persondata) {	$Person->{$x} = $y; }
 

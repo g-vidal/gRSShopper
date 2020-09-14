@@ -9834,7 +9834,8 @@ sub check_user {
         exit;
     } 
 	#   $session->clear(["~logged-in"]);
-
+	
+print "Calling init_login() <p>";
     &init_login($session,$cgi);
 
     #my $cookie = CGI::Cookie->new(CGISESSID => $session->id);
@@ -9846,7 +9847,7 @@ sub check_user {
 
     print $cgi->header(-cookie=>$cookie,-charset => 'utf-8');
 
-
+print "<p>Finishing Check User</p>";
 print "<p>Username logged in?: ".$session->param("~logged-in");
 print "  Username found? ".$session->param("username")."<p>";
 

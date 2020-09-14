@@ -9866,7 +9866,10 @@ sub show_login {
     # Not Logged In
     else {
     
+    &list_all_rows();
   #  &delete_all_rows();
+  
+  
     
     	my $count = &db_count($dbh,"person");
 	if ($count == 0) { $count = "Create an Admin Profile"; } 
@@ -9883,6 +9886,15 @@ sub show_login {
     }
 }
 
+sub list_all_rows {
+
+			my $tsql = "SELECT * from person";
+			my $tsth = $dbh->prepare($tsql);
+			$tsth->execute();
+			while (my $person= $tsth -> fetchrow_hashref()) {
+print "Title: ".$person->{person_title}." Password ".$person->{person_password}." status: ".$person->{person_status}."<p>";
+			}
+}
 
 sub delete_all_rows {
     # delete all rows in the clinks table

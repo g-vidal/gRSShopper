@@ -9830,11 +9830,12 @@ sub check_user {
     if ($cgi->param("action") eq "logout") {
         $session->delete();
         print $cgi->header();
-        print qq|<p>Logged Out</p><a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|">Login</a>|;
+        print qq|Logged Out. <a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|">Login</a>|;
         exit;
     } 
 	#   $session->clear(["~logged-in"]);
 	
+print "Content-type: text/html\n\n";
 print "Calling init_login() <p>";
     &init_login($session,$cgi);
 

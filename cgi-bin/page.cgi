@@ -45,6 +45,8 @@
 	
 
 	my ($session,$username) = &check_user();
+print "Found username $username <p>";	
+	
 	our $Person = {}; bless $Person;
 	&get_person($Person,$username);
 	my $person_id = $Person->{person_id};

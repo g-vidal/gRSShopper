@@ -9923,7 +9923,7 @@ sub _load_profile {
     	my $count = &db_count($dbh,"person");
     	if ($query->param("action") eq "Create an New Profile" || $count == 0) { &_make_profile(); }    # Make a new one if asked
         print "Content-type: text/html\n\n";               # Or exit
-        print "User does not exist";
+        print "User does not exist. $count users exist";
         exit;
     }
 							# User Exists, Check Password

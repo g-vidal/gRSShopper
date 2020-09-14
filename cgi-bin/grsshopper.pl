@@ -9847,7 +9847,8 @@ sub check_user {
     print $cgi->header(-cookie=>$cookie,-charset => 'utf-8');
 
 
-#print "Username logged in?: ".$session->param("~logged-in");
+print "<p>Username logged in?: ".$session->param("~logged-in");
+print "  Username found? ".$session->param("~profile")->{username}."<p>";
 
     return($session,$session->param("username"));
 
@@ -9907,8 +9908,9 @@ sub delete_all_rows {
 
 	# Initializes session and loads profile if new login
 sub init_login {
-    my ($session, $cgi) = @_; # receive two args
-
+    my ($session) = @_; 
+    my $cgi = $query;
+    
     if ( $session->param("~logged-in") ) {
         return 1;  # if logged in, don't bother going further
     }
@@ -9922,7 +9924,7 @@ sub init_login {
     
     
     
-    if ( my $profile = _load_profile($cgi, $lg_name, $lg_psswd) ) {     
+    if ( my $profile = _load_profile($lg_name, $lg_psswd) ) {     
         $session->param("~profile", $profile);
         $session->param("~logged-in", 1);
         $session->clear(["~login-trials"]);
@@ -9939,7 +9941,8 @@ sub init_login {
 
 	# Check password, Load profile from profiles file on new login
 sub _load_profile {
-    my ($cgi, $lg_name, $lg_psswd) = @_;
+    my ($lg_name, $lg_psswd) = @_;
+    my $cgi = $query;
 print "Content-type: text/html\n\n";    
 print "Trying to login     $lg_name, $lg_psswd <p>";
     my $persondata = &db_get_record($dbh,"person",{person_title=>$lg_name});

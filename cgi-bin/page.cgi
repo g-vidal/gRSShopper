@@ -44,7 +44,7 @@
 	our ($Site,$dbh) = &get_site("page");		
 	
 
-	my ($session,$username) = &check_user($query);
+	my ($session,$username) = &check_user();
 	my $login_window = &show_login($session);
 	
 

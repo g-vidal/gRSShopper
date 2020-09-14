@@ -275,7 +275,7 @@ print "Getting person: $username <p>";
 	while (my($x,$y) = each %$persondata) {	$Person->{$x} = $y; }
 
 
-
+print "Found ".$Person->{person_id}."-".$Person->{person_title}." <p>";
 	unless ($Person->{person_status} eq "admin") {		# Screen all non-admin from changing person_status
 		$vars->{person_status} = "";
 	}

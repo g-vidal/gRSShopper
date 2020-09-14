@@ -45,6 +45,11 @@
 	
 
 	my ($session,$username) = &check_user();
+	our $Person = {}; bless $Person;
+	&get_person($Person,$username);
+	my $person_id = $Person->{person_id};
+	
+	print "Person title is: ".$Person->{person_title}." and status is ".$Person->{person_status}."<p>";
 	my $login_window = &show_login($session);
 	
 

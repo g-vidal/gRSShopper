@@ -9845,7 +9845,8 @@ sub check_user {
 	    -secure=>1);
 
     print $cgi->header(-cookie=>$cookie,-charset => 'utf-8');
-    my $username = $session->param("~profile")->{username};
+    my $profile = $session->param("~profile");
+    my $username = $profile->{username};
     return($session,$username);
 
 

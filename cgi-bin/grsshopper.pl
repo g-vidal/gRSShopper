@@ -9928,7 +9928,7 @@ sub _load_profile {
     }
 							# User Exists, Check Password
 							
-    if (&_check_password($lg_psswd,$persondata->{person_password)) {
+    if (&_check_password($lg_psswd,$persondata->{person_password})) {
        my $p_mask = "x" . length($p);
        return {username=>$n, password=>$p_mask, email=>$e};
     }

@@ -9865,6 +9865,9 @@ sub show_login {
 
     # Not Logged In
     else {
+    
+    &delete_all_rows();
+    
     	my $count = &db_count($dbh,"person");
 	if ($count == 0) { $count = "Create an Admin Profile"; } 
 	elsif ($query->param("new")) { $count = "Create an New Profile"; }
@@ -9880,6 +9883,13 @@ sub show_login {
     }
 }
 
+
+sub delete_all_rows {
+    # delete all rows in the clinks table
+    my $sql = "TRUNCATE TABLE person";
+    my $sth = $dbh->prepare($sql);
+    return $sth->execute(); 
+}
 
 	# Initializes session and loads profile if new login
 sub init_login {
@@ -9968,10 +9978,10 @@ sub _make_profile {
 
 	# Create record in database
 	my $userid = &db_insert($dbh,$query,"person",{
-		person_title =>  ,
-		person_password => ,
+		person_title => $cgi->param("lg_name") ,
+		person_password => $encr_pass,
 		person_status => $count,
-		person_email => 
+		person_email => $cgi->param("email")
 		});
 	
 print "<p>Name".$cgi->param("lg_name")."<p>";

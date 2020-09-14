@@ -9914,6 +9914,7 @@ sub init_login {
     my $cgi = $query;
     
     if ( $session->param("~logged-in") ) {
+    print "I'm already logged in<p>";
         return 1;  # if logged in, don't bother going further
     }
  

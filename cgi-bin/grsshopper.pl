@@ -9912,7 +9912,7 @@ sub delete_all_rows {
 sub init_login {
     my ($session) = @_; 
     my $cgi = $query;
-    
+print "In init login<p>";    
     if ( $session->param("~logged-in") ) {
 print "I'm already logged in<p>";
         return 1;  # if logged in, don't bother going further
@@ -9928,14 +9928,14 @@ print "Got data: ".$cgi->param("lg_name")." and ".$cgi->param("lg_password")."<p
     # so let's try to load his/her profile if name/psswds match
     
     
-    
+print "Calling load_profile() <p>";    
     if ( my $profile = _load_profile($lg_name, $lg_psswd) ) {     
         $session->param("~profile", $profile);
         $session->param("~logged-in", 1);
         $session->clear(["~login-trials"]);
 
     print "Content-type: text/html\n\n";
-    print "In init login<p>";
+    print "Just loaded profile<p>";
     print "<p>Username logged in?: ".$session->param("~logged-in");
 print "  Username found? ".$session->param("username")."<p>";
 print " Profile ".$session->param("profile")."<p>";
@@ -9958,9 +9958,9 @@ sub _load_profile {
     my ($lg_name, $lg_psswd) = @_;
     my $cgi = $query;
 print "Content-type: text/html\n\n";    
-print "Trying to login     $lg_name, $lg_psswd <p>";
+print "In load_profile, trying username $lg_name and password $lg_psswd <p>";
     my $persondata = &db_get_record($dbh,"person",{person_title=>$lg_name});
-print "Success? ".$persondata->{person_title}."<p>";    
+print "Success? Person title is: ".$persondata->{person_title}."<p>";    
     unless ($persondata) {		                   # User does not exist
     	my $count = &db_count($dbh,"person");
     	if ($query->param("action") eq "Create an New Profile" || $count == 0) { &_make_profile(); }    # Make a new one if asked

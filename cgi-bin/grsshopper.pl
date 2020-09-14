@@ -9921,6 +9921,13 @@ sub _load_profile {
     my ($cgi, $lg_name, $lg_psswd) = @_;
     
     my $persondata = &db_get_record($dbh,"person",{person_title=>$lg_name});
+    
+    unless ($persondata) {		                   # User does not exist
+    	if ($query->param("new")) { &_make_profile(); }    # Make a new one if asked
+        print "Content-type: text/html\n\n";               # Or exit
+        print "User does not exist";
+        exit;
+    }
 	
  
     local $/ = "\n";
@@ -9950,7 +9957,7 @@ sub _load_profile {
 	# Create a new profile and store it in the profiles file
 sub _make_profile {
 
-my $cgi = shift;
+my $cgi = $query;
 print $cgi->header();
 print "<p>Making Profile</p>";    
 print "<p>Name".$cgi->param("lg_name")."<p>";
@@ -9963,7 +9970,8 @@ print "<p>Encr".$encr_pass."<p>";
     close(PROFILE);
 
 
-print qq|<p>Profile made. Now you can <a href="test_sess.cgi">login</a></p>|;
+print qq|<p>Profile made. Now you can <a href="//$ENV{'SERVER_NAME'}$ENV{'SCRIPT_NAME'}">login</a></p>|;
+   exit;
 }
 
 	# Encrypt a password 

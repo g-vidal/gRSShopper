@@ -38,6 +38,11 @@
 
 	our ($query,$vars) = &load_modules("page");
 	
+	
+# Load Site
+	
+	our ($Site,$dbh) = &get_site("page");		
+	
 
 	my ($session,$username) = &check_user($query);
 	my $login_window = &show_login($session);
@@ -53,9 +58,7 @@ print $username || $login_window;
 
 
 	
-# Load Site
-	
-	our ($Site,$dbh) = &get_site("page");	
+
 
 
 

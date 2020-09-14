@@ -54,8 +54,8 @@
 	print "Person title is: ".$Person->{person_title}." and status is ".$Person->{person_status}."<p>";
 	my $login_window = &show_login($session);
 	
-
-print $username.qq| [<a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|?action=logout">Logout</a>]<p>| || $login_window;
+	if ($username) { print $username.qq| [<a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|?action=logout">Logout</a>]<p>|; }
+	else { $login_window; }
 
 
 	my $vars = $query->Vars;

@@ -9877,12 +9877,15 @@ sub show_login {
     # Not Logged In
     else {
     	my $count = &db_count($dbh,"person");
-	if ($count == 0) { $count = "Create an Admin User: "; } else { $count = ""; }
-        return qq|$count
+	if ($count == 0) { $count = "Create an Admin Profile"; } 
+	elsif ($query->param("new")) { $count = "Create an New Profile"; }
+	else { $count = "Login"; } 
+	
+        return qq|
         <form method="post" action="//$ENV{'SERVER_NAME'}$ENV{'SCRIPT_NAME'}">
         <input type=text name="lg_name">
         <input type=password name="lg_password">
-        <input type="submit">
+        <input type="submit" name="action" value ="$count">
         </form>
         |;
     }
@@ -9926,7 +9929,7 @@ sub _load_profile {
     
     unless ($persondata) {		                   # User does not exist
     	my $count = &db_count($dbh,"person");
-    	if ($query->param("new") || $count == 0) { &_make_profile(); }    # Make a new one if asked
+    	if ($query->param("action") eq "Create an New Profile" || $count == 0) { &_make_profile(); }    # Make a new one if asked
         print "Content-type: text/html\n\n";               # Or exit
         print "User does not exist";
 	

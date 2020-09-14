@@ -9929,8 +9929,13 @@ sub init_login {
         $session->param("~logged-in", 1);
         $session->clear(["~login-trials"]);
         return 1;
- 
     }
+    
+    print "Content-type: text/html\n\n";
+    print "In init login<p>";
+    print "<p>Username logged in?: ".$session->param("~logged-in");
+print "  Username found? ".$session->param("username")."<p>";
+print " Profile ".$session->param("profile")."<p>";
  
     # if we came this far, the login/psswds do not match
     # the entries in the database

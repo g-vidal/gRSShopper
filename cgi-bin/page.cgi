@@ -45,7 +45,7 @@
 	
 
 	my ($session,$username) = &check_user();
-print "Found username $username <p>";	
+	
 	
 	our $Person = {}; bless $Person;
 	&get_person($Person,$username);
@@ -55,7 +55,7 @@ print "Found username $username <p>";
 	my $login_window = &show_login($session);
 	
 
-print $username || $login_window;
+print $username.qq| [<a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|?action=logout">Logout</a>]<p>| || $login_window;
 
 
 	my $vars = $query->Vars;

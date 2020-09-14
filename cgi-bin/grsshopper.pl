@@ -9876,7 +9876,9 @@ sub show_login {
 
     # Not Logged In
     else {
-        return qq|
+    	my $count = &db_count($dbh,"person");
+	if ($count == 0) { $count = "Create an Admin User: "; } else { $count = ""; }
+        return qq|$count
         <form method="post" action="//$ENV{'SERVER_NAME'}$ENV{'SCRIPT_NAME'}">
         <input type=text name="lg_name">
         <input type=password name="lg_password">
@@ -9962,22 +9964,50 @@ sub _load_profile {
 sub _make_profile {
 
 
-my $cgi = $query;
-print $cgi->header();
-print "<p>Making Profile</p>"; 
-exit;
+	my $cgi = $query;
+	print $cgi->header();
+	
+	# Security Functions
+	# Captcha, Email verification, etc. will go here
+	
+	# Check for username and password
+	unless ($cgi->param("lg_name") && $cgi->param("lg_password")) { 
+		print "New account must have both a user name and a password."; exit;
+	}
+	
+	# Check for unique username
+	my $persondata = &db_get_record($dbh,"person",{person_title=>$cgi->param("lg_name")});
+	if ($persondata) { 
+		print "This user name is already in use."; exit;
+	}
+	    
+	# Check in case this is the first user, which must be Admin
+	my $count = &db_count($dbh,"person");
+	if ($count == 0} { $count = "Admin"; } else { $count = "Registered"; }
+	print "<p>Making $count Profile</p>"; 
+	
+	# Encrypt password
+	my $encr_pass = &_encrypt_password($cgi->param("lg_password"));
+
+	# Create record in database
+	my $userid = &db_insert($dbh,$query,"person",{
+		person_title =>  ,
+		person_password => ,
+		person_status => $count,
+		person_email => 
+		});
+	
 print "<p>Name".$cgi->param("lg_name")."<p>";
 print "<p>Pass".$cgi->param("lg_password")."<p>";
-my $encr_pass = &_encrypt_password($cgi->param("lg_password"));
 print "<p>Encr".$encr_pass."<p>";
 
-    open(PROFILE, '>>', "profiles.txt") or die $!;
-    print PROFILE $cgi->param("lg_name")."\t".$encr_pass."\tstephen@downes.ca\n";
-    close(PROFILE);
+	if ($userid) { print qq|<p>Profile made. Now you can <a href="//$ENV{'SERVER_NAME'}$ENV{'SCRIPT_NAME'}">login</a></p>|; }
+	else { print qq|Failed to create profile; I have no idea why.|; }
+	
+	exit;
 
+exit;
 
-print qq|<p>Profile made. Now you can <a href="//$ENV{'SERVER_NAME'}$ENV{'SCRIPT_NAME'}">login</a></p>|;
-   exit;
 }
 
 	# Encrypt a password 

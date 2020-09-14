@@ -9848,7 +9848,7 @@ sub check_user {
 
 
 print "<p>Username logged in?: ".$session->param("~logged-in");
-print "  Username found? ".$session->param("~profile")->{username}."<p>";
+print "  Username found? ".$session->param("username")."<p>";
 
     return($session,$session->param("username"));
 

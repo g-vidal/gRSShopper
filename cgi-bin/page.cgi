@@ -34,12 +34,11 @@
 	require $dirname . "/grsshopper.pl";
 
 
-# Load CGI
+# Load modules
 
-	use CGI;
-	use CGI::Carp qw(fatalsToBrowser);
+	our ($query,$vars) = &load_modules("page");
+	
 
-	my $query = new CGI;
 	my ($session,$username) = &check_user($query);
 	my $login_window = &show_login($session);
 	
@@ -53,9 +52,6 @@ print $username || $login_window;
 
 
 
-# Load modules
-
-	our ($query,$vars) = &load_modules("page");
 	
 # Load Site
 	

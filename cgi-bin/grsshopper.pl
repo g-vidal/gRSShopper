@@ -9972,7 +9972,7 @@ print "Success? Person title is: ".$persondata->{person_title}."<p>";
 							
     if (&_check_password($lg_psswd,$persondata->{person_password})) {
        my $p_mask = "x" . length($p);
-       return {username=>$n, password=>$p_mask, email=>$e};
+       return {username=>$persondata->{person_title}, password=>$p_mask, email=>$persondata->{person_email}};
     }
 
     exit;   # Failed password, script exits in check_password()

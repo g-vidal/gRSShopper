@@ -51,11 +51,11 @@
 	&get_person($Person,$username);
 	my $person_id = $Person->{person_id};
 	
-	print "Person title is: ".$Person->{person_title}." and status is ".$Person->{person_status}."<p>";
-	my $login_window = &show_login($session);
+	#print "Person title is: ".$Person->{person_title}." and status is ".$Person->{person_status}."<p>";
+	print &show_login($session);
 	
-	if ($username) { print $username.qq| [<a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|?action=logout">Logout</a>]<p>|; }
-	else { $login_window; }
+	#if ($username) { print $username.qq| [<a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|?action=logout">Logout</a>]<p>|; }
+	#else { $login_window; }
 
 
 	my $vars = $query->Vars;

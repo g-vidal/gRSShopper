@@ -9850,7 +9850,10 @@ print "Calling init_login() <p>";
 
 print "<p>Finishing Check User</p>";
 print "<p>Username logged in?: ".$session->param("~logged-in");
-print "  Username found? ".$session->param("username")."<p>";
+my $profile = $session->param("~profile");
+print "Hello $profile->{username}, I know it's you. Confess!";
+
+print "  Username found? ".$session->param("~profile")->{username}."<p>";
 
     return($session,$session->param("username"));
 

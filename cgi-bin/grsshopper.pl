@@ -9926,6 +9926,9 @@ sub _load_profile {
     	if ($query->param("new")) { &_make_profile(); }    # Make a new one if asked
         print "Content-type: text/html\n\n";               # Or exit
         print "User does not exist";
+	
+	my $count = &db_count($dbh,"person");
+	print "There are $count users";
         exit;
     }
 	

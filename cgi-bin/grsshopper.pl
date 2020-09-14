@@ -9939,9 +9939,9 @@ sub init_login {
 sub _load_profile {
     my ($cgi, $lg_name, $lg_psswd) = @_;
 print "Content-type: text/html\n\n";    
-print "Trying to l;ogin     $lg_name, $lg_psswd <p>";
+print "Trying to login     $lg_name, $lg_psswd <p>";
     my $persondata = &db_get_record($dbh,"person",{person_title=>$lg_name});
-    
+print "Success? ".$persondata->{person_title}."<p>";    
     unless ($persondata) {		                   # User does not exist
     	my $count = &db_count($dbh,"person");
     	if ($query->param("action") eq "Create an New Profile" || $count == 0) { &_make_profile(); }    # Make a new one if asked

@@ -274,7 +274,7 @@ print "Admin";
 
 	&admin_general($dbh,$query);
 
-	exit; And we're done
+	exit; # And we're done
 	
 	
 
@@ -298,7 +298,7 @@ print "Admin";
 	sub admin_general {
 
 		my ($dbh,$query) = @_;
-
+print "Admin General";
 	        my $content = &printlang("General Information");
 
 		$content .= &admin_update_grsshopper($dbh,$query);
@@ -326,3 +326,150 @@ print "Admin";
 	}
 	
 	
+
+
+# --------------------------------------   Update gRSShopper -----------------------------------------------
+#
+#    Option to calls a shell script that downloads most recent gRSShopper code from
+#    GitHub and installs it in cgi-bin
+#
+# ------------------------------------------------------------------------------------------------------
+
+
+sub admin_update_grsshopper{
+
+	my ($dbh,$query) = @_;
+
+	return unless (&is_viewable("admin","update")); 		# Permissions
+
+  my $update_string = "";
+
+  my $local_version = &read_text_file('version.txt');
+	my $remote_version = get("https://raw.githubusercontent.com/Downes/gRSShopper/master/version");
+
+  if ($local_version eq  $remote_version) {
+    $update_string = "gRSShopper is up to date at version $local_version."
+	} else {
+		$update_string = qq|<p>Local version is $update_string and master version is $remote_version</p>
+			<button onClick="update_grsshopper('$Site->{st_cgi}'+'api.cgi?cmd=gRSShopper_update')">Update gRSShopper</button>|;
+	}
+
+	return qq|<div class="menubox">
+
+		<h3>Update gRSShopper</h3>
+		<script src="$Site->{st_url}/assets/js/jquery.js"></script>
+		<script>
+		function update_grsshopper(url) {
+
+
+			\$('#gRSShopper_update').load(url, function(response, status, xhr) {
+	        if (status == "error") {
+	            var msg = "Sorry but there was an error: ";
+	            alert(msg + xhr.status + " " + xhr.statusText);
+	        }
+	     });
+
+		}
+
+		</script>
+		<p><ul>
+		<div id="gRSShopper_update">$update_string</div>
+		</ul></p>
+
+	</div>|;
+
+}
+
+
+
+	# -----------------------------------   Admin: Config Table   -----------------------------------------------
+
+	sub admin_configtable {
+
+		my ($dbh,$query,$title,@vals) = @_;
+
+		my $content = qq|
+
+			<h3>$title</h3>
+			<div class="adminpanel">
+			<ul><form method="post" action="$Site->{st_cgi}admin.cgi">
+			<input type="hidden" name="action" value="config">
+			<input type="hidden" name="title" value="$title">
+			<table cellspacing="0" cellpadding="2" border="0">
+		|;
+		foreach my $v (@vals) {
+			my ($t,$v,$f,$o,$h) = split ":",$v;    # Title, variable name, format   #"
+			if ($f eq "yesno") {
+				my $yesselected=""; my $noselected="";
+				if ($Site->{$v} eq "yes") { $yesselected = qq| selected="selected"|; }
+				else { $noselected = qq| selected="selected"|; }
+				$content .= qq|<tr><td align="right">$t : </td><td>
+				<select name="$v">
+				<option value="yes" $yesselected >Yes</option>
+				<option value="no" $noselected >No</option>
+				</select>
+				</td></tr>\n|;
+			} elsif($f eq "dir") {
+				my $vfval; $vfval = $Site->{$v} || $o;
+				$content .= qq|<tr><td align="right">$t : </td><td>
+				$Site->{st_urlf}<input type="text" size="60" name="$v" value="$vfval"></td></tr>\n|;
+			} elsif($f eq "url") {
+				my $vuval; $vuval = $Site->{$v} || $o;
+				$content .= qq|<tr><td align="right">$t : </td><td>
+				$Site->{st_url}<input type="text" size="60" name="$v" value="$vuval"></td></tr>\n|;
+			} else {
+				my $vval; $vval = $Site->{$v} || $f;
+				$content .= qq|<tr><td align="right">$t : </td><td>
+				<input type="text" size="60" name="$v" value="$vval"></td></tr>\n|;
+			}
+		}
+
+
+		$content .= qq|<tr><td colspan="2"><input type="submit" class="button" value="Submit $title"></tr></td>|;
+		$content .= "</table>\n</form></ul>
+			</div>\n";
+	}
+
+
+
+	sub admin_api {
+
+		my ($dbh,$query) = @_;
+
+
+
+		my $content = qq|<h2>Access API</h2><p>
+		 <ul><table cellspacing="0" cellpadding="2" border="0"><tr><td>
+	   <form method="post" action="$Site->{st_cgi}admin.cgi">
+		 <input type="hidden" name="action" value="access_api">
+		 Method: <select name="method"><option value="get"> GET </option> <option value="post" selected> POST </option></select><br>
+		 URL: <input type="text" name="url" size="40" value="http://www.mooc.ca/cgi-bin/api.cgi">
+		 JSON: <textarea rows=10 cols="40" name="postdata">
+	{
+	 "action": "search",
+	 "table": "course",
+	 "query": "agriculture",
+	 "language": "en",
+	 "sort": "course_title"
+	}
+		 </textarea>
+		 <input type="submit">
+		 </form>
+	   </table></ul>
+
+		|;
+
+	   return $content;
+
+		exit;
+
+
+
+	}
+
+
+
+
+
+
+

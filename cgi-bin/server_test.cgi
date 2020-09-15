@@ -148,17 +148,9 @@ use DBI;
 # Test sessions
 print "<p>Testing user authentication</p>";
 print "<p>Note that this may create a new Admin user is one is needed; please be sure to take note of the admin user name and password for later logins.</p>";
-# Code from login_widget.cgi
 
-	use File::Basename;
-	my $dirname = dirname(__FILE__);
-	require $dirname . "/grsshopper.pl";
-	our ($query,$vars) = &load_modules("page");
-	our ($Site,$dbh) = &get_site("page");		
-	my ($session,$username) = &check_user();
-	our $Person = {}; bless $Person;
-	&get_person($Person,$username);
-	my $person_id = $Person->{person_id};
-	print &show_login($session);
+print qq|<iframe cols=80 rows=3 border=0 src="login_widget.cgi"></iframe>
+
+
 
 exit;

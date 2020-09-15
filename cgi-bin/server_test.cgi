@@ -147,6 +147,17 @@ use DBI;
 # -------------
 # Test sessions
 print "<p>Testing user authentication</p>";
+# Code from login_widget.cgi
 
+	use File::Basename;
+	my $dirname = dirname(__FILE__);
+	require $dirname . "/grsshopper.pl";
+	our ($query,$vars) = &load_modules("page");
+	our ($Site,$dbh) = &get_site("page");		
+	my ($session,$username) = &check_user();
+	our $Person = {}; bless $Person;
+	&get_person($Person,$username);
+	my $person_id = $Person->{person_id};
+	print &show_login($session);
 
 exit;

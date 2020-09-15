@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+use CGI::Carp qw(fatalsToBrowser);
 
 #    gRSShopper 0.7  Admin  0.62  -- gRSShopper administration module
 #    05 June 2017 - Stephen Downes

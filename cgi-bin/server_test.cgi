@@ -147,6 +147,7 @@ use DBI;
 # -------------
 # Test sessions
 print "<p>Testing user authentication</p>";
+print "<p>Note that this may create a new Admin user is one is needed; please be sure to take note of the admin user name and password for later logins.</p>";
 # Code from login_widget.cgi
 
 	use File::Basename;

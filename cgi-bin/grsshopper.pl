@@ -9870,20 +9870,26 @@ sub show_login {
   
   
     
-    	my $count = &db_count($dbh,"person");
+    	my $count = &db_count($dbh,"person"); my $extra;
 	if ($count == 0) { $count = "Create an Admin Profile"; } 
-	elsif ($query->param("new")) { $count = "Create an New Profile"; }
+	elsif ($query->param("new")) { 
+		$count = "Create an New Profile"; 
+		$extra = qq|<input type=text name="lg_email">|;
+	}
 	else { $count = "Login"; } 
 	
         return qq|
         <form method="post" action="//$ENV{'SERVER_NAME'}$ENV{'SCRIPT_NAME'}">
         <input type=text name="lg_name">
+	$extra
         <input type=password name="lg_password">
         <input type="submit" name="action" value ="$count">
         </form>
         |;
     }
 }
+
+
 
 sub list_all_rows {
 

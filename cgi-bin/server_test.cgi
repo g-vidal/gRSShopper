@@ -149,7 +149,7 @@ use DBI;
 print "<p>Testing user authentication</p>";
 print "<p>Note that this may create a new Admin user is one is needed; please be sure to take note of the admin user name and password for later logins.</p>";
 
-print qq|<iframe cols=80 rows=3 border=0 src="login_widget.cgi"></iframe>|;
+print qq|<iframe cols=120 rows=1 border=0 src="login_widget.cgi"></iframe>|;
 
 
 

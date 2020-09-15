@@ -89,3 +89,46 @@ print "Admin";
 
 	# Restrict to Admin
 
+# Analyze Request --------------------------------------------------------------------
+
+	# Determine Action ( assumes admin.cgi?action=$action&id=$id )
+
+		my $action = $vars->{action};
+		my $id = $vars->{id};
+
+
+
+	# Determine Request Table, ID number ( assumes admin.cgi?$table=$id and not performing action other than list, edit or delete)
+
+		my @tables = &db_tables($dbh);
+		foreach $t (@tables) {
+
+			if ((!$action || $action =~ /^edit$/i || $action =~ /^list$/i || $action =~ /^Delete$/i || $action =~ /^extract_nouns$/i ) && $vars->{$t}) {
+				$table = $t;
+				$id = $vars->{$t};
+				$vars->{id} = $id;
+				last;
+			}
+		}
+
+
+	# Direct Request Table, ID number, and list requests ( required for most actions, assumes admin.cgi?db=$table&id=$id or admin.cgi?table=$table&id=$id , no $id for action=list )
+
+	if ($vars->{db} || $vars->{table}) {
+		$table = $vars->{table} || $vars->{db};
+		if ($vars->{id}) {
+			$id = $vars->{id};
+		} else {
+			unless ($action) {
+				$action = "list";
+			}
+		}
+	}
+
+	# Determine Output Format  ( assumes admin.cgi?format=$format )
+
+	if ($vars->{format}) { 	$format = $vars->{format};  }
+	if ($action eq "list") { $format = "list"; }
+	$format ||= "html";		# Default to HTML
+
+

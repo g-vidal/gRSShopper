@@ -9827,6 +9827,7 @@ sub check_user {
     my $session = new CGI::Session(undef, $cgi, {Directory=>'/tmp'});
 
     if ($cgi->param("action") eq "logout") {
+        $query->param("action") = "";
         $session->delete();
         print $cgi->header();
         print qq|Logged Out. <a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|">Login</a>|;
@@ -9873,6 +9874,7 @@ sub show_login {
     	my $count = &db_count($dbh,"person"); my $extra;
 	if ($count == 0) { $count = "Create an Admin Profile"; } 
 	elsif ($query->param("new")) { 
+		$query->param("new") = "";	# Clear param
 		$count = "Create an New Profile"; 
 		$extra = qq|<input type=text placeholder="Email" name="lg_email">|;
 	}
@@ -9890,23 +9892,6 @@ sub show_login {
 }
 
 
-
-sub list_all_rows {
-
-			my $tsql = "SELECT * from person";
-			my $tsth = $dbh->prepare($tsql);
-			$tsth->execute();
-			while (my $person= $tsth -> fetchrow_hashref()) {
-print "Title: ".$person->{person_title}." Password ".$person->{person_password}." status: ".$person->{person_status}."<p>";
-			}
-}
-
-sub delete_all_rows {
-    # delete all rows in the clinks table
-    my $sql = "TRUNCATE TABLE person";
-    my $sth = $dbh->prepare($sql);
-    return $sth->execute(); 
-}
 
 	# Initializes session and loads profile if new login
 sub init_login {
@@ -9937,6 +9922,7 @@ sub init_login {
  
     # if we came this far, the login/psswds do not match
     # the entries in the database
+    $query->param("action") = ""; # Take no action
     my $trials = $session->param("~login-trials") || 0;
     return $session->param("~login-trials", ++$trials);
 }
@@ -9973,6 +9959,7 @@ sub _make_profile {
 
 	my $cgi = $query;
 	print $cgi->header();
+	$query->param("action") = "";  # Clear action param
 	
 	# Security Functions
 	# Captcha, Email verification, etc. will go here

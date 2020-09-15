@@ -67,9 +67,9 @@ print " <span style='color:green;'> OK</span>$newline";
 $|++;
 my $missing = 0;
 my @lissing_list;
-my @modules = qw(CGI CGI::Carp CGI::Session File::Basename File::stat File::Find DBI LWP LWP::UserAgent
-LWP::Simple MIME::Types MIME::Lite::TT::HTML HTML::Entities Scalar::Util Text::ParseWords Lingua::EN::Inflect
-Net::Twitter::Lite::WithAPIv1_1 Image::Resize DateTime DateTime::TimeZone Time::Local Digest::SHA1
+my @modules = qw(CGI CGI::Carp CGI::Session File::Basename File::stat File::Find Fcntl DBI LWP LWP::UserAgent
+LWP::Simple HTTP::Request::Common MIME::Types MIME::Lite::TT::HTML HTML::Entities Scalar::Util Text::ParseWords Lingua::EN::Inflect
+Net::Twitter::Lite::WithAPIv1_1 Image::Resize DateTime DateTime::TimeZone Time::Local Digest::SHA Crypt::Eksblowfish::Bcrypt
 XML::OPML REST::Client JSON JSON::Parse JSON::XS URI::Escape Email::Stuffer Email::Sender::Transport::SMTP
 Mastodon::Client);
 

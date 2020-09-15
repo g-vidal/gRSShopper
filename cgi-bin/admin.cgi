@@ -267,10 +267,13 @@ print "Admin";
 
 		&output_record($dbh,$query,$table,$id,$format);
 
-	} else {
-
+	} 
+	
+	# Previous processes should all terminate internally; this is the default
 	# Show Admin Menu
 
-		&admin_general($dbh,$query);
-	}
+	&admin_general($dbh,$query);
 
+	exit; And we're done
+	
+	

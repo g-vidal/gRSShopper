@@ -26,7 +26,7 @@
 
 # Diagnostics
 
-	our $diag = 0;
+	our $diag = 1;
 	if ($diag>0) { print "Content-type: text/html\n\n"; }
 
 

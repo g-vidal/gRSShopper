@@ -369,7 +369,7 @@ sub admin_only {
   # if ($Person->{person_title} eq "Downes") { $Person->{person_status} = "admin" }
   #
 
-	unless ($Person->{person_status} eq "admin") {	 &login_needed(); 	}
+	unless ($Person->{person_status} eq "Admin") {	 &login_needed(); 	}
 }
 
 	# -------   Registered Only ---------------------------------------------------------

@@ -369,7 +369,7 @@ sub admin_only {
   # if ($Person->{person_title} eq "Downes") { $Person->{person_status} = "admin" }
   #
 
-	unless ($Person->{person_status} eq "Admin") {	 &login_needed(); 	}
+	unless ($Person->{person_status} eq "Admin") {	 &login_needed("Admin"); 	}
 }
 
 	# -------   Registered Only ---------------------------------------------------------
@@ -377,10 +377,7 @@ sub admin_only {
 sub registered_only {
 
 	unless (($Person->{person_status} eq "registered")
-			 || ($Person->{person_status} eq "admin")) {
-		my $msg = qq|@{[&printlang("Must be registered")]}<br/>
-		   <h3><a href="login.cgi?refer=$Site->{script}">@{[&printlang("Login")]}</a></h3>|;
-		&error($dbh,$query,"",$msg);
+			 || ($Person->{person_status} eq "admin")) {&login_needed(""); 
 	}
 }
 
@@ -10150,55 +10147,11 @@ sub error_inline {
 #
 sub login_needed {
 
-  my $url = $Site->{st_cgi}."login.cgi?action=login_text";
-	my $script = $Site->{script};
+	my ($status) = @_;
+
 	print "Content-type: text/html\n";
-	print "Location: $url&refer=$script\n\n";
-	exit;
-  print qq|
-	<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#loginModal">Login</button>
-	|;
-   qq|
-
-	<form id="login_form_input" action="$Site->{st_cgi}api.cgi" method="post">
-	<input name="cmd" type="hidden" value="login">
-  <input name="person_title" type="text" placeholder="Userid or email"><br>
-	<input name="person_password" type="password" placeholder="Password">
-  <input type="Submit" value="Login">
-	</form>
-  <script type="text/javascript">
-    var frm = \$('#login_form_input');
-    frm.submit(function (e) {
-        e.preventDefault();
-        \$.ajax({
-            type: frm.attr('method'),
-            url: frm.attr('action'),
-            data: frm.serialize(),
-            success: function (data) {
-  							var jjobj = \$.parseJSON(data);
-								expirationDays = 7;
-                var initCookie = 1,cookieName = "myCookie";
-								Cookies.set(jjobj.site_base+'_person_id', jjobj.person_id, { expires: expirationDays });
-								Cookies.set(jjobj.site_base+'_person_title', jjobj.person_title, { expires: expirationDays });
-								Cookies.set(jjobj.site_base+'_session', jjobj.session, { expires: expirationDays });
-								Cookies.set(jjobj.site_base+'_admin', jjobj.admin, { expires: expirationDays });
-
-
-		\$("#form_commit_button_text").show();
-		\$("#form_commit_button_done").hide();
-		\$("#login_form_input").show();
-		\$("#login_form_input").html(data);
-		\$('#login_form_input_okindicator').hide(4000);
-            },
-            error: function (data) {
-                alert('An error occurred.');
-                alert(data);
-            },
-        });
-    });
-
- </script>\n\n|;
-
+	if ($status eq "Admin") {print "You must be an admin to perform this function.";  } else {
+	print "A login is needed to perform this function."; }
 	if ($dbh) { $dbh->disconnect; }
 	exit;
 }

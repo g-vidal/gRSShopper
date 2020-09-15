@@ -2725,7 +2725,7 @@ sub admin_update_grsshopper{
 	  }
 
 			#print "Received reply: $message\n";
-			use JSON::Parse 'parse_json';
+		#	use JSON ::Parse 'parse_json';
 			my $response_data = parse_json($message);
 			#print $response_data->{entries};
 			foreach my $entry (@{$response_data->{entries}}) {

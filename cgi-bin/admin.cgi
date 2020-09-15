@@ -261,3 +261,16 @@ print "Admin";
 
 		}
 
+	# Output Record, or
+
+	} elsif ($table) {					# Default Data Output
+
+		&output_record($dbh,$query,$table,$id,$format);
+
+	} else {
+
+	# Show Admin Menu
+
+		&admin_general($dbh,$query);
+	}
+

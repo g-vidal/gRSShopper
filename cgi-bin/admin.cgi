@@ -131,4 +131,133 @@ print "Admin";
 	if ($action eq "list") { $format = "list"; }
 	$format ||= "html";		# Default to HTML
 
+# Actions ------------------------------------------------------------------------------
+
+	# Perform Action, or
+
+
+
+
+
+	if ($action) {
+
+		for ($action) {
+															# Main admin menu nav
+
+			/start/ && do { &admin_start($dbh,$query); last;			};	# 	- Start Menu
+			/general/ && do { &admin_general($dbh,$query); last;			};	# 	- General Menu
+			/harvester/ && do { &admin_harvester($dbh,$query); last;		};	# 	- Harvester Menu
+			/users/ && do { &admin_users($dbh,$query); last;			};	# 	- Users Menu
+			/newsletters/ && do { &admin_newsletters($dbh,$query); last;	};		#	- Newsletters Menu
+			/database/ && do { &admin_database($dbh,$query); last;		};		#	- Database Menu
+			/meetings/ && do { &admin_meetings($dbh,$query); last;		};		#	- Meetings Menu
+			/logs/ && do { &admin_logs($dbh,$query); last;		};			#	- Logs Menu
+			/accounts/ && do { &admin_accounts($dbh,$query); last;		};		#	- Accounts Menu
+			/permissions/ && do { &admin_permissions($dbh,$query); last;		};	#	- Permissions Menu
+
+
+
+
+															# Editing Functions
+
+			/list/ && do { &admin_list_records($dbh,$query,$table); last;		};		#	- List records
+			/edit/i && do { &edit_record($dbh,$query,$table,$id); last; 	};		#	- Edit Record - Show the Editing form
+			/update/ && do { &update_record($dbh,$query,$table,$id);
+				&edit_record($dbh,$query,$table, $id_number);last; };		# 	- Edit Record - Update with input data
+			/Delete/i && do	{ &record_delete($dbh,$query,$table,$id);last; };		#	- Delete Record
+			/Spam/i && do { &record_delete($dbh,$query,$table,$id);  last; };		#	- Delete Record and log creator IP to Spam
+			/multi/i && do { &admin_multi($dbh,$query); last;		};		#	- Multi-Delete Record (FIXME needs work)
+
+
+
+															# Feed Functions
+
+			/approve/i && do { &record_approve($dbh,$query,$table,$id); last; };		#	- Approve Feed
+			/retire|reject/i && do { &record_retire($dbh,$query,$table,$id); last; };	#	- Reject / Retire Feed
+
+
+															# Site Configuration
+
+			/config/ && do { &admin_update_config($dbh,$query); last;	};		#	- Update config data
+			/export_table/ && do { &admin_db_export($dbh,$query); last;	};		#	- export a table
+			/db_pack/ && do {&admin_db_pack($dbh,$query); last;		};		#	- Make a new pack
+			/db_add_column/ && do { my $msg = &db_add_column($vars->{stable},$vars->{col});
+				&showcolumns($dbh,$query,$msg); last; };				#	- Add new column to a table
+			/removecolumnwarn/ && do { &removecolumnwarn($dbh,$query); last; };		#	- Remove column - warn user
+			/removecolumndo/ && do { &removecolumndo($dbh,$query); last; };			#	- Remove column - remove it
+
+
+
+															# Newsletter and Page Functions
+
+			/publish/ && do {
+					if ($table eq "badge"){ &publish_badge($dbh,$query,$id,"verbose"); last;}
+					else { &publish_page($dbh,$query,$vars->{page},"verbose"); last; } };
+	    /verify_email/ && do { &admin_verify_emails(); last; };
+			/rollup/ && do { &news_rollup($dbh,$query); last;			};	#	- Show posts allocated to future newsletters
+			/autosub/ && do { &autosubscribe_all($dbh,$query); last;   };			#	- Auto-subscribe all users to newsletter
+			/autounsub/ && do { &autounsubscribe_all($dbh,$query); last; };			#	- Auto-unsubscribe all users from newsletter
+			/send_nl/ && do { &send_nl($dbh,$query); last;	};				#	- Send newsletter to email subscribers
+
+
+															# Cron Tasks (FIXME make a separate file? )
+
+			/rotate/ && do { &rotate_hit_counters($dbh,$query,"post"); last;};		#	- Reset daily hits counter to '0'
+
+			/remove_key/ && do { &remove_key($dbh,$query,$table,$id);
+				&edit_record($dbh,$query,$table,$id); last;};
+
+													#		# Database Functions
+
+			/backup_db/ && do { &admin_db_backup($vars->{backup_table},"verbose"); last; };	#	- Back up database
+			/showcolumns/ && do { &showcolumns($dbh,$query); last; };			#	- Show the columns in a table
+			/add_table/ && do { admin_db_add_table($vars->{add_table}); last; };		#	- Add table
+			/drop_table/ && do { admin_db_drop_table($vars->{drop_table}); last; };		#	- Drop table
+
+			/fixmesubs/ && do { &fixmesubs($dbh,$query,$table); last;		};
+
+	                       # API Functions
+
+	    /access_api/ && do { &access_api($dbh,$query); last; };
+
+			/export_users/ && do { &export_user_list($dbh,$query); last;			};
+			/import/ && do { &import($dbh,$query,$table); last;		};
+			/remove_all/ && do { &delete_all_users($dbh,$query); last; };
+
+
+			/youtubepost/ && do { &parse_youtube($dbh,$query); last; };
+			/autopost/ && do { &autopost($dbh,$query); last; };
+			/postedit/ && do { &postedit($dbh,$query); last; };
+
+			/eduser/ && do { &admin_users_edit($dbh,$query); last;			};
+			/subs/ && do { &edit_subs($dbh,$query); last;			};
+
+												 # Analyze
+			/analyze_text/ && do {
+				&analyze_text($dbh,$query,$table,$id); last; };
+			/extract_nouns/ && do {
+				&extract_nouns($dbh,$query,$table,$id); last; };
+			/show_graph/ && do {
+				&show_graph($dbh,$query,$table,$id); last; };
+
+			/make_icon/ && do { &auto_make_icon($table,$id);
+					&edit_record($dbh,$query,$table,$id); last;};
+			/logview/ && do { &log_view($dbh,$query); last; };
+			/logreset/ && do { &log_reset($dbh,$query); last; };
+			/reindex_topics/ && do { &reindex_topics($dbh,$query,$id); last; };
+			/refield/ && do { &refield($dbh,$query); last; };
+			/recache/ && do { &recache($dbh,$query); last; };
+			/reindex/ && do { &reindex_matches($dbh,$query,$table,$id); };
+
+			/count/ && do { &count_feed($dbh,$query); last; };
+
+			/cache_clear/ && do { print "Content-type: text/html\n\n"; &cache_clear($dbh,$query); last; };
+			#/stats/ && do { &calculate_stats($dbh,$query); last;  };
+			/graph/ && do { &make_graph($dbh,$query); last;  };
+			/sendmsg/ && do { &admin_users_send_message($dbh,$query); last; };
+			/moderate_meeting/ && do { &moderate_meeting($dbh,$query); last;			};	# 	- General
+			/test_rest/ && do { api_send_rest($dbh,$query); last; };
+			/cstats/ && do { &calculate_cstats($dbh,$query); last; };
+
+		}
 

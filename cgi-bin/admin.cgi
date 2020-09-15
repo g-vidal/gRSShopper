@@ -70,4 +70,22 @@
 	my $vars = $query->Vars;
 	my $page_dir = "../";
 	
+	# Admin Only
+	die "Admin Only" unless (&admin_only());
+	
 print "Admin";
+
+	# Initialize system variables
+
+		my $options = {}; bless $options;
+		our $cache = {}; bless $cache;
+
+
+	# Option to call initialize functions
+
+		if ($vars->{action} eq "initialize") {  $Site->__initialize("command"); }
+	#    print "Content-type: text/html\n\n";
+	#    while (my($fx,$fy) = each %$vars) { print "$fx = $fy<br>";}   #{%}
+
+	# Restrict to Admin
+

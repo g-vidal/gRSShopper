@@ -9874,15 +9874,15 @@ sub show_login {
 	if ($count == 0) { $count = "Create an Admin Profile"; } 
 	elsif ($query->param("new")) { 
 		$count = "Create an New Profile"; 
-		$extra = qq|<input type=text name="lg_email">|;
+		$extra = qq|<input type=text placeholder="Email" name="lg_email">|;
 	}
 	else { $count = "Login"; } 
 	
         return qq|
         <form method="post" action="//$ENV{'SERVER_NAME'}$ENV{'SCRIPT_NAME'}">
-        <input type=text name="lg_name">
+        <input type=text placeholder="Username" name="lg_name">
 	$extra
-        <input type=password name="lg_password">
+        <input type=password placeholder="Password" name="lg_password">
         <input type="submit" name="action" value ="$count">
         </form>
         |;

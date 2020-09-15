@@ -142,7 +142,7 @@ print "Admin";
 	if ($action) {
 
 		for ($action) {
-															# Main admin menu nav
+			print "Action: $action <p>";												# Main admin menu nav
 
 			/start/ && do { &admin_start($dbh,$query); last;			};	# 	- Start Menu
 			/general/ && do { &admin_general($dbh,$query); last;			};	# 	- General Menu

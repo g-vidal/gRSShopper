@@ -10150,8 +10150,8 @@ sub login_needed {
 	my ($status) = @_;
 
 	print "Content-type: text/html\n";
-	if ($status eq "Admin") {print "You must be an admin to perform this function.";  } else {
-	print "A login is needed to perform this function."; }
+	if ($status eq "Admin") {print "You must be an admin to continue.";  } else {
+	print "A login is needed to continue."; }
 	if ($dbh) { $dbh->disconnect; }
 	exit;
 }

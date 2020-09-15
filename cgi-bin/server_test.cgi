@@ -108,7 +108,7 @@ if ($missing eq "1") {
 # -------------
 # Test database access (from default config in Dockerfile)
 
-print "<p>Testing database access (from default config in Dockerfile)</p>";
+print "<p><b>Testing database access (from default config in Dockerfile)</b></p>";
 use DBI;
 
     	# Make variables easy to read :)
@@ -146,10 +146,10 @@ use DBI;
 
 # -------------
 # Test sessions
-print "<p>Testing user authentication</p>";
+print "<p><b>Testing user authentication</b></p>";
 print "<p>Note that this may create a new Admin user is one is needed; please be sure to take note of the admin user name and password for later logins.</p>";
 
-print qq|<iframe cols=120 rows=1 border=0 src="login_widget.cgi"></iframe>|;
+print qq|<iframe src="login_widget.cgi" height="40" width="500" title="Iframe Example"></iframe>
 
 
 

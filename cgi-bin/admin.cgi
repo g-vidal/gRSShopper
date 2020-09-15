@@ -23,51 +23,52 @@
 #
 #-------------------------------------------------------------------------------
 # print "Content-type: text/html\n\n";
-	use CGI::Carp qw(fatalsToBrowser);
+
+# Diagnostics
+
+	our $diag = 0;
+	if ($diag>0) { print "Content-type: text/html\n\n"; }
 
 
-	# Diagnostics
+# Forbid bots
 
-		our $diag = 0;
-		if ($diag>0) { print "Content-type: text/html\n\n"; }
+	die "HTTP/1.1 403 Forbidden\n\n403 Forbidden\n" if ($ENV{'HTTP_USER_AGENT'} =~ /bot|slurp|spider/);
 
+# Load gRSShopper
 
-	# Forbid bots
-
-		die "HTTP/1.1 403 Forbidden\n\n403 Forbidden\n" if ($ENV{'HTTP_USER_AGENT'} =~ /bot|slurp|spider/);
-
-
-	# Load gRSShopper
-
-		use File::Basename;
-		use CGI::Carp qw(fatalsToBrowser);
-	      use local::lib; # sets up a local lib at ~/perl5
-		my $dirname = dirname(__FILE__);
-		require $dirname . "/grsshopper.pl";
+	use File::Basename;
+      #use local::lib; # sets up a local lib at ~/perl5
+	my $dirname = dirname(__FILE__);
+	require $dirname . "/grsshopper.pl";
 
 
+# Load modules
+
+	our ($query,$vars) = &load_modules("page");
+	
+	
+# Load Site
+	
+	our ($Site,$dbh) = &get_site("page");		
+	
+
+	my ($session,$username) = &check_user();
+	
+	
+	our $Person = {}; bless $Person;
+	&get_person($Person,$username);
+	my $person_id = $Person->{person_id};
+	
+	#print "Person title is: ".$Person->{person_title}." and status is ".$Person->{person_status}."<p>";
+	print &show_login($session);
+	
+	#if ($username) { print $username.qq| [<a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|?action=logout">Logout</a>]<p>|; }
+	#else { $login_window; }
 
 
-	# Load modules
-
-		our ($query,$vars) = &load_modules("admin");
-
-
-
-
-	# Load Site
-
-		our ($Site,$dbh) = &get_site("admin");
-		if ($vars->{context} eq "cron") { $Site->{context} = "cron"; }
-
-
-
-	# Get Person  (still need to make this an object)
-
-		our $Person = {}; bless $Person;
-		&get_person($dbh,$query,$Person);
-		my $person_id = $Person->{person_id};
-
+	my $vars = $query->Vars;
+	my $page_dir = "../";
+	
 
 	# Initialize system variables
 

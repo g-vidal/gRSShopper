@@ -9827,7 +9827,6 @@ sub check_user {
     my $session = new CGI::Session(undef, $cgi, {Directory=>'/tmp'});
 
     if ($cgi->param("action") eq "logout") {
-        $query->param("action") = "";
         $session->delete();
         print $cgi->header();
         print qq|Logged Out. <a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|">Login</a>|;
@@ -9922,7 +9921,6 @@ sub init_login {
  
     # if we came this far, the login/psswds do not match
     # the entries in the database
-    $query->param("action") = ""; # Take no action
     my $trials = $session->param("~login-trials") || 0;
     return $session->param("~login-trials", ++$trials);
 }

@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 
 #    gRSShopper 0.7  Admin  0.62  -- gRSShopper administration module
 #    05 June 2017 - Stephen Downes

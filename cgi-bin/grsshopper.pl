@@ -9906,8 +9906,8 @@ print "Currently logged in <p>";
     }
 print "Not logged in <p>"; 
 exit;
-    my $lg_name = $cgi->param("lg_name") or return;
-    my $lg_psswd=$cgi->param("lg_password") or return;
+   # my $lg_name = $cgi->param("lg_name") or return;
+  #  my $lg_psswd=$cgi->param("lg_password") or return;
 
 
     # if we came this far, user did submit the login form

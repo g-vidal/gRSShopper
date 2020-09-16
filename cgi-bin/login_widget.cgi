@@ -27,7 +27,7 @@
 #
 #-------------------------------------------------------------------------------
 
-#print "Content-type: text/html\n\n";
+print "Content-type: text/html\n\n";
 
 	use File::Basename;
 	my $dirname = dirname(__FILE__);

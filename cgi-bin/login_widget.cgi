@@ -27,14 +27,14 @@
 #
 #-------------------------------------------------------------------------------
 
-print "Content-type: text/html\n\n";
+#print "Content-type: text/html\n\n";
 
 	use File::Basename;
 	my $dirname = dirname(__FILE__);
 	require $dirname . "/grsshopper.pl";
 	our ($query,$vars) = &load_modules("page");
 	our ($Site,$dbh) = &get_site("page");	
-print "Checking user <p>";	
+#print "Checking user <p>";	
 	my ($session,$username) = &check_user();
 	our $Person = {}; bless $Person;
 	&get_person($Person,$username);

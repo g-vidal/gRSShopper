@@ -358,8 +358,12 @@ sub anonymous {
 
 }
 
-#     PERMISSION SYSTEM
 #-------------------------------------------------------------------------------
+#
+#     PERMISSION SYSTEM
+#
+#-------------------------------------------------------------------------------
+
 	# -------   Admin Only ---------------------------------------------------------
 	#
 	# Restrict to admin only
@@ -368,6 +372,9 @@ sub admin_only {
 
   # if ($Person->{person_title} eq "Downes") { $Person->{person_status} = "admin" }
   #
+print "Checking admin status.<br>";
+print "Person name: ".$Person->{person_name}."<br>";
+print "Person status: ".$Person->{person_status}."<br>";
 
 	unless ($Person->{person_status} eq "Admin") {	 &login_needed("Admin"); 	}
 }
@@ -377,7 +384,7 @@ sub admin_only {
 sub registered_only {
 
 	unless (($Person->{person_status} eq "registered")
-			 || ($Person->{person_status} eq "admin")) {&login_needed(""); 
+			 || ($Person->{person_status} eq "Admin")) {&login_needed(""); 
 	}
 }
 

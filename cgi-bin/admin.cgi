@@ -53,28 +53,22 @@ use CGI::Carp qw(fatalsToBrowser);
 	
 	our ($Site,$dbh) = &get_site("page");		
 	
-
+# Load User
 	my ($session,$username) = &check_user();
-	
-	
 	our $Person = {}; bless $Person;
 	&get_person($Person,$username);
 	my $person_id = $Person->{person_id};
-	
-	#print "Person title is: ".$Person->{person_title}." and status is ".$Person->{person_status}."<p>";
 	print &show_login($session);
 	
-	#if ($username) { print $username.qq| [<a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|?action=logout">Logout</a>]<p>|; }
-	#else { $login_window; }
-
-
+# Set vars
 	my $vars = $query->Vars;
 	my $page_dir = "../";
 	
-	# Admin Only
+# Admin Only
 	die "Admin Only" unless (&admin_only());
 	
 print "Admin";
+
 
 	# Initialize system variables
 

@@ -9821,7 +9821,7 @@ sub arrays {
 sub check_user {
 print "Content-type: text/html\n\n";
 print "Checking user <p>";
-exit;
+
     my $cgi = $query;	# get from the global value
 #    my $session = new CGI::Session(undef, $cgi, {Directory=>'/tmp'});
 
@@ -9832,7 +9832,7 @@ exit;
         exit;
     } 
 	#   $session->clear(["~logged-in"]);
-	
+print "Into init_login()<p>";	
     &init_login($session,$cgi);
 
 
@@ -9898,7 +9898,8 @@ sub show_login {
 sub init_login {
     my ($session) = @_; 
     my $cgi = $query;
-   
+print "In init_login()";
+exit;
     if ( $session->param("~logged-in") ) {
         return 1;  # if logged in, don't bother going further
     }

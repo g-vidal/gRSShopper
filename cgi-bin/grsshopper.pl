@@ -9836,7 +9836,8 @@ print "Into init_login()<p>";
     &init_login($session,$cgi);
 
 print "Back from init_login()";
-exit;
+print " Going to print my cookie for the session ".$session->id."<p>";
+
 
     #my $cookie = CGI::Cookie->new(CGISESSID => $session->id);
 
@@ -9845,7 +9846,9 @@ exit;
 	    -expires=>"Wed, 22 Oct 2025 07:28:00 GMT",
 	    -secure=>0);
 
-  #  print $cgi->header(-cookie=>$cookie,-charset => 'utf-8');
+    print $cgi->header(-cookie=>$cookie,-charset => 'utf-8');
+  print "Just printed the cookie<p>";  
+  exit;
     my $profile = $session->param("~profile");
     my $username = $profile->{username};
     return($session,$username);

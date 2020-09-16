@@ -9828,6 +9828,8 @@ sub check_user {
 
     if ($cgi->param("action") eq "logout") {
         $session->delete();
+	&show_login();
+	exit;
         #print $cgi->header();
         #print qq|Logged Out. <a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|">Login</a>|;
         #exit;

@@ -42,9 +42,7 @@ docker run --publish 80:80 --detach --name gr1 grsshopper
 
 Testing the server
 
-http://localhost  (should show Apache index page)
-
-http://localhost/index.php  (should show PHP index page)
+http://localhost  (should show gRSShopper start page)
 
 http://localhost/cgi-bin/server_test.cgi  (should show Perl test page)     
 

@@ -1,0 +1,307 @@
+<!-- This is a page header template used by many of the pages on this site. It's a responsive mobile-compatible template. -->
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html style="" class=" js flexbox canvas canvastext webgl touch geolocation postmessage no-websqldatabase indexeddb hashchange history draganddrop websockets rgba hsla multiplebgs backgroundsize borderimage borderradius boxshadow textshadow opacity cssanimations csscolumns cssgradients no-cssreflections csstransforms csstransforms3d csstransitions fontface generatedcontent video audio localstorage sessionstorage webworkers applicationcache svg inlinesvg smil svgclippaths"><!--<![endif]--><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+<title>gRSShopper: Data Types </title>
+<meta name="description" content="[*page_description*]">
+<meta name="keywords" content="[*page_keywords]">
+
+   <link rel="icon" href="https://grsshopper.downes.ca/assets/ico/favicon.ico">
+
+<!-- Mobile viewport -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<!-- icons -->
+<link rel="apple-touch-icon" sizes="57x57" href="https://grsshopper.downes.ca/assets/icons/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="https://grsshopper.downes.ca/assets/icons/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="https://grsshopper.downes.ca/assets/icons/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="https://grsshopper.downes.ca/assets/icons/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="https://grsshopper.downes.ca/assets/icons/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="https://grsshopper.downes.ca/assets/icons/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="https://grsshopper.downes.ca/assets/icons/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="https://grsshopper.downes.ca/assets/icons/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://grsshopper.downes.ca/assets/icons/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="https://grsshopper.downes.ca/assets/icons/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://grsshopper.downes.ca/assets/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="https://grsshopper.downes.ca/assets/icons/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://grsshopper.downes.ca/assets/icons/favicon-16x16.png">
+  <link rel="icon" href="https://grsshopper.downes.ca/assets/icons/favicon.ico" type="image/x-icon"/>
+<link rel="manifest" href="https://grsshopper.downes.ca/assets/icons/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff"><!-- End Icons -->
+
+<!-- CSS-->
+<link href='https://fonts.googleapis.com/css?family=Droid+Serif|Ubuntu' rel='stylesheet' type='text/css'>
+
+<link rel="stylesheet" href="https://grsshopper.downes.ca/assets/css/normalize.css">
+<link rel="stylesheet" href="https://grsshopper.downes.ca/assets/js/flexslider/flexslider.css">
+<link rel="stylesheet" href="https://grsshopper.downes.ca/assets/css/basic-style.css">
+
+<!-- end CSS-->
+    
+<!-- JS-->
+<script src="https://grsshopper.downes.ca/assets/js/libs/modernizr-2.6.2.min.js"></script>
+
+<!-- end JS-->
+
+
+</head>
+
+<body id="home">
+  
+<!-- header area -->
+    <header class="wrapper clearfix">
+		       
+        <div id="banner">        
+        	<div id="logo">
+                        <span style="float:left"><a  href="https://grsshopper.downes.ca/index.htm" style="text-decoration:none;"><img src="https://www.downes.ca/assets/images/grsshopper_header.jpg" border=0></a><br><a  href="https://grsshopper.downes.ca/index.html" style="text-decoration:none; margin-bttom:0pt;"></a></div> 
+        </div>
+        
+  
+    </header><!-- end header -->
+
+<!-- main content area -->   
+<div class="wrapper" id="main">
+    
+<!-- content area -->    
+	<section id="content" class="wide-content">
+
+      <div class="row">
+        <div class="grid_8"><h2>The Data Types</h2>
+
+
+<p>gRSShopper incorporates a number of distinct data types. Some of these data types are very general, while others are very specific. Each type of data is related to the other.</p>
+
+<p>For example, the gRSShopper harvester will harvest a <b>link</b> from a given <b>feed</b>. A <b>person</b>, if he or she has admin privileges, can transform this link into a <b>post</b>, adding his or her own comments. The post will contain information about the original link's <b>author</b> and <b>journal</b>.</p>
+
+<p>Different data types can be seen by the site administrator from any <i>Admin</i> screen - they are all listed on the left hand side of the screen. Site visitors, on the other hand, will see whatever the administrator wants them to see.</p>
+
+<p>Here, then, are the data types:</p>
+
+<h3>Author</h3>
+
+<p>An <i>author</i> is a person who writes a web resource. Authors are the creators of <i>links</i>, which are harvested by gRSShopper, and of resources referenced by <i>posts</i>.</p>
+
+<p>It should be mentioned at this juncture that <i>posts</i> - which are like blog posts, and are authored by the owner of the site - are unlike the posts you'll find on Blogger or WordPress. Each post contains a field for a <i>link</i>, <i>author</i> and a <i>journal</i>. The idea is that a person using gRSShopper typically writes <i>about</i> something, and so there is a primary reference for each post.</p>
+
+<p>The author, as one of those referents, can be identified with a name and a URL. I'd like this (eventually) to be the author's OpenID website. For now, it's just the author's home page.</p>
+
+<p>On this site, visitors can view a separate page for each author. For example, here is the author page on this site for <a  href="http://grsshopper.downes.ca/cgi-bin/page.cgi?author=1">Stephen Downes</a>. That's me. On the page, if the site owner encodes the view appropriately, you can see a list of the posts which reference the author.</p>
+
+<h3>Box</h3>
+
+<p>A <i>box</i> is a bit of HTML text that can be inserted into any page on the website with a simple command (see <a  href="page_commands.txt">page commands</a>).</p>
+
+<p>Boxes are useful because they are cached by the system, reducing the overhead on the system. They can also be used to access the database, which allows live contents (for example, a list of pages) to be displayed.</p>
+
+<p>To the left you can see an example of a 'Contents' box. This box is a simple list of all the pages on the site. The contents box need never be updated; pages will be added automatically as they are created. If you have Admin access, you can see the <a  href="http://grsshopper.downes.ca/cgi-bin/admin.cgi?box=1&action=edit">encoding for the Contents box</a> here.</p>
+
+<h3>Cite</h3>
+
+<p>A <i>cite</i> is created automatically by the harvester. It is a record that indicates that one resource (as defined by its URI) has referenced (or 'cited') another resource (also referenced by its URI).</p>
+
+<p>(Note that cites are currently disabled in the code while I work out a more efficient way to do them...)</p>
+
+<h3>Event</h3>
+
+<p>An event is, as the name implies, a record that describes something that is scheduled. Hence, events have a 'start' and an 'end' field, which would indicate  when they take place, as well as a location field, for location information.</p>
+
+<p>The <i>event</i> data type is a work in progress. I would like to be able to read and write event metadata, not only in iCal but also in RSS and JSON. The idea would be that you can use this site to create events, and also import events listings, and in turn use the site to update external calendars.</p>
+
+<h3>Feed</h3>
+
+<p>A feed is a remote source of content. A feed might be a blog, a newspaper, a magazine, a journal, or a Twitter account. If new content is added to this location on a regular basis, it can be a feed.</p>
+
+<p>gRSShopper has the option to <i>harvest</i> feed contents. The harvester is controlled by the gRSShopper admin. The harvester will only harvest approved feeds. The following types of feeds are defined:<br>
+<img src="https://www.downes.ca/assets/img/Btiny.jpg"> Inactive - this is a feed with no feed endpoint (that is, no associated RSS or JSON data stream location)<br>
+<img src="https://www.downes.ca/assets/img/Otiny.jpg"> - this is a feed that has an associated RSS or JSON data stream location, but has not been approved for harvesting (it might be a feed that was suggested by a user.<br>
+<img src="https://www.downes.ca/assets/img/Atiny.jpg"> Approved - this is a feed with an associated RSS or JSON data stream location and has been approved for harvesting<br>
+<img src="https://www.downes.ca/assets/img/Rtiny.jpg"> Retired - this is a feed that was previously harvested, but where harvesting has ceased (it is kept because there may still be data in the database related to that feed.</p>
+
+<p>Feeds have various values that control their processing. These are documented in Feed Rules.</p>
+
+<h3>Journal</h3>
+
+<p>A journal is a magazine or publication. It can be used in place of a feed if you wish, but journals are not harvested.</p>
+
+<h3>Link</h3>
+
+<p>A link is a resource on the World Wide Web defined by a URL (or, in the future, by a hash). Links are typically created one of three ways:<br>
+- By the harvester - each individual resource harvested from a feed will be stored as a link by default.<br>
+- By a post - when a link post is created, the link it refers to is stored as a link<br>
+- By an alanysis tool - when contents are analyzed, links that are found are listed as links</p>
+
+<p>Links are useful because they help associate one resource with another. Two posts referring to the same link, for example, may be associated through the graph.</p>
+
+<p>Links decay over time. In the reader you can choose between 'fresh' and stale' links. Orphan links (which are not associated with any other resource in the graph) are automatically deleted.
+
+<h3>Optlist</h3>
+
+<p>Many types of data have properties that are predefined. For example, a 'post' might be a 'link' post, an 'article', an 'announcement', a 'shownote', or whatever.</p>
+
+<p>These predefined types are defined in the 'optlist' table (one day I'll code a way to import optlists from standards organizations). Titles define where the optlist applies. The optlist titled 'post_type', for example, defines the possible types of posts. </p>
+
+<p>Optlists are really useful for defining your own system of categorization.</p>
+
+
+<h3>Page</h3>
+
+<p>A page is a static web document with an HTML address. You can create pages using gRSShopper. You are reading a page right now</p>
+
+<p>Pages may extract data from the database and display it in different formats. There's a list of <a  href="commands.htm">page commands</a> that define how to customize page contents.</p>
+
+<p>Pages may use predefined templates, or not, and may include boxes (defined above).</p>
+
+<p>The purpose of a page is to provide a relaible web-based location for static or slowly changing content.
+
+<h3>Person</h3>
+
+<p>A person is a gRSShopper user on this site. Person's may access gRSShopper features by logging in.</p>
+
+<p>There are three major types of person:<br>
+- Admin - this is a person who has access to the system and database<br>
+- Registered - this is a person who can subscribe to services such as an email newsletter<br>
+- Anonymouse - this is any other person</p>
+
+
+
+<h3>Post</h3>
+
+<p>A post is the primary type of content produced by authors using gRSShopper. Any command that works in a page can work in a post. Posts are accessible as stand-alone pages. However the default URL for a post is defined by the post number, not by the 'location' parameter.</p>
+
+<p>The following different types of posts are defined:<br>
+- link - this is a post that contains a reference to someone else's web page or post, including the title and URL. A link post will identify the web page author and feed using the graph. Normally the <i>description</i> will be displayed to readers; the description is your commentary about the other person's page. <br>
+- article - this is a post that you write and that does not refer to a specific web page (though it may 'cite' some links via the graph). The post <i>content</i> is usually displayed to readers. In the content editor the 'write' tab is used to create post content.</p>
+
+<p>A most may be displayed in multiple formats using a 'view' (see below). This allows a post to be published as HTML, RSS, JSON or whatever all at once. Views for posts are named with reference to the post type. So, for example, an HTML link post will use the view 'post_link_html' while an RSS article post will use the view post_article_rss. Different pages will specifiy different views using page commands.</p>
+
+<h3>Presentation</h3>
+
+<p>Special content with a way to embed YouTube Videos and Slideshare presentations. Also contains a player for audio recordings.</p>
+
+<p>For videos, put the video ID (eg., 5ZmHRElAArc) in the 'Youtube' field.</p>
+
+<p>For presentations, put the 'key' in the 'Slideshare' field.</p>
+
+<h3>Publication</h3>
+
+<p>This contains a reference to a publication. I use it to list my own publications for my CV, as it contains fields for journal name, volumns and number, pages, etc. As well, the 'post' field can be associated with a post containing the text of the journal article (as an 'article' post; if you do this, you can indicate publication information in the post).
+
+<h3>Project</h3>
+
+<p>Still working on this.</p>
+
+
+<h3>Task</h3>
+
+<p>Still working on this.</p>
+
+
+<h3>Template</h3>
+
+<p>This is a predefined bit of coding that can be used as either a page header or a page footer. They will be added automatically to the front and end of a page when the page is published.</p>
+
+<p>Any command that works in a page also works in a template.</p>
+
+<p>Templates are really useful not only for web pages but for things like RSS or Javascript pages.</p>
+
+
+<h3>Topic</h3>
+
+<p>Still working on this.</p>
+
+<h3>View</h3>
+
+<p>A view defines how to present an individual record. For example, the 'author_html' view will define a string of HTML (or JSON, or RSS) code to display an individual author record.</p>
+
+<p>Views display the contents of the record by embedding field contents. Also, any command that works in a page works in a view, allong a view to contain lists of resources from other tables.</p>
+       </div>
+
+        <div class="grid_4">
+<div style="border:solid green 1px;margin:10px;padding:10px;">
+   
+<h3>Contents</h3><p>
+
+[<a  href="https://grsshopper.downes.ca/">gRSShopper Home Page</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/about.htm">About gRSShopper</a>]
+<br />
+[<!--a href="http://demo.downes.ca/"-->Demonstration Site<!--/a-->]
+<br />
+[<a  href="https://grsshopper.downes.ca/description.htm">Detailed Description</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/installation.htm">Installation Instructions</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/data_types.htm">Data Types</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/page_editor.htm">Page Editor</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/commands.htm">Page Commands</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/rules.htm">Feed Rules</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/languages.htm">Languages</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/create_mysql_db.htm">Create a MySQL Database</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/videos.htm">How-To Videos</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/code.htm">gRSShopper Source Code</a>]
+<br />
+
+
+</p>
+</div>
+  <!-- sidebar -->    
+
+  
+      <!-- #end sidebar -->
+   
+  </div><!-- #end div #main .wrapper -->
+   
+
+
+  <!-- footer area -->    
+<footer  >
+	<div id="colophon" class="wrapper clearfix">
+
+
+<span style="float:right"><img src="https://grsshopper.downes.ca/assets/images/Jamlx-DeviantArt-Canada-100.JPG"></span>
+
+<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a>.
+<a  href="https://grsshopper.downes.ca/about.htm"><img alt="gRSShopper" style="border-width:0" src="https://grsshopper.downes.ca/assets/img/gRsshopper_88x31.png"></a>
+
+<p>2018 Stephen Downes ~ 
+
+		Contact: <a  href="mailto:stephen@downes.ca">stephen@downes.ca</a><br />
+This page generated by <a  href="https://grsshopper.downes.ca">gRSShopper</a>. <br />
+Last Updated: Sept 16, 2018 6:07 p.m. <br />
+
+
+
+    </div>
+    
+    
+</footer><!-- #end footer area --> 
+
+
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script  >window.jQuery || document.write('<script src="https://grsshopper.downes.ca/assets/js/libs/jquery-1.9.0.min.js">\x3C/script>')</script>
+
+<script defer src="https://grsshopper.downes.ca/assets/js/flexslider/jquery.flexslider-min.js"></script>
+
+<!-- fire ups - read this file!  -->   
+<script src="https://grsshopper.downes.ca/assets/js/main.js"></script>
+
+</body>
+</html>

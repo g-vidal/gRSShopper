@@ -1,0 +1,473 @@
+gRSShopper
+
+Content Formatting Commands
+----------------------------
+
+
+gRSShopper has two types of display:
+
+- a RECORD display, which speficies how each record is to be displayed
+- a PAGE display, into which you can stream formatted records from the database
+
+For example: the RECORD display will describe how to display an individual POST, while the PAGE display will stream a list of recent POSTS into a page.
+
+
+COMMAND Summary
+---------------
+
+URLs
+
+db=xxx					Access database table xxx
+id=yyy					Access record number yyy
+action=zzz				Perform action zzz
+force=yes				Disable all caches
+pagedata=a,b,c				Sends data to the requested page
+			
+
+Records
+
+[*table_field*]				Display record content (works in views only)
+<box box_title>				Add box
+
+
+Page Display
+
+<box box_title>				Display box
+<keyword xxx>				Keyword command; xxx = commands:
+   db=ddd					select records from ddd database
+   expires=nnn;					do not display records older than nnn seconds
+   number=nn					display no more than nn records
+   sort=xx					sort on field xx
+   sort=xx,yy					sort on field xx first, then yy second
+   format=fff					format using the view ddd_fff
+   lookup					create lookup from another table
+   ...						Use keyword search command or 'all' default
+<NICE_DATE>nnn<END_NICE_DATE>		Nicely formatted date
+<822_DATE>nnn<END_822_DATE>		RFC 822 formatted date (used in RSS)
+<MON_DATE>nnn<END_MON_DATE>		Month and year
+<CFORM>ide,title<END_CFORM>		Insert comment form
+<WIKIPEDIA xxx>				Insert wikipedia entry
+<admin table,id>			Insert admin links (edit, delete, spam)
+<LOGIN_INFO>				Display login info
+<TOPIC>xxx<END_TOPIC>			Display topics for record xxx
+<XMLTOPIC>xxx<END_XMLTOPIC>		Display topics as XML for record xxx
+<BLOG>					Auto-blog
+
+Site Variables
+   
+	st_name		site name
+	st_url		site base URL
+	st_urlf		site base file directory
+	st_cgi		site CGI URL
+	st_cgif		site CGI directory
+	st_img		site image URL / directory (relative to base)
+	st_file		site file URL / directory  (relative to base)
+	st_photo	site photo URL / directory  (relative to base)
+	st_copy		site copyright string
+	st_pub		site publisher
+	st_crea		site creator
+	st_login	site login URL (full URL)
+	st_anon		name of anonymous user
+	st_anon_id	id of anonymous user
+	st_license	site license string (may contain HTML link)
+	st_feed		site default feed (must be full URL)
+	em_from		email 'from' address
+	em_copy		email 'copy to' address
+
+
+
+
+
+
+
+DETAILED DESCRIPTIONS 
+
+
+
+URL Commands
+------------
+
+Contents in gRSShopper are stored as a series of different data types. Learn about data types here:
+http://grsshopper.downes.ca/data_types.htm
+
+Contents may be accessed from predefined pages or directly through URL requests. Users can access
+content using page.cgi while administrators may also use admin.cgi
+
+Basic Requests
+--------------
+
+The basic form of a URL request is:
+
+   domain.com/cgi-bin/page.cgi?db=xxx&id=yyy
+
+where 'db=xxx' specifies the data type (post, event, author, etc) and 'id=yyy' specifies the record number.
+
+Normally, though, users will access data using the SHORTENED version of the links:
+
+   domain.com/cgi-bin/page.cgi?xxx=yyy
+
+where 'xxx' is the data type and yyy is the record id number.
+
+If httpt.conf has been edited as described in the installation instructions, then the system also supports:
+
+   domain.com/xxx/yyy
+
+where 'xxx' is the data type and yyy is the record id number.
+
+
+Actions
+-------
+
+Administrators perform actions by specifying the record to access and the name of the action. For example:
+
+   domain.com/cgi-bin/page.cgi?post=12&action=edit
+
+will take the administrator to the edit screen for post number 12. Actions supported include: edit, list, 
+delete and spam. More actions will be supported in the future.
+
+
+Publishing
+----------
+
+The special PAGE data type corresponds to an HTML page. This allows owners to publish popular pages as
+HTML files, this greatly reducing the load on the system. Publishing is accomplished using the 'publish'
+action, as follows:
+
+   domain.com/cgi-bin/page.cgi?page=12&action=publish
+
+This recreates the page and copies the content to the HTML file specified in the page_file variable in the
+edit page screen (note that your web server needs 'write' permission in the appropriate director for
+this to work).
+
+Note that the location of the HTML page is relative to the 'st_urlf' location defined in your site
+configuration file (see the installation guide for details). It will display relative to the 'st_url'
+URL specified in the site configuration.
+
+The use of HTML pages is recommended, even for dynamic data. You can automate the 'publish' function using
+a CRON job on the unix system (see 'cron configuration' in the installation guide). Using HTML pages 
+greatly reduces the load on your server.
+
+
+Caching
+-------
+
+Data in gRSShopper is heavily cached. Each record view is stored as a cache, and each page output is stored
+as a cache. Consequently, when editing files it is common to see only the cached version, and not the
+updated version.
+
+There is a URL command, 'force=yes', what disables caching. Use this to force a new version of the record 
+to be stored in the cache. Thus, for example,
+
+   domain.com/cgi-bin/page.cgi?post=1442&force=yes
+
+displays the current version of the post and not the cached version.
+
+
+Page Data
+---------
+
+This command lets you send some link data to a page using page variables eg. ... &pagedata=post,12,rdf
+
+Separate the values with commas. A subroutine will insert them into appropriately numbered fields in
+the destination record. eg. <pagedata 1> for the first, <pagedata 2> for the second, etc.
+
+Typically, usage is: pagedata=table,id_number,format
+
+Receives text pointer and query as input; acts directly on text
+
+Note that this will not work on static versions of pages
+
+
+
+
+RECORD Displays
+---------------
+
+Records are displayed using a 'view'. A large number of views has been predefined for you; you can see them by selecting 'list' views in the admin navigation (left side of all admin pages).
+
+View Commands
+-------------
+
+Each record consists of a number of fields. For example, POST will contain fields like TITLE, LINK, and so on. All fields are named according to a common format:  table_field  (they are always in lower case text).
+
+A VIEW consists of some HTML text and some view commands. A view command is indicated using the format: [*table_field*]
+
+Here, for example, is a simple POST view:
+
+	  <p><b><title>[*post_title*]</title></b><br/>
+	  <link>http://www.downes.ca/cgi-bin/page.cgi?post=[*post_id*]</link>
+          <description>[*post_description*] [*post_author*], [*post_journal*]</description>
+      	  </p>
+
+As you can see, the view commands are embedded into the HTML, even right into a link (as you can see on the second line).
+
+View Naming and Formats
+-----------------------
+
+The name of the view corresponds with the format of the view. The format is the type of record being displayed: HTML, RSS, Javascript, etc.
+
+Views are named according to the following convention:  table_format
+
+For example:  event_html
+
+You may make up any format you wish; you are not restricted to common data types. Hence, for example, you will see views using the 'email' format and the 'summary' format.
+
+Some database tables allow for special views. The POST table, for example, allows users to create various post TYPES. You will find views for post_link, post_article, post_comment, and more. 
+
+The name of a view for a post will include the type, as follows:  post_comment_rss
+
+The FORMAT of this view is 'comment_rss'.
+
+
+
+
+
+
+PAGE Displays
+-------------
+
+Page display commands may be used anywhere: in pages, in boxes and in views. Page display commands fill variables, load content from databases, and perform special functions.
+
+The following page commands may be used:
+
+Boxes
+-----
+
+A box is a special data type. Any box may be added to any other content (including views and boxes). The command to add a box is:
+
+   <box box_title>
+
+where 'box_title' is the title given to the box in the box editing screen. This command is typed in lower case.
+
+Keywords
+--------
+
+The KEYWORD command imports content from the database. For example,
+
+   <keyword db=post>
+
+will import data from the POST table (that is, it will import posts). The keyword command has a series of options
+(known as the 'keyword script') that may be selected to specify what data should be displayed and how it should be 
+displayed. For example:
+
+   <keyword db=post;number=10;format=email_rss;all>
+
+this will display 10 posts, formatted using the VIEW post_email_rss, scanning all records in the database. Here is
+a list of the options that can be used in the keyword command:
+
+   db=ddd			select records from ddd database
+   expires=nnn;			do not display records older than nnn seconds
+   number=nn			display no more than nn records
+   sort=xx			sort on field xx
+   sort=xx,yy			sort on field xx first, then yy second
+   format=fff			format using the view ddd_fff
+   lookup			create lookup from another table
+
+
+Keyword searching: you can specify field values to limit your results. For example:
+
+   <keyword db=post;type=link>
+
+This will limit the display of results to those records where the value of the post_type field is 'link'. Note
+that the name of the table is implicit in the field name.
+
+You can use any field name for a search (so long as it is not one of the commands listed above). The name of
+the table is always implicit in the field name. Thus, if you specify 'title' the parser will interpet as
+'post_title' (or 'event_title', or whatever, depending on what table you're searching).
+
+There are various types of keyword search:
+
+   field=xxx		table_field is equal to 'xxx'
+   field~xxx		table_field contains 'xxx'
+   field GT xxx		table_field is greater than 'xxx'
+
+Obviously I'll add more possibilities here.
+
+Keyword Lookups:
+
+This allows you to look up a related value from another table. For example, a post may have an author, specified by
+an author_id. This command allows you to extract information from that other table and display it with the
+current record.
+
+The format of the lookup script command is as follows:
+
+   lf = xxx
+   lookup = lf in ll as yyy
+
+Here's how this works. You specify the value of the field in the other table you want to find. For example,
+
+   author_id=fred
+
+Then you use the lookup command to show how you want this displayed:
+
+   lookup = author_id in author as author_title
+
+This will extractg the author_title corresponding to author_id and make it available as a variable to be
+used by the view being used. So your view might look like:
+
+   [*post_id*] [*post_title} By [*author_title*].
+
+
+Dates
+-----
+
+Various date types can be autofomatted using the autodates commands. The syntax for the various commands is:
+
+   <NICE_DATE>nnn<END_NICE_DATE>	Nicely formatted date
+   <822_DATE>nnn<END_822_DATE>		RFC 822 formatted date (used in RSS)
+   <MON_DATE>nnn<END_MON_DATE>		Month and year
+
+where nnn is the date in unix format (all dates in gRSShopper are stored in unix format. A unix date is simply the number of seconds since January 1, 1970 GMT. There are various scripts to convert unix dates into more combursome
+date formats. See http://www.unixtimestamp.com/ and http://www.onlineconversion.com/unix_time.htm).
+
+Date commands are often used in views in combination with view commands. For example, the following will display 
+the RFC 822 formatted creation date for a post:
+
+   <822_DATE>[*post_crdate*]<END_822_DATE>
+
+(I know the syntax is a bit cuimbersom and I'll probably amend it later)
+
+
+Comment Form
+------------
+
+Inserts a comment form into the display. Currently only used in post views, but will be extended to general
+usage. Implemented by placing the following command into the post view:
+
+   <CFORM>xxx<END_CFORM>
+
+The string 'xxx' is the AUTOTEXT and contains information needed by the comment form. Right now, xxx has the
+form:
+
+   id,title
+
+where 'id' is the post record ID, and 'title' is the post title (or any other string you with to use to
+title the comment. For example:
+
+   <CFORM>[*post_id*],Re: [*post_title*]<END_CFORM>
+
+automatically places the post ID and title into the comment form.
+
+
+Wikipedia Entry
+---------------
+
+Places a wikipedia entry into the display. Use the following syntax:
+
+   <WIKIPEDIA xxx>
+
+where 'xxx' is the title of the wikipedia entry. The script will obtain the current text from Wikipedia and
+place it into the page.
+
+
+Admin Links
+-----------
+
+It is useful for administrators to be able to access admin functions from page displays. The adminlinks
+command makes this possible. The syntax is:
+
+   <admin table,id>
+
+where 'table' is the database table and 'id' is the record id. Typically we would see:
+
+   <admin post,[*post_id*]> or <admin event,[*event_id*]>
+
+This command will create a string with three links:
+
+   Edit - takes the administrator to the edit screen for the record specified
+   Delete - deletes the record specified
+   Spam - deletes the record specified and prohibits any person with an IP matching record_crip from posting
+      (I will add more spam analysis to this command in due time)
+
+This command executes selectively. It only works for dynamic content displays (it is not available for static
+published versions of the page) and only if the person accessing the page has a person_status of 'admin'.
+
+
+Login Info
+----------
+
+Inserts predefined ligin info into any page. This displays the user's current login name and offers them 
+links to logout or access their options. Creates a 'login' link if the use is not logged in. Command
+syntax is:
+
+   <LOGIN_INFO>
+
+Note that login info does not display in static or published pages, though it *will* display properly even
+in cached pages.
+
+
+Site Variables
+--------------
+
+The site and email variables specified in the site configuration for may be used anywhere by placing the
+name of the variable inside angle brackets.
+
+For example:
+
+   <st_name>
+
+will be converted by the parser into the site name specified in the configuration file. The current list
+of possible values is as follows (these are samples; values displayed can be changed to suit your own needs):
+
+	st_name		site name
+	st_url		site base URL
+	st_urlf		site base file directory
+	st_cgi		site CGI URL
+	st_cgif		site CGI directory
+	st_img		site image URL / directory (relative to base)
+	st_file		site file URL / directory  (relative to base)
+	st_photo	site photo URL / directory  (relative to base)
+	st_copy		site copyright string
+	st_pub		site publisher
+	st_crea		site creator
+	st_login	site login URL (full URL)
+	st_anon		name of anonymous user
+	st_anon_id	id of anonymous user
+	st_license	site license string (may contain HTML link)
+	st_feed		site default feed (must be full URL)
+	em_from		email 'from' address
+	em_copy		email 'copy to' address
+
+
+Topics
+------
+
+In gRSShopper, a 'topic' is the equivalent of what other sites might call a 'tag' or a 'category'. A 'topic'
+is a special data type (see http://grsshopper.downes.ca/data_types.htm) which defines a topic title with a
+regular expression.
+
+In gRSShopper, users do not manually tag or categorize resources. This is done automatically by the parser.
+These topics may be displayed in any location using the auto-topics tags.
+
+There are two types of auto-topics tags (there may be more in the future):
+
+   <TOPIC>xxx<END_TOPIC>
+   <XMLTOPIC>xxx<END_XMLTOPIC>
+
+where xxx is the record ID number. Hence, the following formulation is common:
+
+   <TOPIC>[*post_id*]<END_TOPIC> 
+
+The TOPIC command will display an HTML list of topics, each as a link to the appropriate topic page, properly
+formatted as tags, as follows:
+
+   <a href="http://www.downes.ca/cgi-bin/page.cgi?$ext" rel="tag">$topic_title</a>
+
+The XML version will display a list of properly formatted 'categories', as follows:
+
+   <category domain="$topicurl">$topic_title</category>
+
+(Note that the current version of the code is specific to www.downes.ca - I will fix this)
+
+
+
+
+Auto-Blog
+---------
+
+<BLOG>
+
+Inserts a 'blog this' link into the display. This link takes you straight to your edit post page and fills the
+fields in the form with relevant data from the link being viewed.
+
+

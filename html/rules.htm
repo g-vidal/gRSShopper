@@ -1,0 +1,276 @@
+<!-- This is a page header template used by many of the pages on this site. It's a responsive mobile-compatible template. -->
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html style="" class=" js flexbox canvas canvastext webgl touch geolocation postmessage no-websqldatabase indexeddb hashchange history draganddrop websockets rgba hsla multiplebgs backgroundsize borderimage borderradius boxshadow textshadow opacity cssanimations csscolumns cssgradients no-cssreflections csstransforms csstransforms3d csstransitions fontface generatedcontent video audio localstorage sessionstorage webworkers applicationcache svg inlinesvg smil svgclippaths"><!--<![endif]--><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+<title>gRSShopper: Feed Rules </title>
+<meta name="description" content="[*page_description*]">
+<meta name="keywords" content="[*page_keywords]">
+
+   <link rel="icon" href="https://grsshopper.downes.ca/assets/ico/favicon.ico">
+
+<!-- Mobile viewport -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<!-- icons -->
+<link rel="apple-touch-icon" sizes="57x57" href="https://grsshopper.downes.ca/assets/icons/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="https://grsshopper.downes.ca/assets/icons/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="https://grsshopper.downes.ca/assets/icons/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="https://grsshopper.downes.ca/assets/icons/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="https://grsshopper.downes.ca/assets/icons/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="https://grsshopper.downes.ca/assets/icons/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="https://grsshopper.downes.ca/assets/icons/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="https://grsshopper.downes.ca/assets/icons/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://grsshopper.downes.ca/assets/icons/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="https://grsshopper.downes.ca/assets/icons/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://grsshopper.downes.ca/assets/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="https://grsshopper.downes.ca/assets/icons/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://grsshopper.downes.ca/assets/icons/favicon-16x16.png">
+  <link rel="icon" href="https://grsshopper.downes.ca/assets/icons/favicon.ico" type="image/x-icon"/>
+<link rel="manifest" href="https://grsshopper.downes.ca/assets/icons/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff"><!-- End Icons -->
+
+<!-- CSS-->
+<link href='https://fonts.googleapis.com/css?family=Droid+Serif|Ubuntu' rel='stylesheet' type='text/css'>
+
+<link rel="stylesheet" href="https://grsshopper.downes.ca/assets/css/normalize.css">
+<link rel="stylesheet" href="https://grsshopper.downes.ca/assets/js/flexslider/flexslider.css">
+<link rel="stylesheet" href="https://grsshopper.downes.ca/assets/css/basic-style.css">
+
+<!-- end CSS-->
+    
+<!-- JS-->
+<script src="https://grsshopper.downes.ca/assets/js/libs/modernizr-2.6.2.min.js"></script>
+
+<!-- end JS-->
+
+
+</head>
+
+<body id="home">
+  
+<!-- header area -->
+    <header class="wrapper clearfix">
+		       
+        <div id="banner">        
+        	<div id="logo">
+                        <span style="float:left"><a  href="https://grsshopper.downes.ca/index.htm" style="text-decoration:none;"><img src="https://www.downes.ca/assets/images/grsshopper_header.jpg" border=0></a><br><a  href="https://grsshopper.downes.ca/index.html" style="text-decoration:none; margin-bttom:0pt;"></a></div> 
+        </div>
+        
+  
+    </header><!-- end header -->
+
+<!-- main content area -->   
+<div class="wrapper" id="main">
+    
+<!-- content area -->    
+	<section id="content" class="wide-content">
+
+      <div class="row">
+        <div class="grid_8"><h3>Using gRSShopper feed filter rules</h3>
+
+<p>Each harvested resources is saved as a 'Link'. Rules are used to change Link values (such as the link 'title', the link 'category', etc) and use harvested Link data to create a new 'Post'.</p>
+
+<p><b>Rule</b></p>
+
+<p>Rules are composed of conditions and actions. If the condition is satisfied, the rule is 'triggered', that is, the actions are performed. The general syntax is this:</p>
+
+<p>   <tt>condition => action;</tt></p>
+
+<p>The symbol => is used to separate the condition and the action. The semi-colon is used to terminate the rule.</p>
+
+<p>A series of rules can be evaluated. Rules are evaluated in the order tey are listed. All rules are evaluated. However, if a rule begind with the word 'else', it is evaluated only if no previous rule has been triggered. For example:</p>
+
+<p>   <tt>condition => action;<br />
+   else condition2 => action2;</tt></p>
+
+<p>In this example, the first rule is evaluated. Then, the second rule is evaluated only if the first rule was not triggered.</p>
+
+<p><b>Condition</b></p>
+
+<p>A condition queries the data in a harvested link to see whether it matches a given value. If the value is matched, the condition is 'true', and the rule is triggered. If the value is not matched, the condition is 'false', and the rule is not triggered. For example:</p>
+
+<p>   <tt>title = A Tale of Two Cities</tt></p>
+
+<p>In this case, the condition is true if the title is the string 'A Tale of Two Cities'. By default, rules are not case sensitive, so the condition is also true if the title is the string 'a tale of two cities'. It is *not* true if the title is 'A tale', or anything else.</p>
+
+<p>   <tt>title ~ A tale</tt></p>
+
+<p>In this case, the rule is true if the title *contains* the string 'A tale'. Thus, the condition is true if the title is 'A tale of two cities' and also if the title is 'A tale of the tape', but it is not true if the title is 'Great Expectations'.</p>
+
+<p><b>Disjunction</b></p>
+
+<p>A rule can evaluate several data elements (known as 'fields') at one. For example, the following rule will be true if either the title or the description contains the phgrase 'A tale':</p>
+
+<p>   <tt>title|description ~ A tale</tt></p>
+
+<p>Notice that the pipe character '|' is used to indicate a disjunction, that is, to indicate that the rule is true if *either* 'title' or 'description' cvontain the phrase 'A tale'.</p>
+
+<p><b>Conjunction</b></p>
+
+<p>A rule can contain more than one conjunct, such that *all* conjuncts much be true for the rule to be true. Conjuncts are indicated with an ampersand. Hence, for example:</p>
+
+<p>   <tt>title~Canada &amp; description~Lakes</tt></p>
+
+<p>This rule is true only if both the title contains the phrase 'Canada' *and* the description contains the phrase 'Lakes'</p>
+
+<p><b>Negation</b></p>
+
+<p>A negation can be expressed using the bang character: ! For example:</p>
+
+<p>   <tt>title ~ !Canada</tt></p>
+
+<p>This condition is true only if the title does not contain the phrase Canada.</p>
+
+<p><b>Mixing and Matching conditions</b></p>
+
+<p>In any rule, negations are evaluated first, disjunctions are evaluated second, and conjunctions are evaluated third. This is reflected in the syntax of complex rules. For example:</p>
+
+<p>   <tt>title|description ~ France|Canada &amp; link ~ !twitter</tt></p>
+
+<p>Brackets are not used; if more complex formulations are required, additional rules should be added.</p>
+
+<p><b>Actions</b></p>
+
+<p>An action sets the value of a Link data element (or 'field') as desired. For example:</p>
+
+<p>   <tt>=> category=France</tt></p>
+
+<p>This condition sets the value of link_category to 'France'.</p>
+
+<p>A sequence of actions may be performed. This is indicated with the comma operator. For example:</p>
+
+<p>   <tt>=> category=France,title=Trips</tt></p>
+
+<p>This sequence sets the value of link_category and link_title</p>
+
+<p><b>Autopost</b></p>
+
+<p>The 'autopost' function takes the values of 'Link' and uses them to create a new 'Post'. This is useful when creating pages containing multiple posts; only those links that execute the 'autopost' action will appear on such a page.</p>
+
+<p><b>Extract</b></p>
+
+<p>The extract function selects a substring from the value of the string. Extract is expressed using three parameters: => extract(field,start,finish)
+- 'field' is the name of the field you want to extract from (eg. 'link_title', or just 'title')
+- 'start' is a string that delimits the beginning of whatever text you want extracted; use ^ to indicate the beginning of the text
+- 'finish' is a string that delimits the end of whatever text you want extracted; use $ to indicate the very end of the text</p>
+
+<p>For example, suppose you want to extract proper URLs from a feed that harvest links from Google News Alerts. Here is what Google sends you:
+<dl>
+<i>http://news.google.com/news/url?sa=t&fd=R&usg=AFQjCNEqTrLJKkuQiCMkIAAlEO7lBXLGuw&url=http://www.thedp.com/article/2012/10/brian-collopy-coursera-and-the-competition</i>
+</dl>
+and here is what you want:
+<dl>
+<i>http://www.thedp.com/article/2012/10/brian-collopy-coursera-and-the-competition</i>
+</dl>
+In other words, you want the substring between 'url=' and the end of the string. So you would create an extract command as follows:<br/><br/>
+
+<tt>=> extract(link,url=,$)</tt>
+
+
+<p><b>Empty conditions</b></p>
+
+<p>The action in a rule expressed with an empty condition is always performed. Thus, for example, if a feed has a rule:</p>
+
+<p>   <tt>=> autopost;</tt></p>
+
+<p>every Link harvested from the feed will be converted into a post. Note that you should execute autopost only <i>after</i> you've made any changes to the data that you want to make.</p>
+
+<p><p><b>Empty conditions with 'else'</b></p>
+
+<p>The following is a common sequence:</p>
+
+<p>    <tt>title|description ~ Moncton => category=City,autopost;<br/>
+    else => autopost;</tt></p>
+
+<p>This sequence will evaluate the title and description, and if either contains the string 'Moncton', the category will be set to 'City' and the Link autoposted. Otherwise (if the first rule is *not* triggered) the Link will be autoposted as is (probably with a different category value).</p>
+       </div>
+
+        <div class="grid_4">
+<div style="border:solid green 1px;margin:10px;padding:10px;">
+   
+<h3>Contents</h3><p>
+
+[<a  href="https://grsshopper.downes.ca/">gRSShopper Home Page</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/about.htm">About gRSShopper</a>]
+<br />
+[<!--a href="http://demo.downes.ca/"-->Demonstration Site<!--/a-->]
+<br />
+[<a  href="https://grsshopper.downes.ca/description.htm">Detailed Description</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/installation.htm">Installation Instructions</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/data_types.htm">Data Types</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/page_editor.htm">Page Editor</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/commands.htm">Page Commands</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/rules.htm">Feed Rules</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/languages.htm">Languages</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/create_mysql_db.htm">Create a MySQL Database</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/videos.htm">How-To Videos</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/code.htm">gRSShopper Source Code</a>]
+<br />
+
+
+</p>
+</div>
+  <!-- sidebar -->    
+
+  
+      <!-- #end sidebar -->
+   
+  </div><!-- #end div #main .wrapper -->
+   
+
+
+  <!-- footer area -->    
+<footer  >
+	<div id="colophon" class="wrapper clearfix">
+
+
+<span style="float:right"><img src="https://grsshopper.downes.ca/assets/images/Jamlx-DeviantArt-Canada-100.JPG"></span>
+
+<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a>.
+<a  href="https://grsshopper.downes.ca/about.htm"><img alt="gRSShopper" style="border-width:0" src="https://grsshopper.downes.ca/assets/img/gRsshopper_88x31.png"></a>
+
+<p>2018 Stephen Downes ~ 
+
+		Contact: <a  href="mailto:stephen@downes.ca">stephen@downes.ca</a><br />
+This page generated by <a  href="https://grsshopper.downes.ca">gRSShopper</a>. <br />
+Last Updated: Sept 16, 2018 6:07 p.m. <br />
+
+
+
+    </div>
+    
+    
+</footer><!-- #end footer area --> 
+
+
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script  >window.jQuery || document.write('<script src="https://grsshopper.downes.ca/assets/js/libs/jquery-1.9.0.min.js">\x3C/script>')</script>
+
+<script defer src="https://grsshopper.downes.ca/assets/js/flexslider/jquery.flexslider-min.js"></script>
+
+<!-- fire ups - read this file!  -->   
+<script src="https://grsshopper.downes.ca/assets/js/main.js"></script>
+
+</body>
+</html>

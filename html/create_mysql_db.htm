@@ -1,0 +1,255 @@
+<!-- This is a page header template used by many of the pages on this site. It's a responsive mobile-compatible template. -->
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html style="" class=" js flexbox canvas canvastext webgl touch geolocation postmessage no-websqldatabase indexeddb hashchange history draganddrop websockets rgba hsla multiplebgs backgroundsize borderimage borderradius boxshadow textshadow opacity cssanimations csscolumns cssgradients no-cssreflections csstransforms csstransforms3d csstransitions fontface generatedcontent video audio localstorage sessionstorage webworkers applicationcache svg inlinesvg smil svgclippaths"><!--<![endif]--><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+<title>gRSShopper: Create a MySQL Database </title>
+<meta name="description" content="[*page_description*]">
+<meta name="keywords" content="[*page_keywords]">
+
+   <link rel="icon" href="https://grsshopper.downes.ca/assets/ico/favicon.ico">
+
+<!-- Mobile viewport -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<!-- icons -->
+<link rel="apple-touch-icon" sizes="57x57" href="https://grsshopper.downes.ca/assets/icons/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="https://grsshopper.downes.ca/assets/icons/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="https://grsshopper.downes.ca/assets/icons/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="https://grsshopper.downes.ca/assets/icons/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="https://grsshopper.downes.ca/assets/icons/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="https://grsshopper.downes.ca/assets/icons/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="https://grsshopper.downes.ca/assets/icons/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="https://grsshopper.downes.ca/assets/icons/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://grsshopper.downes.ca/assets/icons/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="https://grsshopper.downes.ca/assets/icons/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://grsshopper.downes.ca/assets/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="https://grsshopper.downes.ca/assets/icons/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://grsshopper.downes.ca/assets/icons/favicon-16x16.png">
+  <link rel="icon" href="https://grsshopper.downes.ca/assets/icons/favicon.ico" type="image/x-icon"/>
+<link rel="manifest" href="https://grsshopper.downes.ca/assets/icons/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff"><!-- End Icons -->
+
+<!-- CSS-->
+<link href='https://fonts.googleapis.com/css?family=Droid+Serif|Ubuntu' rel='stylesheet' type='text/css'>
+
+<link rel="stylesheet" href="https://grsshopper.downes.ca/assets/css/normalize.css">
+<link rel="stylesheet" href="https://grsshopper.downes.ca/assets/js/flexslider/flexslider.css">
+<link rel="stylesheet" href="https://grsshopper.downes.ca/assets/css/basic-style.css">
+
+<!-- end CSS-->
+    
+<!-- JS-->
+<script src="https://grsshopper.downes.ca/assets/js/libs/modernizr-2.6.2.min.js"></script>
+
+<!-- end JS-->
+
+
+</head>
+
+<body id="home">
+  
+<!-- header area -->
+    <header class="wrapper clearfix">
+		       
+        <div id="banner">        
+        	<div id="logo">
+                        <span style="float:left"><a  href="https://grsshopper.downes.ca/index.htm" style="text-decoration:none;"><img src="https://www.downes.ca/assets/images/grsshopper_header.jpg" border=0></a><br><a  href="https://grsshopper.downes.ca/index.html" style="text-decoration:none; margin-bttom:0pt;"></a></div> 
+        </div>
+        
+  
+    </header><!-- end header -->
+
+<!-- main content area -->   
+<div class="wrapper" id="main">
+    
+<!-- content area -->    
+	<section id="content" class="wide-content">
+
+      <div class="row">
+        <div class="grid_8"><h2>Create a MySQL Database Manually</h2>
+<p><b>Note</b><br/><br/>
+These are really detailed instructions that you can use if the ordinary <a  href="installation.htm">installation instructions</a> didn't work for you. If you're just starting, go there, not here.</p>
+
+When you create a database you need to keep track of four pieces of information that may be created during this process. They are:<br>
+- the database name <br>
+- the database host (usually: localhost)<br/>
+- the database user<br/>
+- the database user's password</p>
+<p><i>After</i> you have created the database following the instructions below, then you want to <i>import</i> the gRSShopper SQL code <a  href="https://github.com/Downes/gRSShopper/tree/master/cgi-bin/sql">available here</a> on GitHub.
+<p>When the database is created, these values need to be placed into <i>grsshopper.pl</i> - there is a place to put them right at the top of the file.</p>
+
+<p>If you are using a hosting provider, there may be an automated setup solution to set up a new database. Check your hosting provider's support pages or your control panel for clues about whether or not you'll need to create one manually.</p>
+
+<p>If you determine that you'll need to create one manually, follow the instructions for accessing phpMyAdmin on various servers, or follow the instructions for Using cPanel or Using phpMyAdmin below.</p>
+
+<p>If you are installing gRSShopper on your own web server, follow the Using phpMyAdmin or Using the MySQL Client instructions below to create your gRSShopper username and database.</p>
+
+<p><b>Using cPanel</b></p>
+
+<p>If your hosting provider supplies the cPanel hosting control panel, you may follow these simple instructions to create your gRSShopper username and database. A more complete set of instructions for using cPanel to create the database and user can be found in Using cPanel.</p>
+
+<p> - Log in to your cPanel.<br />
+ - Click MySQL Database Wizard icon under the Databases section.<br />
+ - In Step 1. Create a Database enter the database name and click Next Step.<br />
+ - In Step 2. Create Database Users enter the database user name and the password. Make sure to use a strong password. Click Create User.<br />
+ - In Step 3. Add User to Database click the All Privileges checkbox and click Next Step.<br />
+ - In Step 4. Complete the task note the database name and user. Write down the values of hostname, username, databasename, and the password you chose. (Note that hostname will usually be localhost.) </p>
+
+<p><b>Using phpMyAdmin</b></p>
+
+<p>If your web server has phpMyAdmin installed, you may follow these instructions to create your gRSShopper username and database.</p>
+
+<p>Note: These instructions are written for phpMyAdmin 2.6.0; the phpMyAdmin user interface can vary slightly between versions.</p>
+
+<p>If a database relating to gRSShopper does not already exist in the Database dropdown on the left, create one:</p>
+
+<p>- Choose a name for your gRSShopper database ('grsshoppers' or 'blog' are good), enter it in the Create new database field, and click Create. <br />
+- Click the Home icon in the upper left to return to the main page, then click Privileges. If a user relating to gRSShopper does not already exist in the list of users, create one:<br />
+-- Click Add a new User.<br />
+-- Chose a username for gRSShopper ('grsshopper' is good) and enter it in the User name field. (Be sure Use text field: is selected from the dropdown.)<br />
+-- Choose a difficult-to-guess password (ideally containing a combination of upper- and lower-case letters, numbers, and symbols), and enter it in the Password field. (Be sure Use text field: is selected from the dropdown.) Re-enter the password in the Re-type field.<br />
+-- Write down the username and password you chose.<br />
+-- Leave all options under Global privileges at their defaults.<br />
+-- Click Go. </p>
+
+<p>Return to the Privileges screen and click the Check privileges icon on the user you've just created for WordPress. In the Database-specific privileges section, select the database you've just created for WordPress under the Add privileges to the following database dropdown. The page will refresh with privileges for that database. Click Check All to select all privileges, and click Go.</p>
+
+<p>On the resulting page, make note of the host name listed after Server: at the top of the page. (This will usually be localhost.) </p>
+
+<p><b>Using the MySQL Client</b></p>
+
+<p>You can create MySQL users and databases quickly and easily by running mysql from the shell. The syntax is shown below and the dollar sign is the command prompt:</p>
+
+<p>$ mysql -u adminusername -p<br />
+Enter password:<br />
+Welcome to the MySQL monitor.  Commands end with ; or \g.<br />
+Your MySQL connection id is 5340 to server version: 3.23.54</p>
+
+<p>Type 'help;' or '\h' for help. Type '\c' to clear the buffer.</p>
+
+<p>mysql> CREATE DATABASE databasename;<br />
+Query OK, 1 row affected (0.00 sec)</p>
+
+<p>mysql> GRANT ALL PRIVILEGES ON databasename.* TO "grsshopperusername"@"hostname" IDENTIFIED BY "password";<br />
+Query OK, 0 rows affected (0.00 sec)</p>
+
+<p>mysql> FLUSH PRIVILEGES;<br />
+Query OK, 0 rows affected (0.01 sec)</p>
+
+<p>mysql> EXIT<br />
+Bye<br />
+$ </p>
+
+<p>The example shows:</p>
+
+<p>- that root is also the adminusername. It is a safer practice to choose a so-called "mortal" account as your mysql admin, so that you are not entering the command "mysql" as the root user on your system. (Any time you can avoid doing work as root you decrease your chance of being exploited). The name you use depends on the name you assigned as the database administrator using mysqladmin.<br />
+- grsshopper or blog are good values for databasename.<br />
+- grsshopper is a good value for grsshopperusername but you should realize that, since it is used here, the entire world will know it too.<br />
+- hostname will usually be localhost. If you don't know what this value should be, check with your system administrator if you are not the admin for your <br />gRSShopper host. If you are the system admin, consider using a non-root account to administer your database.<br />
+- password should be a difficult-to-guess password, ideally containing a combination of upper- and lower-case letters, numbers, and symbols. One good way of avoiding the use of a word found in a dictionary, uses the first letter of each word in a phrase that you find easy to remember. </p>
+
+<p>If you need to write these values somewhere, avoid writing them in the system that contains the things protected by them. You need to remember the value used for databasename, grsshopperusername, hostname, and password. Of course, since they are already in (or will be, shortly) your grsshopper.pl file, there is no need to put them somewhere else, too.</p>
+
+<p><b>Using Plesk</b></p>
+
+<p>See: Plesk 7 at tamba2.org</p>
+
+<p><b>Using DirectAdmin</b></p>
+
+<p>a. Regular "User" of a single-site webhosting account logs in normally. Then click "MySQL Management." (If this is not readily visible, perhaps your host needs to modify your "package" to activate MySQL.) Then follow part "c" below.</p>
+
+<p>b. "Reseller" accounts or "Admin" accounts may need to click "User Level." They also must first log-in as "Reseller" if the relevant domain is a Reseller's primary domain... or log-in as a "User" if the domain is not a Reseller's primary domain. If a Reseller's primary domain, then when logged-in as Reseller, you simply click "User Level." However if the relevant domain is not the Reseller's primary domain, then you must log-in as the relevant User. Then click "MySQL Management." (If not readily visible, perhaps you need to return to the Reseller or Admin level, and modify the "Manage user package" or "Manage Reseller package" to enable MySQL.)</p>
+
+<p>c. In "MySQL Management," click on the small words: "Create new database." Here you are asked to submit two suffixes for the database and its username. For maximum security, use two different sets of 4-6 random characters. Then the password field has a "Random" button that generates an 8-character password. You may also add more characters to the password for maximum security. "Create." The next screen will summarize the database, username, password and hostname. Be sure to copy and paste these into a text file for future reference. </p>
+
+<p>(Yes, I stole these instructions from the WordPress site <a  href="http://codex.wordpress.org/Installing_WordPress#Using_the_MySQL_Client">located here</a>. The process of creating a database for gRSShopper is exactly the same as for WordPress).</p>       </div>
+
+        <div class="grid_4">
+<div style="border:solid green 1px;margin:10px;padding:10px;">
+   
+<h3>Contents</h3><p>
+
+[<a  href="https://grsshopper.downes.ca/">gRSShopper Home Page</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/about.htm">About gRSShopper</a>]
+<br />
+[<!--a href="http://demo.downes.ca/"-->Demonstration Site<!--/a-->]
+<br />
+[<a  href="https://grsshopper.downes.ca/description.htm">Detailed Description</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/installation.htm">Installation Instructions</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/data_types.htm">Data Types</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/page_editor.htm">Page Editor</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/commands.htm">Page Commands</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/rules.htm">Feed Rules</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/languages.htm">Languages</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/create_mysql_db.htm">Create a MySQL Database</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/videos.htm">How-To Videos</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/code.htm">gRSShopper Source Code</a>]
+<br />
+
+
+</p>
+</div>
+  <!-- sidebar -->    
+
+  
+      <!-- #end sidebar -->
+   
+  </div><!-- #end div #main .wrapper -->
+   
+
+
+  <!-- footer area -->    
+<footer  >
+	<div id="colophon" class="wrapper clearfix">
+
+
+<span style="float:right"><img src="https://grsshopper.downes.ca/assets/images/Jamlx-DeviantArt-Canada-100.JPG"></span>
+
+<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a>.
+<a  href="https://grsshopper.downes.ca/about.htm"><img alt="gRSShopper" style="border-width:0" src="https://grsshopper.downes.ca/assets/img/gRsshopper_88x31.png"></a>
+
+<p>2018 Stephen Downes ~ 
+
+		Contact: <a  href="mailto:stephen@downes.ca">stephen@downes.ca</a><br />
+This page generated by <a  href="https://grsshopper.downes.ca">gRSShopper</a>. <br />
+Last Updated: Sept 16, 2018 6:07 p.m. <br />
+
+
+
+    </div>
+    
+    
+</footer><!-- #end footer area --> 
+
+
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script  >window.jQuery || document.write('<script src="https://grsshopper.downes.ca/assets/js/libs/jquery-1.9.0.min.js">\x3C/script>')</script>
+
+<script defer src="https://grsshopper.downes.ca/assets/js/flexslider/jquery.flexslider-min.js"></script>
+
+<!-- fire ups - read this file!  -->   
+<script src="https://grsshopper.downes.ca/assets/js/main.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!-- This is a page header template used by many of the pages on this site. It's a responsive mobile-compatible template. -->
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html style="" class=" js flexbox canvas canvastext webgl touch geolocation postmessage no-websqldatabase indexeddb hashchange history draganddrop websockets rgba hsla multiplebgs backgroundsize borderimage borderradius boxshadow textshadow opacity cssanimations csscolumns cssgradients no-cssreflections csstransforms csstransforms3d csstransitions fontface generatedcontent video audio localstorage sessionstorage webworkers applicationcache svg inlinesvg smil svgclippaths"><!--<![endif]--><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+<title>gRSShopper: Form Editor </title>
+<meta name="description" content="[*page_description*]">
+<meta name="keywords" content="[*page_keywords]">
+
+   <link rel="icon" href="https://grsshopper.downes.ca/assets/ico/favicon.ico">
+
+<!-- Mobile viewport -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<!-- icons -->
+<link rel="apple-touch-icon" sizes="57x57" href="https://grsshopper.downes.ca/assets/icons/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="https://grsshopper.downes.ca/assets/icons/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="https://grsshopper.downes.ca/assets/icons/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="https://grsshopper.downes.ca/assets/icons/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="https://grsshopper.downes.ca/assets/icons/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="https://grsshopper.downes.ca/assets/icons/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="https://grsshopper.downes.ca/assets/icons/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="https://grsshopper.downes.ca/assets/icons/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="https://grsshopper.downes.ca/assets/icons/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="https://grsshopper.downes.ca/assets/icons/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://grsshopper.downes.ca/assets/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="https://grsshopper.downes.ca/assets/icons/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://grsshopper.downes.ca/assets/icons/favicon-16x16.png">
+  <link rel="icon" href="https://grsshopper.downes.ca/assets/icons/favicon.ico" type="image/x-icon"/>
+<link rel="manifest" href="https://grsshopper.downes.ca/assets/icons/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff"><!-- End Icons -->
+
+<!-- CSS-->
+<link href='https://fonts.googleapis.com/css?family=Droid+Serif|Ubuntu' rel='stylesheet' type='text/css'>
+
+<link rel="stylesheet" href="https://grsshopper.downes.ca/assets/css/normalize.css">
+<link rel="stylesheet" href="https://grsshopper.downes.ca/assets/js/flexslider/flexslider.css">
+<link rel="stylesheet" href="https://grsshopper.downes.ca/assets/css/basic-style.css">
+
+<!-- end CSS-->
+    
+<!-- JS-->
+<script src="https://grsshopper.downes.ca/assets/js/libs/modernizr-2.6.2.min.js"></script>
+
+<!-- end JS-->
+
+
+</head>
+
+<body id="home">
+  
+<!-- header area -->
+    <header class="wrapper clearfix">
+		       
+        <div id="banner">        
+        	<div id="logo">
+                        <span style="float:left"><a  href="https://grsshopper.downes.ca/index.htm" style="text-decoration:none;"><img src="https://www.downes.ca/assets/images/grsshopper_header.jpg" border=0></a><br><a  href="https://grsshopper.downes.ca/index.html" style="text-decoration:none; margin-bttom:0pt;"></a></div> 
+        </div>
+        
+  
+    </header><!-- end header -->
+
+<!-- main content area -->   
+<div class="wrapper" id="main">
+    
+<!-- content area -->    
+	<section id="content" class="wide-content">
+
+      <div class="row">
+        <div class="grid_8"><h2>Form Editor</h2>
+<p>The form editor can be opened by clicking 'Make' and then listing 'Form'. Then click on the edit icon for the form you want to edit.<p>
+<p><b>Edit Tab</b><br /><br />
+In the Edit Tab you are presented with a large field titled 'form_data'. This is a free-text input. Carriage returns don't matter but they make it clearer.
+<i>Tabs</i><br/>
+Forms are divided into tabs. The tab is defined with a tab command,like this:<ul>
+<tt>tab:Tab Title;</tt></ul>
+Don't forget the colon and the semicolon. These are needed by the system to parse the command. If you don't use tab commands, then everything will be placed in the Edit tab by default.<br /><br />
+<i>Fields</i>
+Under each tab is one or more fields. The field definition is a set of variables separated by commas and finished with a semicolon.Like, for example, this:<ul>
+<tt>title,varchar,124;</tt><br />
+</ul>
+In order, the contents of the field definition are:<ul>
+<tt>name,type,size,default,label;</tt></ul>
+Some notes about each of these:<br />
+- <i>name</i> - any text string will work; illegal characters will be removed. Note that in the <i>actual</i> database each field name is prefixed with the table name (eg., 'post_title' for 'title'), but this is done automatically, so you don't have to do this.<br />
+- <i>type</i> - can be: varchar, text, wysihtml5, yes-no, optlist, int. Note that an 'optlist' is a set of predefined options, defined in the optlist table. Also, 'wysihtml5' is like text but includes an HTML editor.<br />
+- <i>size</i> - for varchar, int and yes-no it's the number of characters. For text and wysihtml5, this defines the editor size (in ems), eg. '20x5'. For optlist you don't need to specify a size.<br />
+- <i>default</i> - is the default value for the field, though honestly, I hardly ever use it.<br />
+- <i>label</i> - the label that will appear beside the field; useful for optlist and yes-no fields where you can't see the name of the field<br />
+Again, the punctuation is essential, otherwise you'll get weird forms.<br/><br/>
+Here is a sample form definition (actually used for the 'Post' table):<ul><pre>
+tab:Publish;
+pub_date,date,,,Publication Date;
+crdate,int,15,,Creation Date;
+type,optlist,1,,Publication Type;
+social_media,publish;
+content,wysihtml5
+tab:Preview;
+tab:Upload;
+file,file;
+tab:Edit;
+title,varchar,256;
+link,varchar,256;
+author,keylist;
+feed,keylist;
+description,wysihtml5,40x20;
+tab:Write;
+content,wysihtml5,60x60;</pre></ul><br/>
+<i>Make, Find and Read</i><br/>
+Select these to determine whether the table shows under any of the Make, Find and Read tabs in the left-hand navigation pane. Note that not selecting at least one of these will make your new table a lot harder to use in the future. So select, at the very least, 'Make', until you are done with it.</p>
+<b>Table Tab</b><br/><br/>
+This provides access to the table definition itself. Edit any field by clicking on the Edit icon (at the far right).  Create a new field at the bottom of the form.</p>
+
+       </div>
+
+        <div class="grid_4">
+<div style="border:solid green 1px;margin:10px;padding:10px;">
+   
+<h3>Contents</h3><p>
+
+[<a  href="https://grsshopper.downes.ca/">gRSShopper Home Page</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/about.htm">About gRSShopper</a>]
+<br />
+[<!--a href="http://demo.downes.ca/"-->Demonstration Site<!--/a-->]
+<br />
+[<a  href="https://grsshopper.downes.ca/description.htm">Detailed Description</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/installation.htm">Installation Instructions</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/data_types.htm">Data Types</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/page_editor.htm">Page Editor</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/commands.htm">Page Commands</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/rules.htm">Feed Rules</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/languages.htm">Languages</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/create_mysql_db.htm">Create a MySQL Database</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/videos.htm">How-To Videos</a>]
+<br />
+[<a  href="https://grsshopper.downes.ca/code.htm">gRSShopper Source Code</a>]
+<br />
+
+
+</p>
+</div>
+  <!-- sidebar -->    
+
+  
+      <!-- #end sidebar -->
+   
+  </div><!-- #end div #main .wrapper -->
+   
+
+
+  <!-- footer area -->    
+<footer  >
+	<div id="colophon" class="wrapper clearfix">
+
+
+<span style="float:right"><img src="https://grsshopper.downes.ca/assets/images/Jamlx-DeviantArt-Canada-100.JPG"></span>
+
+<a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/3.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a>.
+<a  href="https://grsshopper.downes.ca/about.htm"><img alt="gRSShopper" style="border-width:0" src="https://grsshopper.downes.ca/assets/img/gRsshopper_88x31.png"></a>
+
+<p>2018 Stephen Downes ~ 
+
+		Contact: <a  href="mailto:stephen@downes.ca">stephen@downes.ca</a><br />
+This page generated by <a  href="https://grsshopper.downes.ca">gRSShopper</a>. <br />
+Last Updated: Sept 24, 2018 2:04 p.m. <br />
+
+
+
+    </div>
+    
+    
+</footer><!-- #end footer area --> 
+
+
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script  >window.jQuery || document.write('<script src="https://grsshopper.downes.ca/assets/js/libs/jquery-1.9.0.min.js">\x3C/script>')</script>
+
+<script defer src="https://grsshopper.downes.ca/assets/js/flexslider/jquery.flexslider-min.js"></script>
+
+<!-- fire ups - read this file!  -->   
+<script src="https://grsshopper.downes.ca/assets/js/main.js"></script>
+
+</body>
+</html>

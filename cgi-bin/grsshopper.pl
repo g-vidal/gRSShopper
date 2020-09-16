@@ -9824,12 +9824,13 @@ sub check_user {
 
     my $cgi = $query;	# get from the global value
     my $session = new CGI::Session(undef, $cgi, {Directory=>'/tmp'});
+    $session->expires("+1y");
 
     if ($cgi->param("action") eq "logout") {
         $session->delete();
         print $cgi->header();
         print qq|Logged Out. <a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|">Login</a>|;
-        exit;
+        #exit;
     } 
 	#   $session->clear(["~logged-in"]);
 #print "Into init_login()<p>";	
@@ -9848,7 +9849,7 @@ sub check_user {
 #	    -secure=>0);
 
     print $cgi->header(-cookie=>$cookie,-charset => 'utf-8');
-print "Content-type: text/html\n\n OK";
+#print "Content-type: text/html\n\n OK";
     my $profile = $session->param("~profile");
     my $username = $profile->{username};
   #print "Just printed the cookie<p>";  

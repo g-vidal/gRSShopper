@@ -9839,7 +9839,7 @@ print "Checking user <p>";
 
     #my $cookie = CGI::Cookie->new(CGISESSID => $session->id);
 
-    my $cookie = $cgi->cookie(-name=>CGISESSID,
+    my $cookie = $cgi->cookie(-name=>fCGISESSID,
 	    -value=>$session->id,
 	    -expires=>"Wed, 22 Oct 2025 07:28:00 GMT",
 	    -secure=>0);

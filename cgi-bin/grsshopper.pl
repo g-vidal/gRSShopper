@@ -9922,7 +9922,7 @@ sub init_login {
     # if we came this far, user did submit the login form
     # so let's try to load his/her profile if name/psswds match
   
-  print "About to load profile <p>";
+#  print "About to load profile <p>";
        
     if ( my $profile = _load_profile($lg_name, $lg_psswd) ) {     
         $session->param("~profile", $profile);

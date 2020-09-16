@@ -9847,10 +9847,12 @@ print " Going to print my cookie for the session ".$session->id."<p>";
 #	    -secure=>0);
 
     print $cgi->header(-cookie=>$cookie,-charset => 'utf-8');
-  print "Just printed the cookie<p>";  
-  exit;
+
     my $profile = $session->param("~profile");
     my $username = $profile->{username};
+  print "Just printed the cookie<p>";  
+  print "Returning session $session and username $username <p>";
+ 
     return($session,$username);
 
 

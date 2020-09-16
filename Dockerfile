@@ -55,7 +55,8 @@ RUN apt-get install -y \
       libjson-xs-perl \
       libtypes-datetime-perl \
       libmime-lite-tt-html-perl \
-      libcrypt-eksblowfish-perl
+      libcrypt-eksblowfish-perl \
+      libtext-vcard-perl 
       
 RUN apt-get install apache2 libapache2-mod-php7.0 -y
 RUN apt-get install mariadb-common mariadb-server mariadb-client -y

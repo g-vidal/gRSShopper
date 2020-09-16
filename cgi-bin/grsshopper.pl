@@ -9832,6 +9832,8 @@ sub check_user {
 	#   $session->clear(["~logged-in"]);
 	
     &init_login($session,$cgi);
+print "Content-type: text/html\n\n";
+
 
     #my $cookie = CGI::Cookie->new(CGISESSID => $session->id);
 

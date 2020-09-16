@@ -9835,7 +9835,7 @@ sub check_user {
 #print "Into init_login()<p>";	
     &init_login($session,$cgi);
 
-print "Content-type: text/html\n\n";
+
 #print "Back from init_login()";
 #print " Going to print my cookie for the session ".$session->id."<p>";
 
@@ -9848,7 +9848,7 @@ print "Content-type: text/html\n\n";
 #	    -secure=>0);
 
     print $cgi->header(-cookie=>$cookie,-charset => 'utf-8');
-
+print "Content-type: text/html\n\n OK";
     my $profile = $session->param("~profile");
     my $username = $profile->{username};
   #print "Just printed the cookie<p>";  

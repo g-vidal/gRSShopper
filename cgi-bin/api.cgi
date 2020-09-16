@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+use CGI::Carp qw(fatalsToBrowser);
 
 #    gRSShopper 0.7  API 0.01  -- gRSShopper api module
 #    30 December 2017 - Stephen Downes
@@ -23,7 +24,7 @@
 #
 #-------------------------------------------------------------------------------
 
-# print "Content-type: text/html\n\n";
+ print "Content-type: text/html\n\n";
 
 # Forbid bots
 

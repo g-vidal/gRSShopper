@@ -9835,8 +9835,8 @@ print "Checking user <p>";
 print "Into init_login()<p>";	
     &init_login($session,$cgi);
 
-
-
+print "Back from init_login()";
+exit;
 
     #my $cookie = CGI::Cookie->new(CGISESSID => $session->id);
 
@@ -9906,11 +9906,11 @@ print "Currently logged in <p>";
     }
 print "Not logged in <p>"; 
 print "Login name (from form): ".$cgi->param("lg_name")."<p>";
-exit;
+
     my $lg_name = $cgi->param("lg_name") or return;
     my $lg_psswd=$cgi->param("lg_password") or return;
 
-
+exit;
 
 
     # if we came this far, user did submit the login form

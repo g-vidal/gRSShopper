@@ -9822,7 +9822,7 @@ sub check_user {
 print "Content-type: text/html\n\n";
 print "Checking user <p>";
     my $cgi = $query;	# get from the global value
-    my $session = new CGI::Session(undef, $cgi, {Directory=>'/tmp'});
+#    my $session = new CGI::Session(undef, $cgi, {Directory=>'/tmp'});
 
     if ($cgi->param("action") eq "logout") {
         $session->delete();
@@ -9844,7 +9844,7 @@ print "Checking user <p>";
 	    -expires=>"Wed, 22 Oct 2025 07:28:00 GMT",
 	    -secure=>0);
 
-    print $cgi->header(-cookie=>$cookie,-charset => 'utf-8');
+  #  print $cgi->header(-cookie=>$cookie,-charset => 'utf-8');
     my $profile = $session->param("~profile");
     my $username = $profile->{username};
     return($session,$username);

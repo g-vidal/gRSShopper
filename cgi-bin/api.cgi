@@ -24,34 +24,52 @@ use CGI::Carp qw(fatalsToBrowser);
 #
 #-------------------------------------------------------------------------------
 
- print "Content-type: text/html\n\n";
+# print "Content-type: text/html\n\n";
+
+# Diagnostics
+
+	our $diag = 0;
+	if ($diag>0) { print "Content-type: text/html\n\n"; }
+	
+	
 
 # Forbid bots
 
 	die "HTTP/1.1 403 Forbidden\n\n403 Forbidden\n" if ($ENV{'HTTP_USER_AGENT'} =~ /bot|slurp|spider/);
 
-
 # Load gRSShopper
-  use strict;
+
 	use File::Basename;
-	use CGI::Carp qw(fatalsToBrowser);
-#      use local::lib; # sets up a local lib at ~/perl5
-	use Fcntl qw(:flock SEEK_END);
+      #use local::lib; # sets up a local lib at ~/perl5
 	my $dirname = dirname(__FILE__);
 	require $dirname . "/grsshopper.pl";
-	use JSON;
-
-
 
 
 # Load modules
 
 	our ($query,$vars) = &load_modules("api");
-  $vars->{db} ||= $vars->{table};
-	$vars->{table} ||= $vars->{db};
-  if ($vars->{source} && $vars->{target}) { $vars->{cmd} = "webmention"; }
-
-
+	
+	
+# Load Site
+	
+	our ($Site,$dbh) = &get_site("api");		
+	
+# Load User
+	my ($session,$username) = &check_user();
+	our $Person = {}; bless $Person;
+	&get_person($Person,$username);
+	my $person_id = $Person->{person_id};
+	print &show_login($session);
+	
+# Set vars
+	my $vars = $query->Vars;
+	my $page_dir = "../";
+	
+# Admin Only
+	die "Admin Only" unless (&admin_only());
+	
+print "API";
+exit;
 
 # Get Post Data
   our $request_data;
@@ -66,13 +84,6 @@ use CGI::Carp qw(fatalsToBrowser);
 			print "ok";
 			exit;
 	}
-
-# Load Site
-
-
-	our ($Site,$dbh) = &get_site("api");
-
-
 
 # while (my($vx,$vy) = each %$vars) { print "$vx = $vy <br>"; }                      #"
 

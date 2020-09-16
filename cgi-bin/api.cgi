@@ -248,7 +248,7 @@ use CGI::Carp qw(fatalsToBrowser);
 # Admin Only
 	die "Admin Only" unless (&admin_only());
 	
-print "API ";
+
 
 # get Postdata, in which API JSON will be stored
 

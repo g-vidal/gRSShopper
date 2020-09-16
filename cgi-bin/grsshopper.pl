@@ -9905,6 +9905,7 @@ print "Currently logged in <p>";
         return 1;  # if logged in, don't bother going further
     }
 print "Not logged in <p>"; 
+exit;
     my $lg_name = $cgi->param("lg_name") or return;
     my $lg_psswd=$cgi->param("lg_password") or return;
 

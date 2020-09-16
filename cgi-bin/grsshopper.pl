@@ -9898,12 +9898,13 @@ sub show_login {
 sub init_login {
     my ($session) = @_; 
     my $cgi = $query;
-print "In init_login()";
-exit;
+print "In init_login() <p>";
+
     if ( $session->param("~logged-in") ) {
+print "Currently logged in <p>";    
         return 1;  # if logged in, don't bother going further
     }
- 
+print "Not logged in <p>"; 
     my $lg_name = $cgi->param("lg_name") or return;
     my $lg_psswd=$cgi->param("lg_password") or return;
 

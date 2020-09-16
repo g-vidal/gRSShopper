@@ -70,7 +70,7 @@ my @lissing_list;
 my @modules = qw(CGI CGI::Carp CGI::Session Crypt::Eksblowfish::Bcrypt Fcntl DateTime DateTime::TimeZone DBI
 Digest::SHA Email::Stuffer Email::Sender::Transport::SMTP File::Basename File::stat File::Find HTML::Entities HTTP::Request::Common
 Image::Resize JSON JSON::Parse JSON::XS Lingua::EN::Inflect LWP LWP::UserAgent LWP::Simple MIME::Types Mastodon::Client MIME::Lite::TT::HTML
-Net::Twitter::Lite::WithAPIv1_1 REST::Client Scalar::Util Text::ParseWords Time::Local URI::Escape vCard XML::OPML);
+Net::Twitter::Lite::WithAPIv1_1 REST::Client Scalar::Util Slurp Text::ParseWords Time::Local URI::Escape vCard XML::OPML);
 
 print "Checking: ";
 foreach my $module (@modules) {

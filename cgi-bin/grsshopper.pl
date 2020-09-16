@@ -9821,6 +9821,7 @@ sub arrays {
 sub check_user {
 print "Content-type: text/html\n\n";
 print "Checking user <p>";
+exit;
     my $cgi = $query;	# get from the global value
 #    my $session = new CGI::Session(undef, $cgi, {Directory=>'/tmp'});
 

@@ -1148,8 +1148,12 @@ sub list_tables {
 
 }
 
-
-
+# replaces function from Lingua::EN::Inflect for now
+sub PL {
+   	my ($table,$count) = @_;
+	if ($count == 1) { return $table; }
+	else { return $table."s"; }
+}
 
 sub list_records {
 

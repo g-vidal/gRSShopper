@@ -9828,13 +9828,9 @@ sub check_user {
 
     if ($cgi->param("action") eq "logout") {
         $session->delete();
-	$session = new CGI::Session(undef, $cgi, {Directory=>'/tmp'});
-	print $cgi->header();
-	&show_login($session);
-	exit;
-        #print $cgi->header();
-        #print qq|Logged Out. <a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|">Login</a>|;
-        #exit;
+        print $cgi->header();
+        print qq|Logged Out. <a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|">Login</a>|;
+        exit;
     } 
 	#   $session->clear(["~logged-in"]);
 #print "Into init_login()<p>";	

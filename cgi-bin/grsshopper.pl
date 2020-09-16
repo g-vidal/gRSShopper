@@ -9819,8 +9819,8 @@ sub arrays {
 
 	# Checks for logout, initializes session, writes cookie
 sub check_user {
-print "Content-type: text/html\n\n";
-print "Checking user <p>";
+#print "Content-type: text/html\n\n";
+#print "Checking user <p>";
 
     my $cgi = $query;	# get from the global value
     my $session = new CGI::Session(undef, $cgi, {Directory=>'/tmp'});
@@ -9832,11 +9832,11 @@ print "Checking user <p>";
         exit;
     } 
 	#   $session->clear(["~logged-in"]);
-print "Into init_login()<p>";	
+#print "Into init_login()<p>";	
     &init_login($session,$cgi);
 
-print "Back from init_login()";
-print " Going to print my cookie for the session ".$session->id."<p>";
+#print "Back from init_login()";
+#print " Going to print my cookie for the session ".$session->id."<p>";
 
 
     my $cookie = CGI::Cookie->new(CGISESSID => $session->id);
@@ -9850,8 +9850,8 @@ print " Going to print my cookie for the session ".$session->id."<p>";
 
     my $profile = $session->param("~profile");
     my $username = $profile->{username};
-  print "Just printed the cookie<p>";  
-  print "Returning session $session and username $username <p>";
+  #print "Just printed the cookie<p>";  
+  #print "Returning session $session and username $username <p>";
  
     return($session,$username);
 
@@ -9903,14 +9903,14 @@ sub show_login {
 sub init_login {
     my ($session) = @_; 
     my $cgi = $query;
-print "In init_login() <p>";
+#print "In init_login() <p>";
 
     if ( $session->param("~logged-in") ) {
-print "Currently logged in <p>";    
+#print "Currently logged in <p>";    
         return 1;  # if logged in, don't bother going further
     }
-print "Not logged in <p>"; 
-print "Login name (from form): ".$cgi->param("lg_name")."<p>";
+#print "Not logged in <p>"; 
+#print "Login name (from form): ".$cgi->param("lg_name")."<p>";
 
     my $lg_name = $cgi->param("lg_name") or return;
     my $lg_psswd=$cgi->param("lg_password") or return;
@@ -9927,7 +9927,7 @@ print "Login name (from form): ".$cgi->param("lg_name")."<p>";
         $session->param("~profile", $profile);
         $session->param("~logged-in", 1);
         $session->clear(["~login-trials"]);
-print "Got the profile, $profile and loaded it into the session $session <p>";
+#print "Got the profile, $profile and loaded it into the session $session <p>";
         return 1;
     }
     
@@ -9944,7 +9944,7 @@ print "Got the profile, $profile and loaded it into the session $session <p>";
 sub _load_profile {
     my ($lg_name, $lg_psswd) = @_;
     my $cgi = $query;
-print "Loading profile <p>";
+#print "Loading profile <p>";
     my $persondata = &db_get_record($dbh,"person",{person_title=>$lg_name});
     
     unless ($persondata) {		                   # User does not exist
@@ -9955,10 +9955,10 @@ print "Loading profile <p>";
         exit;
     }
 							# User Exists, Check Password
-print "Checking password<p>";							
+#print "Checking password<p>";							
     if (&_check_password($lg_psswd,$persondata->{person_password})) {
        my $p_mask = "x" . length($p);
-print "Password OK, returning ".$persondata->{person_title}."<p>";       
+#print "Password OK, returning ".$persondata->{person_title}."<p>";       
        return {username=>$persondata->{person_title}, password=>$p_mask, email=>$persondata->{person_email}};
     }
 

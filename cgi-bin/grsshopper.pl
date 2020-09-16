@@ -9838,7 +9838,7 @@ sub check_user {
     my $cookie = $cgi->cookie(-name=>CGISESSID,
 	    -value=>$session->id,
 	    -expires=>"Wed, 22 Oct 2025 07:28:00 GMT",
-	    -secure=>1);
+	    -secure=>0);
 
     print $cgi->header(-cookie=>$cookie,-charset => 'utf-8');
     my $profile = $session->param("~profile");

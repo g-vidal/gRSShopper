@@ -9819,7 +9819,8 @@ sub arrays {
 
 	# Checks for logout, initializes session, writes cookie
 sub check_user {
-
+print "Content-type: text/html\n\n";
+print "Checking user <p>";
     my $cgi = $query;	# get from the global value
     my $session = new CGI::Session(undef, $cgi, {Directory=>'/tmp'});
 
@@ -9832,7 +9833,8 @@ sub check_user {
 	#   $session->clear(["~logged-in"]);
 	
     &init_login($session,$cgi);
-print "Content-type: text/html\n\n";
+
+
 
 
     #my $cookie = CGI::Cookie->new(CGISESSID => $session->id);

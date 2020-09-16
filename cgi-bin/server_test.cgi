@@ -77,11 +77,11 @@ foreach my $module (@modules) {
   print "$module ";
   eval "use $module";
   if ($@) {
-    print "<span style='color:red;'> X</span>$newline";
+    print "<span style='color:red;'> X</span> ";
     $missing=1;
     push @missing_list,$module;
   } else {
-    print "<span style='color:green;'> OK</span>$newline";
+    print "<span style='color:green;'> OK</span> ";
   }
 }
 

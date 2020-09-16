@@ -53,23 +53,12 @@ use CGI::Carp qw(fatalsToBrowser);
 # Load Site
 	
 	our ($Site,$dbh) = &get_site("api");		
-	
-# Load User
-	my ($session,$username) = &check_user();
-	our $Person = {}; bless $Person;
-	&get_person($Person,$username);
-	my $person_id = $Person->{person_id};
-	 print &show_login($session);
-	
+
 # Set vars
 	my $vars = $query->Vars;
 	my $page_dir = "../";
 	
-# Admin Only
-	die "Admin Only" unless (&admin_only());
 	
-print "API";
-
 
 # Get Post Data
   our $request_data;
@@ -247,15 +236,19 @@ print "API";
 
 	}
 
-	# Get Person  (still need to make this an object)
+# Load User
+	my ($session,$username) = &check_user();
+	our $Person = {}; bless $Person;
+	&get_person($Person,$username);
+	my $person_id = $Person->{person_id};
+	 print &show_login($session);
+	
 
-		our $Person = {}; bless $Person;
-		&get_person($dbh,$query,$Person);
-		my $person_id = $Person->{person_id};
-
-
-	&admin_only();
-  print "Content-type: text/html\n\n";
+	
+# Admin Only
+	die "Admin Only" unless (&admin_only());
+	
+print "API";
 
 # get Postdata, in which API JSON will be stored
 

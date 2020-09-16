@@ -35,7 +35,7 @@ use CGI::Carp qw(fatalsToBrowser);
   use strict;
 	use File::Basename;
 	use CGI::Carp qw(fatalsToBrowser);
-      use local::lib; # sets up a local lib at ~/perl5
+#      use local::lib; # sets up a local lib at ~/perl5
 	use Fcntl qw(:flock SEEK_END);
 	my $dirname = dirname(__FILE__);
 	require $dirname . "/grsshopper.pl";

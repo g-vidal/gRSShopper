@@ -59,7 +59,7 @@ use CGI::Carp qw(fatalsToBrowser);
 	our $Person = {}; bless $Person;
 	&get_person($Person,$username);
 	my $person_id = $Person->{person_id};
-	# print &show_login($session);
+	 print &show_login($session);
 	
 # Set vars
 	my $vars = $query->Vars;

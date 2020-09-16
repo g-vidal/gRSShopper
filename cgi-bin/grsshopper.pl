@@ -9829,6 +9829,7 @@ sub check_user {
     if ($cgi->param("action") eq "logout") {
         $session->delete();
 	$session = new CGI::Session(undef, $cgi, {Directory=>'/tmp'});
+	print $cgi->header();
 	&show_login($session);
 	exit;
         #print $cgi->header();

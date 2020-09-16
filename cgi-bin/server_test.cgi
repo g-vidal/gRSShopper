@@ -67,18 +67,17 @@ print " <span style='color:green;'> OK</span>$newline";
 $|++;
 my $missing = 0;
 my @lissing_list;
-my @modules = qw(CGI CGI::Carp CGI::Session File::Basename File::stat File::Find Fcntl DBI LWP LWP::UserAgent
-LWP::Simple HTTP::Request::Common MIME::Types MIME::Lite::TT::HTML HTML::Entities Scalar::Util Text::ParseWords Lingua::EN::Inflect
-Net::Twitter::Lite::WithAPIv1_1 Image::Resize DateTime DateTime::TimeZone Time::Local Digest::SHA Crypt::Eksblowfish::Bcrypt
-XML::OPML REST::Client JSON JSON::Parse JSON::XS URI::Escape Email::Stuffer Email::Sender::Transport::SMTP
-Mastodon::Client);
+my @modules = qw(CGI CGI::Carp CGI::Session Crypt::Eksblowfish::BcryptFcntl DateTime DateTime::TimeZone DBI
+Digest::SHA Email::Stuffer Email::Sender::Transport::SMTP File::Basename File::stat File::Find HTML::Entities HTTP::Request::Common
+Image::Resize JSON JSON::Parse JSON::XS Lingua::EN::Inflect LWP LWP::UserAgent LWP::Simple MIME::Types Mastodon::Client MIME::Lite::TT::HTML
+Net::Twitter::Lite::WithAPIv1_1 REST::Client Scalar::Util Text::ParseWords Time::Local URI::Escape Vcard XML::OPML);
 
-
+print "Checking: ";
 foreach my $module (@modules) {
-  print "Checking for $module. ";
+  print "$module ";
   eval "use $module";
   if ($@) {
-    print "<span style='color:red;'>The $module module could not be located.</span>$newline";
+    print "<span style='color:red;'> X</span>$newline";
     $missing=1;
     push @missing_list,$module;
   } else {

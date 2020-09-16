@@ -168,7 +168,7 @@ sub get_site {
 	our $Site = gRSShopper::Site->new({
 		context		=>	$context,
 		data_dir	=>	'./data/',		# Location of site configuration files
-		secure => 1,							# Turns on SSH
+		secure => 0,							# Turns on SSH
 
 	});
 

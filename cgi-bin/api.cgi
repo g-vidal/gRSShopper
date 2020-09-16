@@ -59,7 +59,7 @@ use CGI::Carp qw(fatalsToBrowser);
 	if ($postdata) {
 	    print "Found postdata<br>";
 			# Parse the JSON Data
-			use JSON::Parse 'parse_json';
+			#use JSON::Parse 'parse_json';
 			use JSON;
 			$request_data = parse_json($postdata);
 			print "Content-type: text/html\n\n";

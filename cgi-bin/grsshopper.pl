@@ -9835,6 +9835,7 @@ sub check_user {
 #print "Into init_login()<p>";	
     &init_login($session,$cgi);
 
+print "Content-type: text/html\n\n";
 #print "Back from init_login()";
 #print " Going to print my cookie for the session ".$session->id."<p>";
 

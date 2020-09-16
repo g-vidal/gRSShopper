@@ -9915,18 +9915,19 @@ print "Login name (from form): ".$cgi->param("lg_name")."<p>";
     my $lg_name = $cgi->param("lg_name") or return;
     my $lg_psswd=$cgi->param("lg_password") or return;
 
-exit;
+
 
 
     # if we came this far, user did submit the login form
     # so let's try to load his/her profile if name/psswds match
-    
+  
+  print "About to load profile <p>";
        
     if ( my $profile = _load_profile($lg_name, $lg_psswd) ) {     
         $session->param("~profile", $profile);
         $session->param("~logged-in", 1);
         $session->clear(["~login-trials"]);
-
+print "Got the profile, $profile and loaded it into the session $session <p>";
         return 1;
     }
     
@@ -9943,7 +9944,7 @@ exit;
 sub _load_profile {
     my ($lg_name, $lg_psswd) = @_;
     my $cgi = $query;
-
+print "Loading profile <p>";
     my $persondata = &db_get_record($dbh,"person",{person_title=>$lg_name});
     
     unless ($persondata) {		                   # User does not exist
@@ -9954,9 +9955,10 @@ sub _load_profile {
         exit;
     }
 							# User Exists, Check Password
-							
+print "Checking password<p>";							
     if (&_check_password($lg_psswd,$persondata->{person_password})) {
        my $p_mask = "x" . length($p);
+print "Password OK, returning ".$persondata->{person_title}."<p>";       
        return {username=>$persondata->{person_title}, password=>$p_mask, email=>$persondata->{person_email}};
     }
 

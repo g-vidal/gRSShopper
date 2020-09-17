@@ -21,7 +21,7 @@ docker run --publish 80:80 --detach --name gr1 grsshopper
 ```
 
 
-OR, run from thw GitHub repository as follows:
+OR, run from the GitHub repository as follows:
 
 Process:
 
@@ -111,5 +111,5 @@ https://metacpan.org/pod/release/SHERZODR/CGI-Session-3.95/Session.pm
 
 https://metacpan.org/pod/release/SHERZODR/CGI-Session-3.95/Session/CookBook.pm
 
-
+https://blog.ouseful.info/2020/06/09/first-forays-into-the-reclaim-cloud-beta-running-a-personal-jupyter-notebook-server/
 

@@ -67,11 +67,9 @@ Credits
 
 I did the coding, etc., but here are some resources that really helped along the way
 
-https://mariadb.com/kb/en/making-backups-with-mysqldump/
+https://mariadb.com/kb/en/making-backups-with-mysqldump/ - Maria db making backups with mysqldump
 
-https://alysivji.github.io/php-mysql-docker-containers.html
-
-https://hub.docker.com/r/fauria/lamp
+https://hub.docker.com/r/fauria/lamp - Fauria LAMP Docker image
 
 https://www.edureka.co/community/10534/copying-files-from-host-to-docker-container
 

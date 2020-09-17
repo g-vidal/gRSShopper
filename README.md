@@ -97,7 +97,19 @@ https://stackoverflow.com/questions/22720763/how-to-use-perl-to-change-a-mysql-p
 
 https://stackoverflow.com/questions/25920029/setting-up-mysql-and-importing-dump-within-dockerfile
 
+https://docs.docker.com/get-started/
+
+https://docs.docker.com/get-started/part2/
+
 https://docs.docker.com/get-started/part3/
 
 https://gist.github.com/gcrawshaw/1071698/fe4a2ac69d845a65a093a23c4899fd9d80d5c466
+
+https://www.digitalcitizen.life/how-view-remove-cookies-mozilla-firefox
+
+https://metacpan.org/pod/release/SHERZODR/CGI-Session-3.95/Session.pm
+
+https://metacpan.org/pod/release/SHERZODR/CGI-Session-3.95/Session/CookBook.pm
+
+
 

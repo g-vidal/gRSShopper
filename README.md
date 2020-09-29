@@ -77,7 +77,11 @@ https://www.reclaim.cloud
 
 https://www.drdobbs.com/web-development/session-management-with-cgisession/184415974
 
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie - Set Cookie
+
 https://metacpan.org/
+
+https://metacpan.org/pod/CGI::Cookie - CGI::Cookie
 
 https://docs.jelastic.com/
 
@@ -87,7 +91,7 @@ https://registry.hub.docker.com/r/mattrayner/lamp/
 
 https://alysivji.github.io/php-mysql-docker-containers.html
 
-https://stackoverflow.com/questions/1443210/updating-a-local-repository-with-changes-from-a-github-repository
+https://stackoverflow.com/questions/1443210/updating-a-local-repository-with-changes-from-a-github-repository - Stack Overflow
 
 https://stackoverflow.com/questions/37523338/how-to-restart-apache2-without-terminating-docker-container
 
@@ -95,13 +99,19 @@ https://stackoverflow.com/questions/22720763/how-to-use-perl-to-change-a-mysql-p
 
 https://stackoverflow.com/questions/25920029/setting-up-mysql-and-importing-dump-within-dockerfile
 
+https://stackoverflow.com/questions/13154552/javascript-set-cookie-with-expire-time
+
 https://docs.docker.com/get-started/
 
 https://docs.docker.com/get-started/part2/
 
 https://docs.docker.com/get-started/part3/
 
-https://gist.github.com/gcrawshaw/1071698/fe4a2ac69d845a65a093a23c4899fd9d80d5c466
+https://gist.github.com/gcrawshaw/1071698/fe4a2ac69d845a65a093a23c4899fd9d80d5c466 - Using bcrypt to secure passwords in a Perl application 
+
+https://gist.github.com/gcrawshaw/1071698/53f042e5e3bf399bdf2e5e023ffa057d3a15467a - Using bcrypt to secure passwords in a Perl application 
+
+https://rosettacode.org/wiki/SHA-256#Perl - SHA 256
 
 https://www.digitalcitizen.life/how-view-remove-cookies-mozilla-firefox
 
@@ -110,4 +120,6 @@ https://metacpan.org/pod/release/SHERZODR/CGI-Session-3.95/Session.pm
 https://metacpan.org/pod/release/SHERZODR/CGI-Session-3.95/Session/CookBook.pm
 
 https://blog.ouseful.info/2020/06/09/first-forays-into-the-reclaim-cloud-beta-running-a-personal-jupyter-notebook-server/
+
+https://www.effectiveperlprogramming.com/2020/06/turn-off-indirect-object-notation/ - Perl - Turn off indirect object notation
 

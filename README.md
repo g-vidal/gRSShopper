@@ -11,7 +11,7 @@ Note: still being set up, these instructions don't work yet
 
 gRSShopper is a tool that aggregates, organizes and distributes resources to support online learning. Read more here: https://grsshopper.downes.ca/
 
-Docker image is here: https://hub.docker.com/r/downes/grsshopper
+Docker image is here: https://hub.docker.com/r/downes/grsshopper-ple
 
 To run:
 ```

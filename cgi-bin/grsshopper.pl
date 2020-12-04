@@ -1662,6 +1662,7 @@ sub format_record {
 
 	&make_badges(\$view_text,$table,$id_number,$filldata);												# Badges
 
+	&make_conditionals(\$view_text,$table,$id_number,$filldata);		# Resolve conditional statements
 
 	if ($record_format =~ /opml/) { $view_text =~ s/&/&amp;/g; }
 	if ($record_format =~ /text|txt/) { &strip_html($text_ptr); }
@@ -2449,6 +2450,41 @@ sub make_tz {
 	return unless $$input =~ /<timezone>/;
 	my $newinput = $Site->{st_timezone};
 	$$input =~ s/<timezone>/$newinput/ig;
+}
+
+	# -------   Make Conditionals ------------------------------------------------------
+	#
+	#           Analyzes <if> <then> <endif> 
+	#
+	#           In the text, if the contents between <if> and <then> are nonzero, then the content 
+	#           between <then> and <endif> become part of the text, otherwise the whole <if> ... <endif>
+	#           expression is removed. Note that this function should be run *after* content-filling
+	#           functions such as make_data_elements() and make_keywords()        
+	#
+	#-------------------------------------------------------------------------------
+
+sub make_conditionals {
+
+   	my ($text_ptr,$table,$id,$filldata) = @_;
+
+	my $count = 0; 							# Look for conditional statements
+	while ($$text_ptr =~ /<if>(.*?)<then>(.*?)<endif>/sig) {
+		$count++; last if ($count > 100);			# Prevent infinite loop
+		my $replace = "";					# Create an original empty replace string
+		my $autotexta = $1; my $autotextb = $2;			# Parse conditional statement
+		my $antecedent = $autotexta;				# Extract antecedent from text, then
+		$antecedent =~ s/\s+//g;				# clean spaces, line feeds from antecedent
+		if ($antecedent) { 					# and look for content in antecedent
+			$replace .= $autotextb;				# If content is found, put the consequent into the replace string,
+			$replace =~ s/^\s+|\s+$//sg;			# removing leading and trailing spaces, which
+									# allows us to insert strings into formatting, URLs, etc
+		} 
+									# Substitute the original content with the replace string
+									# noting that if the antecedent is empty the entire conditional
+									# will be replaced with the original empty replace string
+		$$text_ptr =~ s/<if>\Q$autotexta\E<then>\Q$autotextb\E<endif>/$replace/sig;
+									# Win code documentation of the year award
+	}
 }
 
 	# -------   Make Keylist ------------------------------------------------------

@@ -82,6 +82,9 @@ RUN mkdir /var/www/html/cgi-bin
 RUN a2enconf cgi-enabled 
 
 COPY index.php /var/www/html/
+COPY html/index.html /var/www/html/index.html
+COPY html/index.html /var/www/html/index.htm
+ADD html/assets /var/www/html/assets/
 ADD cgi-bin /var/www/html/cgi-bin/
 RUN chmod 705 /var/www/html/cgi-bin/*.cgi
 COPY cgi-bin/server_test.cgi /var/www/html/cgi-bin

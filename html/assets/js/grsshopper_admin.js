@@ -1,4 +1,4 @@
-var url = 'cgi-bin/api.cgi';
+var url = 'api.cgi';
 
 // Stores current status of the Reader
 var readerTable;

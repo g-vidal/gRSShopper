@@ -10018,7 +10018,8 @@ sub _make_profile {
 
 	my $cgi = $query;
 	print $cgi->header();
-	$query->param("action") = "";  # Clear action param
+	$query->param(action => ''); # Clear action param
+ 
 	
 	# Security Functions
 	# Captcha, Email verification, etc. will go here

@@ -10018,6 +10018,7 @@ sub _make_profile {
 
 	my $cgi = $query;
 	print $cgi->header();
+	print "Working <p>";
 	$query->param(action => ''); # Clear action param
  
 	

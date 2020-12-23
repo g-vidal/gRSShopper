@@ -57,7 +57,8 @@ RUN apt-get install -y \
       libmime-lite-tt-html-perl \
       libcrypt-eksblowfish-perl \
       libtext-vcard-perl \
-      libfile-slurp-perl
+      libfile-slurp-perl \
+      liblingua-en-inflect-number-perl
       
 RUN apt-get install apache2 libapache2-mod-php7.0 -y
 RUN apt-get install mariadb-common mariadb-server mariadb-client -y

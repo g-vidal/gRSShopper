@@ -58,7 +58,9 @@ RUN apt-get install -y \
       libcrypt-eksblowfish-perl \
       libtext-vcard-perl \
       libfile-slurp-perl \
-      liblingua-en-inflect-number-perl
+      liblingua-en-inflect-number-perl \
+	  perl-Image-Resize-Path \
+	  libemail-stuffer-perl
       
 RUN apt-get install apache2 libapache2-mod-php7.0 -y
 RUN apt-get install mariadb-common mariadb-server mariadb-client -y

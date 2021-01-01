@@ -9873,7 +9873,8 @@ sub check_user {
     if ($cgi->param("action") eq "logout") {
         $session->delete();
         print $cgi->header();
-        print qq|Logged Out. <a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|">Login</a>|;
+        print qq|Logged Out. <a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|">Login</a>
+		<script>window.scrollTo(0,document.body.scrollHeight);</script'>|;
         exit;
     } 
 	#   $session->clear(["~logged-in"]);
@@ -9912,7 +9913,8 @@ sub show_login {
     my $session = shift;
     # Logged In
     if ($session->param("~logged-in")) { 
-        return "Username: ".$session->param("~profile")->{username}.qq| [<a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|?action=logout">Logout</a>]<p>|;
+        return "Username: ".$session->param("~profile")->{username}.qq| [<a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|?action=logout">Logout</a>]<p>
+		<script>window.scrollTo(0,document.body.scrollHeight);</script'>|;
     } 
 
     # Not Logged In
@@ -9939,6 +9941,7 @@ sub show_login {
         <input type=password placeholder="Password" name="lg_password">
         <input type="submit" name="action" value ="$count">
         </form>
+		<script>window.scrollTo(0,document.body.scrollHeight);</script>
         |;
     }
 }
@@ -10027,13 +10030,17 @@ sub _make_profile {
 	
 	# Check for username and password
 	unless ($cgi->param("lg_name") && $cgi->param("lg_password")) { 
-		print "New account must have both a user name and a password."; exit;
+		print "New account must have both a user name and a password."; 
+		print qq|<script>window.scrollTo(0,document.body.scrollHeight);</script>|;
+		exit;
 	}
 	
 	# Check for unique username
 	my $persondata = &db_get_record($dbh,"person",{person_title=>$cgi->param("lg_name")});
 	if ($persondata) { 
-		print "This user name is already in use."; exit;
+		print "This user name is already in use."; 
+		print qq|<script>window.scrollTo(0,document.body.scrollHeight);</script>|;
+		exit;
 	}
 	    
 	# Check in case this is the first user, which must be Admin
@@ -10056,7 +10063,8 @@ print "<p>Name".$cgi->param("lg_name")."<p>";
 print "<p>Pass".$cgi->param("lg_password")."<p>";
 print "<p>Encr".$encr_pass."<p>";
 
-	if ($userid) { print qq|<p>Profile made. Now you can <a href="//$ENV{'SERVER_NAME'}$ENV{'SCRIPT_NAME'}">login</a></p>|; }
+	if ($userid) { print qq|<p>Profile made. Now you can <a href="//$ENV{'SERVER_NAME'}$ENV{'SCRIPT_NAME'}">login</a></p>
+	<script>window.scrollTo(0,document.body.scrollHeight);</script>|; }
 	else { print qq|Failed to create profile; I have no idea why.|; }
 	
 	exit;

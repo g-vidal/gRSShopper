@@ -26,57 +26,55 @@ use CGI::Carp qw(fatalsToBrowser);
 
 # print "Content-type: text/html\n\n";
 
+# Diagnostics
+
+	our $diag = 0;
+	if ($diag>0) { print "Content-type: text/html\n\n"; }
+	
+	
+
 # Forbid bots
 
 	die "HTTP/1.1 403 Forbidden\n\n403 Forbidden\n" if ($ENV{'HTTP_USER_AGENT'} =~ /bot|slurp|spider/);
 
-
 # Load gRSShopper
-  use strict;
+
 	use File::Basename;
-	use CGI::Carp qw(fatalsToBrowser);
-      use local::lib; # sets up a local lib at ~/perl5
-	use Fcntl qw(:flock SEEK_END);
+      #use local::lib; # sets up a local lib at ~/perl5
 	my $dirname = dirname(__FILE__);
 	require $dirname . "/grsshopper.pl";
-	use JSON;
-
-
 
 
 # Load modules
 
 	our ($query,$vars) = &load_modules("api");
-  $vars->{db} ||= $vars->{table};
-	$vars->{table} ||= $vars->{db};
-  if ($vars->{source} && $vars->{target}) { $vars->{cmd} = "webmention"; }
+	
+	
+# Load Site
+	
+	our ($Site,$dbh) = &get_site("api");		
 
-
+# Set vars
+	my $vars = $query->Vars;
+	my $page_dir = "../";
+	
+	
 
 # Get Post Data
-  our $request_data; our $request_type;
+  our $request_data;
 	my $postdata = $query->param('POSTDATA');
 	if ($postdata) {
-			$request_type = "post";
+	    print "Found postdata<br>";
 			# Parse the JSON Data
-			use JSON::Parse 'parse_json';
+			#use JSON::Parse 'parse_json';
 			use JSON;
-			$vars = parse_json($postdata);
-			$request_data = $vars;
-
-			#exit;
+			#$request_data = parse_json($postdata);
+			print "Content-type: text/html\n\n";
+			print "ok";
+			exit;
 	}
 
-# Load Site
-
-
-
-
-	our ($Site,$dbh) = &get_site("api");
-
-
-#print "Content-type: text/html\n\n";
- #while (my($vx,$vy) = each %$vars) { print "$vx = $vy <br>"; }                      #"
+# while (my($vx,$vy) = each %$vars) { print "$vx = $vy <br>"; }                      #"
 
 
 
@@ -87,76 +85,6 @@ use CGI::Carp qw(fatalsToBrowser);
 # These are requests put to the app to offer some sort of form or interaction
 #
 # -------------------------------------------------------------------------------------
-
-  # Default to test
-#die "Made it here 92 Cmd=".$vars->{cmd};
-#  if ($vars->{cmd} eq "") { $vars->{cmd} = "test"; }
-#die "Made it here 94 Cmd=".$vars->{cmd};
-  # TEST
-
-	if ($vars->{cmd} eq "show" && $vars->{table} eq "link") {
-		print "Content-type: text/json\n\n";
-   		$vars->{format} = "json";
-		my $data = &list_records($dbh,$query,"link",{link_id=>$vars->{id}});
-   		my $json = encode_json $data;
-   		print $json;exit;
-	}
-
-	my $listsearch;
-	if ($vars->{cmd} eq "list") {
-		
-		while (my($vx,$vy) = each %$vars) {
-			if ($vx =~ /category|genre|status|section/) {  # filter parameters
-				$listsearch->{$vx} = $vy; }
-		}
-
-	}
-
-	if ($vars->{cmd} eq "list" && $vars->{table} eq "link") {
-		print "Content-type: text/json\n\n";
-   		$vars->{format} = "json";
-   		my $data = &list_records($dbh,$query,"link",$listsearch);
-   		my $json = encode_json $data;
-   		print $json;exit;
-	}
-
-
-	if ($vars->{cmd} eq "list" && $vars->{table} eq "media") {
-
-		print "Content-type: text/json\n\n";
-   $vars->{format} = "json";
-   my $data = &list_records($dbh,$query,"media",{mimetype=>"audio/mpeg"});
-   
-   my $json = encode_json $data;
-   print $json;exit;
-
-
-
-		print "Content-type: text/json\n\n";
-		#my $json = encode_json $vars;
-		my $json = qq|
-[
-    {
-        "url": "1",
-        "title": "John",
-        "mimetype": "Doe"
-    },
-    {
-        "id": "2",
-        "firstName": "Mary",
-        "lastName": "Peterson"
-    },
-    {
-        "id": "3",
-        "firstName": "George",
-        "lastName": "Hansen"
-    }
-]
-|;		
-		print $json;
-		 exit;
-	}
-
 
   # LOGIN
 	if ($vars->{cmd} eq "login") {
@@ -346,17 +274,6 @@ if ($vars->{cmd}) {
 
 	if ($vars->{cmd} eq "list") {
 
-# testing
-if ($vars->{table} eq "media") {
-  # print "Content-type: text/json\n\n";
-  
-   $vars->{format} = "json";
-   my $data = &list_records($dbh,$query,"media",{mimetype=>"audio/mpeg"});
-   my $json = encode_json $data;
-   print $json;
-   exit;
-
-}
   #  print "Content-type: text/html\n\n";
 
     # List Tables
@@ -817,7 +734,7 @@ if ($vars->{table} eq "media") {
 		elsif ($vars->{type} eq "data") { &api_data_update();  }
 
 	  # file upload
-		elsif ($vars->{type} eq "file") {   &api_file_upload(); }
+		elsif ($vars->{type} eq "file") { &api_file_upload(); }
 
 	  # url upload
 		elsif ($vars->{type} eq "file_url") { &api_url_upload(); }
@@ -1629,13 +1546,6 @@ sub api_textfield_update {
 	# Update the cached version of the record
 	if ($id_number) {
  		&output_record($dbh,$query,$vars->{table_name},$vars->{table_id},"viewer");
-		my $published = &db_get_single_value($dbh,$vars->{table_name},$vars->{table_name}."_social_media",$vars->{table_id});
-
-		# Update if alread published to web
-		# Autopublishing author, feed
-		if ($published =~ /web/ || $vars->{table_name} eq "author" || $vars->{table_name} eq "feed") { 
-			&print_record($dbh,$query,$vars->{table_name},$vars->{table_id});
-		 }   
 		&api_ok();
   } else { &api_error(); }
 	die "api failed to update $vars->{table_name}  $vars->{table_id}" unless ($id_number);
@@ -1665,11 +1575,7 @@ sub api_datetime_update {
 
 	# Update the cached version of the record
 	if ($id_number) {
-		
 		&output_record($dbh,$query,$vars->{table_name},$vars->{table_id},"viewer");
-		my $published = &db_get_single_value($dbh,$vars->{table_name},$vars->{table_name}."_social_media",$vars->{table_id});
-		if ($published =~ /web/) { &print_record($dbh,$query,$vars->{table_name},$vars->{table_id}); }   # Update if alread published to web
-
 		&api_ok();
 	} else { &api_error(); }
 	die "api failed to update $vars->{table_name}  $vars->{table_id}" unless ($id_number);
@@ -1695,7 +1601,6 @@ sub api_publish {
 
 
 	my $published = &db_get_single_value($dbh,$table,$col,$id);
-
 
 
 
@@ -1786,29 +1691,10 @@ sub api_publish {
 	}
 
 		elsif ($vars->{value} =~ /web/i) {
-#print "Printing $table $id <p>";
+
 			$vars->{force} = "yes"; 							# Over-write cache
 			&output_record($dbh,$query,$table,$id,"html","api");
-			my $printed = &print_record($dbh,$query,$table,$id);					# Publish
-			die "Printing error ,$table,$id  $? $!" unless ($printed);
 			my $url = $Site->{st_url}.$table."/".$id;
-			$published .= ",web";
-			my $result = &db_update($dbh,$table,{$table."_social_media"=>$published}, $id); # Prevent publishing twice
-
-			# Find the previous record, and print it (to create its 'next' link, which won't exist unless we do this)
-			my $nextsql ="SELECT ".$table."_id FROM $table WHERE ".$table."_id <'".$id."' ORDER BY ".$table."_id DESC  LIMIT 1";
-			my ($newprevid) = $dbh->selectrow_array($nextsql);
-			if ($newprevid) { &print_record($dbh,$query,$table,$newprevid); } 
-
-			# Publish feed and author records
-			foreach my $assoc_table ("author","feed") {
-				my @assoc_graph = &find_graph_of($table,$id,$assoc_table);
-				foreach my $assoc_item (@assoc_graph) {
-					&print_record($dbh,$query,$assoc_table,$assoc_item);
-					print "Printed $assoc_table $assoc_item <br>";
-				}
-			}
-
 
 			# Scan links for webmentions
 			my $record = &db_get_record($dbh,$table,{$table."_id"=>$id});
@@ -1821,7 +1707,7 @@ sub api_publish {
 			foreach my $l (@links) {
 
 				# Look for the link ID
-       # print "Checking $l <br>";
+        print "Checking $l <br>";
 				my $lid = &db_locate($dbh,"link",{link_link => $l});
 				$lid ||= "new";
 
@@ -2212,11 +2098,11 @@ sub api_error {
 
 sub api_file_upload {
 
+
 	$vars->{graph_table} = $vars->{table_name};
 	$vars->{graph_id} = $vars->{table_id};
 
 	# Upload the file
-
 
 	my $file = &upload_file();
 	&api_save_file($file);

@@ -54,7 +54,8 @@ if ($vars->{cmd} eq "transaction") {
 
 # MINE
 elsif ($vars->{cmd} eq "mine") {
-
+print "Content-type: tet/html\n\n";
+print "mining";
 	my $blockchain = new Blockchain;
   my $response = $blockchain->mine();
 	&blockchain_close($blockchain);

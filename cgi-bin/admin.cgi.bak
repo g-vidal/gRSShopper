@@ -48,12 +48,13 @@ use CGI::Carp qw(fatalsToBrowser);
 
 # Load modules
 
-	our ($query,$vars) = &load_modules("admin");
+	our ($query,$vars) = &load_modules("page");
 	
 	
 # Load Site
 	
-	our ($Site,$dbh) = &get_site("admin");	
+	our ($Site,$dbh) = &get_site("page");	
+	
 
 		
 	
@@ -67,15 +68,11 @@ use CGI::Carp qw(fatalsToBrowser);
 # Set vars
 	my $vars = $query->Vars;
 	my $page_dir = "../";
-	if ($vars->{context} eq "cron") { $Site->{context} = "cron"; }
-	else { $Site->{context} = "admin"; }
-
-# Restrict to Admin and cron (which runs every 60 seconds)
-	if (time - $Site->{cronrun} > 120)	{ $Site->{cronerr} = "Cron not running"; }
-	if ($vars->{context} eq "cron") { &cron_tasks($dbh,$query,$ARGV); } else { &admin_only(); }
 	
+# Admin Only
+	die "Admin Only" unless (&admin_only());
 	
-# print "Admin";
+print "Admin";
 
 
 	# Initialize system variables
@@ -90,9 +87,7 @@ use CGI::Carp qw(fatalsToBrowser);
 	#    print "Content-type: text/html\n\n";
 	#    while (my($fx,$fy) = each %$vars) { print "$fx = $fy<br>";}   #{%}
 
-
-
-
+	# Restrict to Admin
 
 # Analyze Request --------------------------------------------------------------------
 
@@ -190,7 +185,7 @@ use CGI::Carp qw(fatalsToBrowser);
 				&showcolumns($dbh,$query,$msg); last; };				#	- Add new column to a table
 			/removecolumnwarn/ && do { &removecolumnwarn($dbh,$query); last; };		#	- Remove column - warn user
 			/removecolumndo/ && do { &removecolumndo($dbh,$query); last; };			#	- Remove column - remove it
-			/make_search_forms/ && do { &make_search_forms($dbh,$query); last; };	 #Make search form templates 
+
 
 
 															# Newsletter and Page Functions
@@ -308,8 +303,6 @@ print "Admin General";
 
 		$content .= &admin_update_grsshopper($dbh,$query);
 
-		$content .= &admin_cron($dbh,$query);
-
 		$content .= &admin_configtable($dbh,$query,"Site Information",
 			("Site Name:st_name","Site Tag:st_tag","Email:st_email","Description:st_desc","Publisher:st_pub","Creator:st_crea","License:st_license","Time Zone:st_timezone","Reset Key:reset_key","Cron Key:cronkey"));
 
@@ -410,14 +403,13 @@ print "Admin General";
 
 		my ($dbh,$query) = @_;
 
-	    my $content = &printlang("General Information");
+	        my $content = &printlang("General Information");
 
 		$content .= &admin_update_grsshopper($dbh,$query);
 
-        $content .= &admin_cron($dbh,$query);
-
 		$content .= &admin_configtable($dbh,$query,"Site Information",
-			("Site Name:st_name","Site Tag:st_tag","Email:st_email","Description:st_desc","Publisher:st_pub","Creator:st_crea","License:st_license","Time Zone:st_timezone","Reset Key:reset_key"));
+			("Site Name:st_name","Site Tag:st_tag","Email:st_email","Description:st_desc","Publisher:st_pub","Creator:st_crea","License:st_license","Time Zone:st_timezone","Reset Key:reset_key","Cron Key:cronkey"));
+
 
 		$content .= &admin_api($dbh,$query);
 
@@ -445,7 +437,7 @@ print "Admin General";
 
 
 
-		my $content = qq|<h3>Access API</h3><p>
+		my $content = qq|<h2>Access API</h2><p>
 		 <ul><table cellspacing="0" cellpadding="2" border="0"><tr><td>
 	   <form method="post" action="$Site->{st_cgi}admin.cgi">
 		 <input type="hidden" name="action" value="access_api">
@@ -515,44 +507,6 @@ print "Admin General";
 
 		&admin_frame($dbh,$query,"Admin Accounts",$content);					# Print Output
 		exit;
-
-
-	}
-
-	# -----------------------------------   Admin: Cron   ------------------------------------------------------
-	#
-	#   Display cron status (running / errors)
-	#
-	# ---------------------------------------------------------------------------------------------
-
-	sub admin_cron {
-
-		my ($dbh,$query) = @_;
-
-	    my $croncolor; my $croncontent;
-	    if ($Site->{cronerr} eq "none") { 
-			$croncontent = "Cron OK"; 
-			$croncolor = "green";
-		} else { 
-			$croncontent = $Site->{cronerr};
-			$croncolor = "red";
-		}
-
-		
-		my $content = qq|<h3>Cron Status</h3><p>
-		 <ul><table cellspacing="0" cellpadding="2" border="0">
-		 <tr><td style="background-color:$croncolor">&nbsp;&nbsp</td>
-		 <td>$croncontent</td><td>&nbsp;</td><td>
-		 <a href="|.$Site->{st_cgi}.qq|admin.cgi?action=logview&logfile=cronlog">
-		 View Cron Log</a></td></tr></table></ul>|;
-
-		$content .= &admin_configtable($dbh,$query,"",("Cron Key:cronkey"));
-
-
-	    return $content;
-
-		exit;
-
 
 
 	}
@@ -1411,7 +1365,7 @@ print "Admin General";
 
 	# --------------------------------------   Update Config -----------------------------------------------
 	#
-	#    Accept user input from admin and update the config table (using reset flag)
+	#    Accept user input from admin and update the config table
 	#
 	# ------------------------------------------------------------------------------------------------------
 
@@ -1422,32 +1376,7 @@ print "Admin General";
 
 		while (my ($vx,$vy) = each %$vars) { $config->{$vx} = $vy; }
 
-		&update_config_table($dbh,$config,1);
-
-        return if ($config);		# 'config' allows config to be set on the fly
-
-		# Display Admin Page
-		unless ($silent) { &admin_sorter($dbh,$query,$vars->{title}); }
-
-	}
-
-# --------------------------------------   Update Config -----------------------------------------------
-#
-#    Accept input from other process updates the config table
-#    based on values found in $%config
-#
-#	 Note that setting $reset to 1 will reset all $Site variables, meaning that if any are
-#    changed during previous execution (eg. $Site->context}) it will have to be captured
-#    and reset after.
-#
-# ------------------------------------------------------------------------------------------------------
-
-sub update_config_table {
-
-	my ($dbh,$config,$reset) = @_;
-
 		# Update Config Table
-
 		while (my ($vx,$vy) = each %$config) {
 
 			next if ($vx =~ /^(action|mode|cronsite|format|button|force|comment|id|title|mod_load|msg|test)$/);
@@ -1473,15 +1402,16 @@ sub update_config_table {
 
 
 		# Reload Site Data
-		if ($reset) {
-			my $sth = $dbh -> prepare("SELECT * FROM config"); $sth -> execute();
-			while (my $c = $sth -> fetchrow_hashref()) { $Site->{$c->{config_noun}} = $c->{config_value}; }
-			$sth->finish();
-		}
+		my $sth = $dbh -> prepare("SELECT * FROM config"); $sth -> execute();
+		while (my $c = $sth -> fetchrow_hashref()) { $Site->{$c->{config_noun}} = $c->{config_value}; }
+		$sth->finish();
 
-		return 1;
+    return if ($config);		# 'config' allows config to be set on the fly
 
-}
+		# Display Admin Page
+		unless ($silent) { &admin_sorter($dbh,$query,$vars->{title}); }
+
+	}
 
 
 # --------------------------------------   Update gRSShopper -----------------------------------------------
@@ -2872,28 +2802,21 @@ sub admin_update_grsshopper{
 	#
 	#--------------------------------------------------------
 
-
-
 	sub cron_tasks {
 
 		my ($dbh,$query) = @_;
 
 		my $log = "";	# Flag that indicates whether an activity was logged
-	
-		&update_config_table($dbh,{cronrun=>time});
-		&update_config_table($dbh,{cronerr=>"none"});
-
 		my $loglevel = 10;
 
-        if ($loglevel > 5) { $log .= sprintf("Context:%s, Args 0:%s, %s, 1:%s, 2:%s, 3:%s\n",
+    if ($loglevel > 5) { $log .= sprintf("Context:%s, Args 0:%s, %s, 1:%s, 2:%s, 3:%s\n",
 			$Site->{context},$ARGV[0],$ARGV[1],$ARGV[2],$ARGV[3]); }
 
 		# Confirm cron key
 		my $cronkey = $ARGV[1] || $vars->{cronkey};
 		unless ($Site->{cronkey} eq $cronkey) {
-			update_config_table($dbh,{cronerr=>"Cron key mismatch"});
-			&log_cron(0,$log.sprintf("Error: Cron key mismatch. Cron key in Cron table must match the value of the cronkey set in %s admin.",
-				$Site->{st_name}));
+			&log_cron(0,$log.sprintf("Error: Cron key mismatch. %s must match the value of the cronkey set in %s admin.",
+				$vars->{cronkey},$Site->{st_name}));
 			exit;
 		}
 
@@ -2908,7 +2831,7 @@ sub admin_update_grsshopper{
 		if ($loglevel > 1) { $log .= "Hour: $hour, Minute = $min\n"; }
 		elsif ($loglevel > 0) { $log .= "$hour:$min - "; }
 
-        # Republish  - Runs a batch every cron cycle (so as not to overload the whole system publishing 30K+ posts)
+                        # Republish  - Runs a batch every cron cycle (so as not to overload the whole system publishing 30K+ posts)
 		my $republish = 1;
 		foreach my $rtable ("feed","author","post","presentation") {
 		    if ($republish == 1) { &republish($rtable,15); }
@@ -2918,21 +2841,17 @@ sub admin_update_grsshopper{
 		# Autopublish
 		my $asql=""; my $amode;
 		if ($weekday eq "Sunday" && $hour eq "23" && $min eq "54")
-			{ $amode = "Weekly"; 
-			$asql = qq|SELECT * FROM page WHERE page_autopub='yes' AND page_autowhen='Weekly'|; }
-		elsif ($hour eq "16" && $min eq "30") {
-			 $amode = "Daily";  
-			 $asql = qq|SELECT * FROM page WHERE page_autopub='yes' AND page_autowhen='Daily'|; }
+			{ $amode = "Weekly"; $asql = qq|SELECT * FROM page WHERE page_autopub='yes' AND page_autowhen='Weekly'|; }
+		elsif ($hour eq "16" && $min eq "30") { $amode = "Daily";  $asql = qq|SELECT * FROM page WHERE page_autopub='yes' AND page_autowhen='Daily'|; }
 		elsif ($min eq "37") { $amode = "Hourly"; $asql = qq|SELECT * FROM page WHERE page_autopub='yes' AND page_autowhen='Hourly'|; }
+
 		if ($amode) { $log .= "Autopublish mode triggered: $amode \n"; }
 		if ($asql) {
 			my $asth = $dbh -> prepare($asql);
 			$asth->execute();
-&log_cron(0,"Autopublish executing");			
 			if ($dbh->errstr()) { &send_email("stephen\@downes.ca","stephen\@downes.ca","Autopublish Error",$dbh->errstr()); }
 			while (my $npage = $asth -> fetchrow_hashref()) {
 				&publish_page($dbh,$query,$npage->{page_id},0);
-&log_cron(0,"Published page: ".$npage->{page_title});				
 				if ($loglevel > 1) { $log .= "Autopublish $npage->{page_id} - $npage->{page_title}\n"; }
 			}
 			$asth->finish;
@@ -2950,9 +2869,13 @@ sub admin_update_grsshopper{
 			my $report = &send_nl($dbh,$query,$npage->{page_id},"subscribers",0);
 			if ($loglevel > 1) { $log .= "Sent newsletter - $npage->{page_title}\n"; }
 		}
+
 		$sth->finish;
 
-$Site->{st_harvest_on} = "yes";
+
+
+	$Site->{st_harvest_on} = "yes";
+
 											# Harvester
 		if ($Site->{st_harvest_on} eq "yes") {
 
@@ -2962,6 +2885,10 @@ $Site->{st_harvest_on} = "yes";
 			my $divisor = $Site->{st_harvest_int}; $divisor ||= 60;
 
 			my $h = qq|Harvesting: $dividend $divisor |.$Site->{st_harvest_on};
+
+
+
+
 
 
 $divisor = 10;
@@ -2995,7 +2922,6 @@ $divisor = 10;
         }
 
 print "$hn <p>\n\n";
-&log_cron(0,$hn);
 				if ($loglevel > 5) { $log .= "\nHarvester run, Status: $status\n"; }
 
 
@@ -3010,7 +2936,7 @@ print "$hn <p>\n\n";
 
 											# Hourly Tasks
 		if ($min eq "33") {
-&log_cron(0,"Performing hourly tasks");
+
 	#		my $dsql = qq|select link_id FROM link WHERE link_link LIKE $deletelink|;
 #print $dsql;
 	#		my $sthl = $dbh->prepare($dsql);
@@ -3617,161 +3543,4 @@ print "$hn <p>\n\n";
 			close FILE;
             $count++;
       }
-	  return 1;
 }
-
-# Make search form templates 
-# for use with api.cgi
-
-sub make_search_forms($dbh,$query) {
-
-	my ($dbh,$query) = @_;
-	my $vars = $query->Vars;
-
-print "Content-type: text/html\n\n";
-print "<p>Making Search forms templates<p>";		
-
-
-	my $doptions; my $templ="";
-	$doptions->{a}="b";
-	my @tables = &db_tables($dbh);
-	foreach my $table (@tables) {
-
-		next if ($table eq "class");  # Javascript chokes on this
-		# Get options from optlist
-
-		my @optlists = &db_get_record_list($dbh,"optlist",{optlist_table=>"$table"});
-		foreach my $optlist (@optlists){ 
-			my $options = &db_get_record($dbh,"optlist",{optlist_id=>"$optlist"});
-			my $option_field = $options->{optlist_field};
-			next unless ($option_field);	# Some optlist entries are incomplete
-
-			my $option_data = $options->{optlist_data};
-			my @option_list = split /;/,$option_data;
-			
-			foreach my $option (@option_list) {
-				($ofield,$oname) = split /,/,$option;
-				$doptions->{$table}->{$option_field}->{$ofield} = $oname;
-			}
-		}
-
-		# Get options from fields that might not be in optlist
-		my @miscfieldlist = qw(category genre type class status);
-
-		# Get the list of columns from the database
-		my @columns = ();
-		my $showstmt = "SHOW COLUMNS FROM $table";
-		my $sth = $dbh -> prepare($showstmt);
-		$sth -> execute();
-
-		# For each column...
-		while (my $showref = $sth -> fetchrow_hashref()) {
-			
-			# Normalize the column name
-			my $fullfieldname = $showref->{Field};
-			my $prefix = $table."_"; $showref->{Field} =~ s/$prefix//;
-			next if ($showref->{Field} eq "class");  # Javascript chokes on this
-
-			# See if it's the sort of thing that might be a category
-			foreach my $miscfield (@miscfieldlist) {
-				if ($showref->{Field} =~ /$miscfield/) {  # It's a hit
-					unless ($doptions->{$table}->{$showref->{Field}}) {  # If it is not in optlist
-						$doptions->{$table}->{$showref->{Field}}->{something} = "something else";
-
-					}
-
-				}
-			}
-
-		}
-
-	}
-			
-
-
-
-
-	while (my($table,$ty) = each %$doptions){	# For each table
-
-		# Write the template
-		$templ .= qq|
-	function |.$table.qq|SearchTemplate(request) {	
-		return `<button class="accordion" onClick="togglePanel(this.nextElementSibling);">Filter \${request.table}</button>
-		<div class="panel">
-		|;
-
-		while (my($column,$cy) = each %$ty) {		# For each column
-			$templ .= sprintf(qq|
-				<p>%s <select name="%s" id="%s%s" 
-				onChange="alert(this.value);loadList({div:'\${request.div}',cmd:'\${request.cmd}',table:'\${request.table}',%s:this.value});">
-				    <option value="all" selected>All</a>
-			|,$column,$column,$column,$table,$column);
-
-			while (my($fname,$fval) = each %$cy) {   #For each option
-				$templ .= qq|
-					<option value="$fval">$fname</a>|;
-			}
-
-			$templ .= qq|
-							</select></p>|;
-		}
-		$templ .= qq|
-		</div>`;
-	};
-
-	|;
-
-		
-
-	}
-
-	my $js_assets_dir = $Site->{st_urlf}."assets/js/";
-		my $filename = $js_assets_dir."gRSShopper_dataTemplates.js";
-		open OUT,">$filename" or print "Error opening $filename: $! <br>";
-		
-		print OUT $templ or print "Error printing $filename: $! <br>";
-		close OUT;
-
-		print qq|Templates printed to 
-			<a href="|.$Site->{st_url}.
-		qq|assets/js/gRSShopper_dataTemplates.js">gRSShopper_dataTemplates.js</a>|;
-		
-
-
-
-	exit;
-
-}	 
-
-
-
-	# -----------------------------------   Admin: Logs   -----------------------------------------------
-	#
-	#   View Logs
-	#
-	# ------------------------------------------------------------------------------------------------------
-
-
-	sub admin_logs {
-
-		my ($dbh,$query) = @_;
-
-		return unless (&is_viewable("admin","logs")); 		# Permissions
-
-		my $content = qq|<h2>View Logs</h2><p>
-			General Statistics -
-			[<a href="admin.cgi?action=logview&logfile=General Stats&format=table">Table</a>]
-			[<a href="admin.cgi?action=logview&logfile=General Stats&format=tsv">TSV</a>]
-			[<a href="admin.cgi?action=logview&logfile=General Stats&format=csv">CSV</a>]<br/>
-			Cron Logs - [<a href="admin.cgi?action=logview&logfile=cronlog">Text File</a>]
-			</p>|;
-
-
-
-
-		&admin_frame($dbh,$query,"Admin General",$content);					# Print Output
-		exit;
-
-
-
-	}

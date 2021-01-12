@@ -1,5 +1,4 @@
 #!/usr/bin/perl
-#print "Content-type: text/html\n\n";
 
 #    gRSShopper 0.7  Page  0.7  -- gRSShopper administration module
 #    26 April 2017 - Stephen Downes
@@ -33,6 +32,8 @@
 
 	use CGI;
 	use CGI::Carp qw(fatalsToBrowser);
+	my $query = new CGI;
+	my $vars = $query->Vars;
 	my $page_dir = "../";
 
 
@@ -51,67 +52,13 @@
 # Load Site
 	
 	our ($Site,$dbh) = &get_site("page");		
-
-# Convert old-style requests
-# (Allows API style requests of the form domain/table/id/action for most things
-# and requests of the form domain/table/seach_term/q  )
-	my $table = $vars->{db} || $vars->{table};
-	if ($table) { $vars->{table} = $vars->{id};	}
-
-# Detect Search Requests (ensures maximum flexibility in how to form these)
-	if ($table eq "search") { $vars->{q} = $vars->{id}; }	
-	if ($vars->{q} || $vars->{action} eq "q") { 
-		$vars->{action} = "search"; 
-		$vars->{table} ||= "post"; 
-		$vars->{$vars->{table}} = $vars->{q};
-	}
-
-# Analyze Request --------------------------------------------------------------------
-# Determine Request Table, ID number 
-# ( assumes page.cgi?$table=$id )
-	my $action = $vars->{action};
-	my $id = $vars->{id};
-	my @tables = &db_tables($dbh);
-	foreach $table (@tables) {				# Scan the list of tables	
-		if ($vars->{$table}) {				#     and if we've specified one	
-			$id = $vars->{$table};			#	      get its ID, and
-			if ($action) {				    # 		  Perform Action, or
-				for ($action) {
-					/rd/ && do { &redirect($dbh,$query,$table,$id); exit; 		};
-					/search/ && do { &show_search($dbh,$query,$table); exit; 		};
-					/list/ && do { &list_records($dbh,$query,$table); exit;		};
-				}
-			} else {						# Show $table number $id			
-				&show_page($dbh,$query,$table,$id,$vars->{format});
-				exit;
-			} 
-
-		} 
-		
-	}	# No table? Default to home
-
-	print "Content-type: text/html; charset=utf-8\n";
-	print "Location:".$Site->{st_url}."\n\n";
-	exit;
+	if ($vars->{context} eq "cron") { $Site->{context} = "cron"; }
 	
-
-
-# Nothing below this line is operational, will be fixed
-
-		if ((!$action || $action =~ /^list$/i || $action =~ /^rd$/i) && $vars->{$t}) {
-			$table = $t;
-			$id = $vars->{$t};
-			$vars->{id} = $id;
-			last;
-		}
-	
-
-
-# Initialize User
 
 	my ($session,$username) = &check_user();
 	
-		our $Person = {}; bless $Person;
+	
+	our $Person = {}; bless $Person;
 	&get_person($Person,$username);
 	my $person_id = $Person->{person_id};
 	
@@ -120,6 +67,72 @@
 	
 	#if ($username) { print $username.qq| [<a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|?action=logout">Logout</a>]<p>|; }
 	#else { $login_window; }
+
+
+	my $vars = $query->Vars;
+	my $page_dir = "../";
+
+						# Search
+
+if ($vars->{q}) {
+	&post_search(); exit;
+}
+
+
+
+# Analyze Request --------------------------------------------------------------------
+
+
+
+# Determine Action ( assumes admin.cgi?action=$action&id=$id )
+
+	my $action = $vars->{action};
+	my $id = $vars->{id};
+
+
+# Determine Request Table, ID number ( assumes admin.cgi?$table=$id and not performing action other than list, edit or delete)
+
+	my @tables = &db_tables($dbh);
+	foreach $t (@tables) {
+
+		if ((!$action || $action =~ /^list$/i || $action =~ /^rd$/i) && $vars->{$t}) {
+			$table = $t;
+			$id = $vars->{$t};
+			$vars->{id} = $id;
+			last;
+		}
+	}
+
+
+# Direct Request Table, ID number, and list requests ( required for most actions, assumes admin.cgi?db=$table&id=$id or admin.cgi?table=$table&id=$id , no $id for action=list )
+
+if ($vars->{db} || $vars->{table}) {
+	$table = $vars->{table} || $vars->{db};
+	if ($vars->{id}) {
+		$id = $vars->{id};
+	} else {
+		unless ($action) {
+			$action = "list";
+		}
+	}
+}
+
+
+
+# Determine Output Format  ( assumes admin.cgi?format=$format )
+
+if ($vars->{format}) { 	$format = $vars->{format};  }
+if ($action eq "list") { $format = "list"; }
+$format ||= "html";		# Default to HTML
+
+
+unless ($table || $action || $api) {				# Default to Home
+
+	print "Content-type: text/html; charset=utf-8\n";
+	print "Location:".$Site->{st_url}."\n\n";
+	exit;
+}
+
 
 
 
@@ -151,7 +164,8 @@ if ($action) {						# Perform Action, or
 	}
 }
 
-
+# Default Data Output
+else { &show_page($dbh,$query,$table,$id,$format); }
 
 if ($dbh) { $dbh->disconnect; }			# Close Database and Exit
 exit;
@@ -171,20 +185,7 @@ exit;
 
 sub show_page {
 
-  	my ($dbh,$query,$table,$id,$format) = @_;
-  	$vars = $query->Vars;
-
-	# Find page by title, if applicable
-	unless (&db_locate($dbh,$table,{$table."_id"=>$id})) { 
-		$id = &db_locate($dbh,$table,{$table."_title"=>$id});
-	}
-
-	# Determine Output Format  ( assumes admin.cgi?format=$format )
-
-	if ($vars->{action} eq "list") { $format = "list"; }
-	$format ||= "html";		# Default to HTML
-
-
+  my ($dbh,$query,$table,$id,$format) = @_;
 	# Try to show the cached version
 	my @tables = qw(post presentation page author feed link publication);
 	foreach my $t (@tables) {
@@ -412,138 +413,6 @@ sub list_records {
 	}
 }
 
-#
-
-sub autopost {
-
-	my ($dbh,$query) = @_;
-	my $vars = $query->Vars;
-	my $postid = &auto_post($dbh,$query,$vars->{id});
-	print "Content-type: text/html\n";
-	print "Location:$Site->{st_url}post/$postid\n\n";
-	exit;
-
-}
-# -------   Output Record ------------------------------------------------------
-
-sub show_search {
-
-	my ($dbh,$query,$table) = @_;
-
-	my $output = "<h2>Searching</h2>";
-	my $search_dir = $Site->{st_urlf}."search/";
-
-	print "Content-type: text/html; charset=utf-8\n\n";
-
-
-
-	my $newq = $vars->{q};
-	$newq =~ s/[^a-zA-Z0-9 -]//g; 
-
-
-
-	$vars->{number}=20;
-	my ($sort,$start,$number,$limit) = &sort_start_number($query,$table);
-	my $searchtable = $table || "post"; exit "No search permitted" if ($searchtable =~ /person/);
-
-	# Try to show the cached version
-#	if ($vars->{force} ne "yes" ) {
-
-			&quick_show_search($search_dir,$table,$newq,$start,"html");
-#	}
-	
-
-
-
-
-	if ($searchtable eq "post") {
-		$output .=  qq|<p>This page: <a href="$Site->{st_url}search/$newq">$Site->{st_url}search/$newq</a></p>|;
-	} else {
-		$output .=  qq|<p>This page: <a href="$Site->{st_url}search/$newq">$Site->{st_url}search/$searchtable/$newq</a></p>|;
-	}
-
-	my $keyword = qq|<keyword start=$start;db=$searchtable;sort=crdate DESC;number=$number;title,description~$vars->{q};truncate=500;format=search>|;
-	my $results_count = &make_keywords($dbh,$query,\$keyword);
-
-
-
-
-	$output .= $keyword;
-
-	my $newstart = $vars->{start} + $vars->{number};
-
-	unless ($results_count < $vars->{number}) {
-		$output .=  qq|<p>[<a href="$Site->{st_cgi}page.cgi?start=$newstart&q=$newq">Next $vars->{number} results</a>]|;
-	}
-
-	$page->{page_content} =
-		&db_get_template($dbh,"static_header",$record->{page_title}) . 
-		$output .
-		&db_get_template($dbh,"static_footer",$record->{page_title});
-	
-
-	&format_content($dbh,"","",$page);
-
-	# save a cached version
-
-
-	my $page_file = $search_dir.$table.".".$newq.".".$start.".html";
-	
-	unless (-d $search_dir) { mkdir($search_dir,0755); }
-    binmode(STDOUT, ":utf8");
-    open FILE, ">$page_file" or die "Cannot open $page_file: $!";
-	print FILE $page->{page_content} or die "Print failure: $!";
-	close FILE;
-
-	print $page->{page_content};
-	exit;
-
-}
-
-
-
-
-
-
-#---------------------  Input Vote  ----------------------------------
-
-sub input_vote {
-
-	my ($dbh,$query) = @_;
-	my $sum = &update_vote($dbh,$query);
-	$vars->{vote_table} ||= "post";
-
-	print &output_record($dbh,$query,$vars->{vote_table},$vars->{vote_post},"html");
-
-}
-
-#
-
-
-
-
-#
-#
-# -------   Print Status -------------------------------------------------------
-#
-#           Print output in a 'status' span
-#	      Edited: 27 March 2010
-#
-
-sub pr_status {
-
-	my ($msg) = @_;
-	return qq|<span class="status">$msg</span>|;
-}
-
-
-
-
-
-
-
-
-
 
 #-------------------------------------------------------------------------------
 #
@@ -708,19 +577,107 @@ sub moderate_meeting {
 
 }
 
+#
+
+sub autopost {
+
+	my ($dbh,$query) = @_;
+	my $vars = $query->Vars;
+	my $postid = &auto_post($dbh,$query,$vars->{id});
+	print "Content-type: text/html\n";
+	print "Location:$Site->{st_url}post/$postid\n\n";
+	exit;
+
+}
+# -------   Output Record ------------------------------------------------------
+
+sub post_search {
+
+
+	$Site->{header} =~ s/\Q[*page_title*]\E/Search/g;
+	$Site->{header} =~ s/\Q<page_title>\E/Search/g;
+
+	print "Content-type: text/html; charset=utf-8\n\n";
+
+
+
+	my $newq = $vars->{q};
+	$newq =~ s/ /%20/g;
+
+	my $header = &db_get_template($dbh,"page_header","Search: $vars->{q}");
+	my $footer = &db_get_template($dbh,"page_footer","Search: $vars->{q}");
+
+	my $output = $header;
+
+	$vars->{number}=20;
+	my ($sort,$start,$number,$limit) = &sort_start_number($query,"post");
+	my $searchtable = $vars->{db} || "post"; exit "No search permitted" if ($searchtable =~ /person/);
+
+	$output .= "<h2>Search</h2>";
+	if ($searchtable eq "post") {
+		$output .=  qq|<p>This page: <a href="$Site->{st_url}search/$newq">$Site->{st_url}search/$newq</a></p>|;
+	} else {
+		$output .=  qq|<p>This page: <a href="$Site->{st_url}search/$newq">$Site->{st_url}search/$searchtable/$newq</a></p>|;
+	}
+
+	my $keyword = qq|<keyword start=$start;db=$searchtable;sort=crdate DESC;number=$number;title,description~$vars->{q};truncate=500;format=search>|;
+	my $results_count = &make_keywords($dbh,$query,\$keyword);
+
+
+
+
+	$output .= $keyword;
+
+	my $newstart = $vars->{start} + $vars->{number};
+
+	unless ($results_count < $vars->{number}) {
+		$output .=  qq|<p>[<a href="$Site->{st_cgi}page.cgi?start=$newstart&q=$newq">Next $vars->{number} results</a>]|;
+	}
+
+	$output .=  $footer;
+
+	my $page->{page_content} = $output;
+	&format_content($dbh,"","",$page);
+	print $page->{page_content};
+	exit;
+
+}
 
 
 
 
 
 
+#---------------------  Input Vote  ----------------------------------
+
+sub input_vote {
+
+	my ($dbh,$query) = @_;
+	my $sum = &update_vote($dbh,$query);
+	$vars->{vote_table} ||= "post";
+
+	print &output_record($dbh,$query,$vars->{vote_table},$vars->{vote_post},"html");
+
+}
+
+#
 
 
 
 
+#
+#
+# -------   Print Status -------------------------------------------------------
+#
+#           Print output in a 'status' span
+#	      Edited: 27 March 2010
+#
 
+sub pr_status {
 
-
+	my ($msg) = @_;
+	return qq|<span class="status">$msg</span>|;
+}
 
 
 

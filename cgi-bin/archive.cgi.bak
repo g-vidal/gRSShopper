@@ -75,9 +75,7 @@ my $start_mday = 1;
 my $base_dir = $Site->{st_urlf}."archive";
 my $base_url = $Site->{st_url}."archive";
 my $archive_page = $base_dir . "/index.html";
-print "Content-type: text/html\n\n";
-my $page_content = "<h1>Archives</h1>";
-# = $Site->{header};
+my $page_content = $Site->{header};
 my @months = ('Jan','Feb','Mar','Apr','May','Jun','Jul',
  			   'Aug','Sept','Oct','Nov','Dec');
 
@@ -150,7 +148,7 @@ while ($start_year > $end_year) {
 	$start_year--;
 }
 
-# $page_content .= $Site->{footer};
+$page_content .= $Site->{footer};
 
 # Print Archives -----------------------------------------------------------------
 
@@ -164,7 +162,6 @@ unless ($vars->{mode} eq "cron") {		# Allow cron to process as well
 }
 
 exit;
-
 
 
 1;

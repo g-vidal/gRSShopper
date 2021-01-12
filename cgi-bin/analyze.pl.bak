@@ -15,9 +15,7 @@
 	# Uses the _summary view but I'll fix this later
 	#
 	# -------------------------------------------------------------------------
-
-# Format the Analyze Tab
-sub Tab_Analyze {
+	sub Tab_Analyze {
 
 	my ($window,$table,$id_number,$record,$data,$defined) = @_;
 	my $output = qq|
@@ -27,35 +25,25 @@ sub Tab_Analyze {
 		</iframe>
 	|;
 	return  $output;
-}
+	}
+		#
+		# Buttons
+		#
+	sub analysis_buttons {
 
+		my ($table,$id_number) = @_;
 
-	#
-	# Buttons -
-	#             'Show Graph'   calls show_graph()
-	#             'Build Graph'  calls analyze_text()
-	#
-sub analysis_buttons {
+		$output .= qq|
+		<input type="button" id="show_graph" value="Show Graph"
+			onClick="window.location.href = '|.
+			$Site->{st_cgi}.qq|admin.cgi?action=show_graph&table=$table&id=$id_number'" />
+		<input type="button" id="build_graph" value="Build Graph"
+			onClick="window.location.href = '|.
+			$Site->{st_cgi}.qq|admin.cgi?action=analyze_text&analysis=new&table=$table&id=$id_number'"><p>|;
 
-	my ($table,$id_number) = @_;
+		return $output;
+	}
 
-	$output .= qq|
-	<input type="button" id="show_graph" value="Show Graph"
-		onClick="window.location.href = '|.
-		$Site->{st_cgi}.qq|admin.cgi?action=show_graph&table=$table&id=$id_number'" />
-	<input type="button" id="build_graph" value="Build Graph"
-		onClick="window.location.href = '|.
-		$Site->{st_cgi}.qq|admin.cgi?action=analyze_text&analysis=new&table=$table&id=$id_number'"><p>|;
-
-	return $output;
-}
-
-
-# ------------------------------------------------------------------------------
-#
-#                        Show graph
-#
-# ------------------------------------------------------------------------------
 
 	#		   onClick="\$('#analysis_window').attr('src','|.
 	#		 $Site->{st_cgi}.qq|admin.cgi?action=show_graph&table=$table&id=$id_number');">
@@ -63,11 +51,8 @@ sub analysis_buttons {
 	#			 $Site->{st_cgi}.qq|admin.cgi?action=analyze_text&analysis=new&table=$table&id=$id_number');"><p>|;
 
 	sub show_graph {
-    print "Content-type: text/html\n\n";
+
 		my ($dbh,$query,$table,$id) = @_;
-
-		print "Show Graph: ".ucfirst($table)." $id <br>";
-
 		die "Table not provided to show_graph()" unless ($table);
 		die "ID not provided to show_graph()" unless ($id);
 		print "Content-type: text/html\n\n";
@@ -114,7 +99,7 @@ sub analysis_buttons {
 	}
 	# -------------------------------------------------------------------------------------------------------------
 	#
-	#                                   Extract Nouns (called by 'Build Graph')
+	#                                   Extract Nouns
 	#
 	# This is a set of functions to study the text of a post and extract words of significance. It works with an
 	# author, presenting candidates for categorization as author, organization, company, etc., and identifying
@@ -127,7 +112,6 @@ sub analysis_buttons {
 
 		my ($dbh,$query,$table,$id) = @_;
 		my $vars = $query->Vars;
-
 
 		# If this is the first associate in a new post, we will be creating a file listing all the associates
 		if ($vars->{analysis} eq "new") { &clear_associates_file(); }
@@ -143,7 +127,7 @@ sub analysis_buttons {
 
 		print "Content-type: text/html\n\n";
 		print &analysis_buttons($table,$id);
-		print "Analyzing ".ucfirst($table)." $id...<br>";
+		print "Analyzing $table $id...<br>";
 
 		my @nouns = &extract_nouns($dbh,$query,$table,$id,$text);
 
@@ -151,11 +135,11 @@ sub analysis_buttons {
 
 		exit;
 
-}
+	}
 
 
 
-sub get_analysis_text {
+	sub get_analysis_text {
 
 	my ($dbh,$query,$table,$id) = @_;
 	my $vars = $query->Vars;
@@ -215,15 +199,13 @@ sub get_analysis_text {
 
 	 return $str;
 
-}
+	}
 
-sub extract_nouns {
+	sub extract_nouns {
 
 	my ($dbh,$query,$table,$id,$str) = @_;
 	# print $record->{$table."_description"},"<p>";
 	#use Data::Dumper qw(Dumper);
-  print "Extracting nouns<br>";
-
 
 	# Define and extract the list of words @matches matching the test string
 	$str =~ s/\.,!\?//g;
@@ -249,7 +231,6 @@ sub extract_nouns {
 		# Create test concatinations between the previous match $quickprev and the current one
 					my $quicktesta = $quickprev." ".$match;
 					my $quicktestb = $quickprev." of ".$match;
-					my $quicktestc = $quickprev."-".$match;
 
 					#print qq|Looking for "$quicktesta" in string<br>|;
 					if ($teststr =~ m/$quicktesta/) {
@@ -264,13 +245,6 @@ sub extract_nouns {
 
 							# If we find the $quicktest in the string, we'll make it $quickprev, so we can test for even more matches
 							$quickprev = $quicktestb;
-							#print "Found $quicktest in string. <br>";
-							next;
-
-					} elsif ($teststr =~ m/$quicktestc/) {
-
-							# If we find the $quicktest in the string, we'll make it $quickprev, so we can test for even more matches
-							$quickprev = $quicktestc;
 							#print "Found $quicktest in string. <br>";
 							next;
 
@@ -320,7 +294,6 @@ sub extract_nouns {
 	sub evaluate_nouns {
 
 		my ($dbh,$query,$table,$id,$str,@associates) = @_;
-    print "Evaluating nouns<br>";
 
 		# Define the list of tables we're including in our graph
 		my @categories = qw(common_noun author place institution organization company product project work feed journal concept);
@@ -342,13 +315,13 @@ sub extract_nouns {
 
 							#my $rec = db_get_record($dbh,$table,{$vars->{category}."_id"=>$record_id});
 							$found=1;
+							#print "Found $associate in $category <br>";
 
 							# Save found associates to associates file
 							# print "Add $associate : $category to associates file<br>";
 							&add_to_associates_file($associate,$category);
 							last;   # Last category
 						}
-
 				}
 
 
@@ -454,70 +427,64 @@ sub previous_next_analysis {
 	#    Saves new data submitted about an associated term (or 'associate')
 	#
 
-sub assoc_save_data {
+	sub assoc_save_data {
 
 	my ($dbh,$query,$table,$id,$str) = @_;
 
-		print "Content-type: text/html\n\n";
-		print "Saving data - assoc_save_data<p>";
+	print "Content-type: text/html\n\n";
+	print "Saving data<p>";
 
-		# First, save any new_genres, new_categories or new_types that may have been created
-		my @sorters = qw(genre category type);
-		foreach my $sorter (@sorters) {
-			if($vars->{"new_".$sorter}) {
+	# First, save any new_genres, new_categories or new_types that may have been created
+	my @sorters = qw(genre category type);
+	foreach my $sorter (@sorters) {
+		if($vars->{"new_".$sorter}) {
 
-				# Get existing optlist data
-				my $optlist_record = &db_get_record($dbh,"optlist",{optlist_title => $vars->{insert_table}."_".$sorter});
-				my $optlist_id = $optlist_record->{optlist_id};
-				my $optlist_data = $optlist_record->{optlist_data};
-				my @optlist_data_array = split ";",$optlist_data;
+			# Get existing optlist data
+			my $optlist_record = &db_get_record($dbh,"optlist",{optlist_title => $vars->{insert_table}."_".$sorter});
+			my $optlist_id = $optlist_record->{optlist_id};
+			my $optlist_data = $optlist_record->{optlist_data};
+			my @optlist_data_array = split ";",$optlist_data;
 
-				# Generate new optlist data
-				$optlist_id ||= "new";
-				my $sorter_val = lc($vars->{"new_".$sorter});			# Standardizing
-				my $sorter_tit = ucfirst($sorter_val);						# capitalization
-				unless ($optlist_data =~ /$sorter_tit.",".$sorter_val/) { # prevent duplicates
-					push @optlist_data_array, $sorter_tit.",".$sorter_val; }
+			# Generate new optlist data
+			$optlist_id ||= "new";
+			my $sorter_val = lc($vars->{"new_".$sorter});			# Standardizing
+			my $sorter_tit = ucfirst($sorter_val);						# capitalization
+			unless ($optlist_data =~ /$sorter_tit.",".$sorter_val/) { # prevent duplicates
+				push @optlist_data_array, $sorter_tit.",".$sorter_val; }
 
-				# Save optlist record
-				$vars->{optlist_data} = join ";",@optlist_data_array;
-				$vars->{optlist_table} = $vars->{insert_table};
-				$vars->{optlist_field} = $sorter;
-				my $rid = &update_record($dbh,$query,"optlist",$optlist_id);
-				unless ($rid) { die "Failed to update optlists properly."; }
-
-			}
+			# Save optlist record
+			$vars->{optlist_data} = join ";",@optlist_data_array;
+			$vars->{optlist_table} = $vars->{insert_table};
+			$vars->{optlist_field} = $sorter;
+			my $rid = &update_record($dbh,$query,"optlist",$optlist_id);
+			unless ($rid) { die "Failed to update optlists properly."; }
 
 		}
 
+	}
 
 
-		# Second, save the word data itself as a new record
-		my $name_or_title = &get_key_namefield($vars->{insert_table});
-		$vars->{$vars->{insert_table}."_id"} = "new";
 
-		if ($vars->{$name_or_title}) {
+	# Second, save the word data itself as a new record
+	my $name_or_title = &get_key_namefield($vars->{insert_table});
+	$vars->{$vars->{insert_table}."_id"} = "new";
 
-					 unless ($update_id = &update_record($dbh,$query,$vars->{insert_table},$vars->{$vars->{insert_table}."_id"})) {
-								die "Update record failed for some reason, $vars->{insert_table} : $vars->{$name_or_title}"; }
+	if ($vars->{$name_or_title}) {
 
-					 # print "Updated in table ".$vars->{insert_table}." as id $update_id<br>";
-					 if ($update_id eq "duplicate") {
-						   #$update_id = &db_locate();
-							 unless ($update_id) { die "Failed to locate record even though it was flagged as a duplicate";}
-					 }
+				 unless ($update_id = &update_record($dbh,$query,$vars->{insert_table},$vars->{$vars->{insert_table}."_id"})) {
+							die "Update record failed for some reason, $vars->{insert_table} : $vars->{$name_or_title}"; }
 
-					 &add_to_associates_file($vars->{$name_or_title},$vars->{insert_table});
+				 # print "Updated in table ".$vars->{insert_table}." as id $update_id<br>";
 
-
-		}
+				 unless ($update_id eq "duplicate") { &add_to_associates_file($vars->{$name_or_title},$vars->{insert_table}); }
+	}
 
 	# Third, create associations in the graph
 	my @associates = split ",",$vars->{associates};
 	foreach my $associate (@associates) {
 
 		# Do not associate duplicates; the record was never created
-		#last if ($update_id eq "duplicate");
+		last if ($update_id eq "duplicate");
 
 		# For each associate listed in the imput form
 
@@ -547,7 +514,7 @@ sub assoc_save_data {
 		my ($dbh,$query,$table,$id,$str) = @_;
 		my $vars = $query->Vars;
 		my $table = $vars->{table}; my $id = $vars->{id};
-    # print "Assoc present save options <br>";
+
 		# Override the selected word with the new suggested word input by the user, if any
 		if ($vars->{new_associates}) { $vars->{word} = $vars->{new_associates}; }
 
@@ -564,7 +531,7 @@ sub assoc_save_data {
 				&add_word_to_file($vars->{word},$vars->{category});
 			}
 
-		# Then bail
+			# Then bail
 		print "Content-type: text/html\n";
 		print "Location: $Site->{st_cgi}admin.cgi?table=$table&id=$id&action=analyze_text\n\n";
 		exit;
@@ -742,28 +709,25 @@ sub assoc_save_data {
 	return $id;
 	}
 
-  # Tests to see if a word is in a file containing words relevant to a category
-sub test_word_in_file {
+	sub test_word_in_file {
 
 	my ($word,$category) = @_;
 
 	#print "Content-type: text/html\n\n";
-	#print qq|Testing $word in $category <p>|;
 
-  # Open the file
-	my $filename = $Site->{st_urlf}."files/".$category.".txt";
-	open(FILE,$filename);
+		#print qq|Testing $word in $category <p>|;
 
-	# Looking for an exact match in a line
+			my $filename = $Site->{st_urlf}."files/".$category.".txt";
+
+			open(FILE,$filename);
+			# Looking for an exact match in a line
 	if (grep{/^$word\n/} <FILE>){
 		#print qq|<b>The word "$word" was found $filename.</b><br>|;
-		close FILE; return 1;
-	}
-
+		close FILE; return 1; }
 	#print qq|The word "$word" was not found in $filename.<br>|;
 	close FILE; return 0;
 
-}
+	}
 
 	sub add_word_to_file {
 	#print "Content-type: text/html\n\n";
@@ -814,10 +778,10 @@ sub test_word_in_file {
 
 	}
 
-sub clear_associates_file {
+	sub clear_associates_file {
 
-	
-	my $filename = $Site->{st_urlf}."files/associates.txt";
+	#print "Content-type: text/html\n\n";
+			my $filename = $Site->{st_urlf}."files/associates.txt";
 	open OUT,">$filename" or die "Could not open $filename $!";
 	print OUT "" or die "Could not append to $filename $!";
 	close OUT;
@@ -830,7 +794,7 @@ sub clear_associates_file {
 
 	#print qq|Content in associates.txt erased <br>|;
 
-}
+	}
 
 	sub get_url_from_clearbit {
 

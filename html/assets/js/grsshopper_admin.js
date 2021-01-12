@@ -1,8 +1,9 @@
-var url = 'api.cgi';
+var url = 'https://www.downes.ca/cgi-bin/api.cgi';
 
 // Stores current status of the Reader
 var readerTable;
 var readerIndex;
+
 
 //
 //  Initialize Content Windows
@@ -12,13 +13,169 @@ function startUp(url) {
 
   $( document ).ready(function() {
 
-    read_into({div:"Read",cmd:"list",table:"link",tab:"Read"});
+    loadList({div:'myData',cmd: 'list', table: 'media' });
+
+    loadList({div:'Read',cmd:'list',table:'link'});
+
     read_into({div:"Make",cmd:"list_tables",table:"tables",tab:"Make"});
     $('#list-button').hide();
     closeTalkNav();  // To get it to slide the right way when first started
 
   });
 }
+
+//
+//  loadList
+//
+//  Sets up and loads liust results page, including search form and next n results
+//
+
+function loadList(request) {
+var whatitis = `Cmd ${request.cmd} Status ${request.status}`; alert(whatitis);
+    var mainContainer = document.getElementById(request.div);
+    mainContainer.innerHTML = '';  // Clear previous content from list container
+    loadListHeaders(request);
+    loadData(request);
+
+}
+
+//
+//  loadListHeaders
+//
+//  Sets up and loads list results page, including search form and next n results
+//
+
+function loadListHeaders(request) {
+
+    var mainContainer = document.getElementById(request.div);
+    var headers = document.createElement("div");
+    var panel = this.nextElementSibling;
+    var templatetext = linkSearchTemplate(request,panel);
+    headers.innerHTML = templatetext;
+    mainContainer.appendChild(headers);
+
+}
+
+function togglePanel(panel) {
+    if (panel.style.display === "block") {
+        panel.style.display = "none";
+      } else {
+        panel.style.display = "block";
+      }
+
+}
+
+var panel = this.nextElementSibling;
+
+
+//
+//  loadData
+//
+//  Obtain data from the API and load into selected div
+//
+
+
+function loadData(request) {
+
+    fetch('https://www.downes.ca/cgi-bin/api.cgi',{
+        method: 'POST', // or 'PUT'
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+      })
+        .then(response => response.json())
+        .then(function (data) {
+            appendData(request,data);
+          })
+        .catch((error) => {
+            console.error('Error:', error);}
+      );
+
+}
+
+function appendData(request,data) {
+
+    var mainContainer = document.getElementById(request.div);
+    for (var i = 0; i < data.length; i++) {
+      var div = document.createElement("div");
+      var templ = selectTemplate(request,data,i);
+      div.innerHTML = templ;
+      mainContainer.appendChild(div);
+    }
+}
+
+function selectTemplate(request,data,i) {
+
+    if (request.cmd == 'list') {
+       if (request.table == 'link') { return linkListTemplate(data,i); }
+       if (request.table == 'media') { return mediaListTemplate(data,i); }
+    } else if (request.cmd == 'show') {
+       if (request.table == 'link') { return linkShowTemplate(request,data,i); }
+    }
+}
+//
+//  templates
+//
+
+function mediaListTemplate(data,i) {
+   return `<a href="${data[i].url}">${data[i].title}</a>${data[i].mimetype} `;
+}
+
+function linkListTemplate(data,i) {
+    return `<div class="table-list-element">
+    <a href="#" onClick="loadData({div:'Reader',cmd:'show',table:'link',id:'${data[i].id}'});">
+    ${data[i].title}</a>
+    <span style="font-size:8pt;"><br/>
+    ${data[i].section} - ${data[i].genre} - ${data[i].category} - ${data[i].status}</span></div>`;
+}
+
+function linkShowTemplate(request,data,i) {
+
+    // Clear previous content
+    var mainContainer = document.getElementById(request.div);
+    mainContainer.innerHTML='';
+
+    // return new content
+    return prevTemplate(request,data,i)+
+           nextTemplate(request,data,i)+
+            `Title: ${data[i].title} <br>
+            Link: ${data[i].link} <br>
+            ID: ${data[i].id} <br>
+            Feed: <a href="${data[i].feed_link}">${data[i].feed_title}</a><br>
+            Category: ${data[i].feed_category}    Genre:  ${data[i].feed_genre}
+            Description: ${data[i].description}<br>
+            <iframe style="width: 60vw;height: 90vh;" src="${data[i].link}"></iframe>`;
+}
+
+function nextTemplate(request,data,i) {
+
+    return `<span class="next" 
+       onClick="loadData({div:'${request.div}',cmd:'show',table:'${request.table}',id:'${data[i].next}'});">
+       Next
+       </span>`;
+
+}
+
+function prevTemplate(request,data,i) {
+
+    return `<span class="next" 
+    onClick="loadData({div:'${request.div}',cmd:'show',table:'${request.table}',id:'${data[i].prev}'});">
+       Prev
+    </span>`;
+
+}
+
+
+function templater(strings, ...keys) {
+    return function(data) {
+        let temp = strings.slice();
+        keys.forEach((key, i) => {
+            temp[i] = temp[i] + data[key];
+        });
+        return temp.join('');
+    }
+};
 
 //
 //  openDiv
@@ -73,9 +230,11 @@ function read_into(args) {
              return;
            }
       });
-
+     
 
 }
+
+
 
 //
 // The Main Window uses Bootstrap Nav tabs
@@ -314,6 +473,7 @@ function api_submit(url,div,cmd,obj,table,id,col,content) {
                 $('#'+div+'_result').html("<div class=\"success\">"+value+"</div>");
                 $('#'+div+'_liveupdate').html(value);
                 $('#'+div+'_result').show();
+alert(previewURL);
                 var previewUrl= url+"?cmd=show&table="+table+"&id="+id+"&format=summary";
                 $('#Preview').load(previewUrl);
                 $('.empty-after').val("");
@@ -456,3 +616,13 @@ function remove_column(url,table,col_name,content) {
         });
         setTimeout(function(){$('#columns_table').removeClass('spinner');}, 1000);
 }
+
+
+//
+//  Listeners
+//
+
+// 
+//  Accordion
+//
+

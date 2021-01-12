@@ -583,21 +583,6 @@ sub quick_show_page {
 	exit;
 }
 
-sub quick_show_search {
-
-	my ($search_dir,$table,$q,$start,$format) = @_;
-	$q =~ s/[^a-zA-Z0-9 -]//g; 
-	
-	my $page_file = $search_dir.$table.".".$q.".".$start.".".$format;
-
-  	return unless (-e $page_file);
-
-	open FILE, $page_file or die $!;
-	while (<FILE>) { print $_; }
-	close FILE;
-
-	exit;
-}
 
 #-------------------------------------------------------------------------------
 
@@ -1246,11 +1231,10 @@ sub list_tables {
 
 sub list_records {
 
-	my ($dbh,$query,$table,$parms) = @_;
+	my ($dbh,$query,$table,$tab) = @_;
 	my $vars = $query->Vars;
 	my $output = "";
 	my $onclickurl = $Site->{st_cgi}."api.cgi";
-
 
 	$vars->{where} =~ s/[^\w\s]//ig;	# chars only, no SQL injection for you
 
@@ -1263,10 +1247,10 @@ sub list_records {
 
 	# Set Conditions Related to Permissions
 	my $permtype = "list_".$table; my $where;
-#	if ($Site->{$permtype} eq "owner" && $Person->{person_status} ne "admin") {
-#			$where = "WHERE ".$table."_creator = '".$Person->{person_id}."'";
+	if ($Site->{$permtype} eq "owner" && $Person->{person_status} ne "admin") {
+			$where = "WHERE ".$table."_creator = '".$Person->{person_id}."'";
 
-#	} else { $where = ""; }
+	} else { $where = ""; }
 
 
 	# Set Search Conditions
@@ -1284,90 +1268,16 @@ sub list_records {
 		}
 	}
 
-	if ($parms) {
-		my @wherelist;
-		while (my ($px,$py) = each %$parms) {
-			my $tablelead = $table."_";
-			unless ($px =~ /$tablelead/) { $px = $tablelead.$px; }
-			push @wherelist,qq|($px = "$py")|;
-		}
-		$where = join / AND /,@wherelist;
-		if ($where) { $where = "WHERE ".$where; }
-	}
-	
-
-
-
 	# Count Total Number of Items
 	my $count;
+
   	if ($where) { $count = &db_count($dbh,$table,$where); } else { $count = &db_count($dbh,$table); }
 
 	# Execute SQL search
 	my $stmt = qq|SELECT * FROM $table $where $sort $limit|;
-	
 	my $sthl = $dbh->prepare($stmt);
 	$sthl->execute();
 	if ($sthl->errstr) { print "Content-type: text/html\n\n";print "DB LIST ERROR: ".$sthl->errstr." <p>"; exit; }
-
-	if ($table eq "media" || $table eq "link") {
-		my $listarray;
-		my $feeds_data;	# Cache, so we don't reload feed info for each item
-		while (my $list_record = $sthl -> fetchrow_hashref()) {
-
-			my $id = $list_record->{$table."_id"};  # So the record is $table $id
-
-			# Unescape data that was escaped for storage
-			while (my($lx,$ly) = each %$list_record) {
-				$list_record->{$lx} =~ s/&amp;/&/g;
-			}
-			
-			my $itemdata;
-
-			# Basic list data, always sent
-			foreach my $field (qw(title name mimetype url link id section genre category status)) {
-				$itemdata->{$field} = $list_record->{$table."_".$field};
-			}
-
-
-			
-			# Large list data, sent if we're showing a single record
-			if ($count == 1) {
-
-				# Content
-				foreach my $field (qw(description content)) {
-					$itemdata->{$field} = $list_record->{$table."_".$field};
-				}
-
-				# Get the previous and next records
- 				my $nextdata = &get_next($dbh,$table,$id,$sort,$where,$list_record);
-				foreach my $field (qw(first last prev next)) {
-					$itemdata->{$field} = $nextdata->{$field};
-				}
-
-				# Get the linked data from feed
-
-				my @connections = &find_graph_of($table,$id,"feed");
-				foreach my $feed (@connections) {
-					my $feeditem;
-					unless ($feeds_data->{$feed}) {  # If it's not in cache get it from db and save into cache
-						$feeditem = &db_get_record($dbh,"feed",{feed_id=>$feed});
-						$feeds_data->{$feed} = $feeditem;
-					}
-					$feeditem = $feeds_data->{$feed}; # get from cache
-					foreach my $field (qw(title name url link id category genre status)) {
-						$itemdata->{"feed_".$field} = $feeditem->{"feed_".$field};
-					}
-				}
-			}
-				 
-			push @$listarray,$itemdata;
-		}
-		return $listarray;
-	}
-
-
-
-
 
 	# print Search form
 	$output .=  qq|<div class="table-list-heading">
@@ -2488,72 +2398,6 @@ sub get_options {
 	return $output;
 }
 
-	# -------  Get Next -------------------------------------------------------------
-	# Get previous, stext, start and end id numbers given a table, 
-	# and 'where' as a hash of key=>value, search 
-	# and sort information, returning the four values as a hash {prev=>$id,etc}
-	# This is being use for API output, not formatting
-
-sub get_next {
-
-	my ($dbh,$table,$id,$sort,$where,$record_data) = @_;
-	my @directions = qw(first last next prev);  # The order here matters, in case next > last
-	my $idfield = $table."_id";
-	my $results;
-
-	my $sortreplace = "ORDER BY ".$table."_";
-	$sort =~ s/$sortreplace//;	# fixes something from sort_start_number();
-	$sort =~ s/ DESC//;			# where it returns the full 'ORDER BY' phrase
-								# used elsewhere, but we don't want to use it here 
-
-
-	foreach my $direction (@directions) {
-
-		# This is some arbitrary search stuff
-		my $rwhere = "";
-		if ($table eq "presentation"){
-			$rwhere = qq|(presentation_catdetails NOT IN("Interview","Class","Internal Presentation")) AND |;
-		} elsif ($record_data->{presentation_catdetails} eq "Interview") {
-			$rwhere = qq|(presentation_catdetails = "Interview") AND |;
-		} elsif ($record_data->{presentation_catdetails} eq "Class") {
-			$rwhere = qq|(presentation_catdetails = "Class") AND |;
-		}
-
-		# How are we sorting the next, previous, etc (default to crdate)?
-		# (Again, remember table data uses fields with table name, eg. presentation_title)
-		my $sort_by; my $search_value;
-		if ($sort) { 
-			$sort_by = $table."_".$sort;	
-			$search_value = $record_data->{$table."_".$sort}; }
-		else { 
-			$sort_by = $table."_crdate";	
-			$search_value = $record_data->{$table."_".$sort}; }
-		
-		# Handle case of first or last record (to allow blank search result to produce an error)
-		
-		if (($direction eq "next") && ($id eq $results->{last})) {  
-			$results->{next} = $results->{last}; next; }
-		if (($direction eq "prev") && ($id eq $results->{first})) { 
-			$results->{prev} = $results->{first}; next; }	
-
-		# Define and execute search for first,last,next,prev record id	
-		my $nextsql = sprintf("SELECT %s FROM %s WHERE %s%s ",$idfield,$table,$rwhere,$sort_by);
-		if ($direction eq "first") { $nextsql .= sprintf("<= '%s' ORDER BY %s ",$search_value,$sort_by); }
-		elsif ($direction eq "last") { $nextsql .= sprintf(">= '%s' ORDER BY %s DESC",$search_value,$sort_by);}
-		elsif ($direction eq "next") { $nextsql .= sprintf("> '%s' ORDER BY %s ",$search_value,$sort_by); }
-		elsif ($direction eq "prev") { $nextsql .= sprintf("< '%s' ORDER BY %s DESC",$search_value,$sort_by);}		
-		$nextsql .= " LIMIT 1";
-
-		# Will fail if $table or $id don't exist or if $sort isn't a valid field
-		my ($newnextid) = $dbh->selectrow_array($nextsql) 
-			or die "Can't execute SQL statement (will fail if table or id don't exist or if sort isn't a valid field) $nextsql: $dbh::errstr\n"; 
-		$results->{$direction} = $newnextid; 
-		
-	}
-	
-	return $results;
-}
-
 	# -------  Make Next -------------------------------------------------------------
 	#
 sub make_next {
@@ -2742,7 +2586,7 @@ sub make_conditionals {
 sub make_keylist {
 
 	my ($dbh,$query,$text_ptr) = @_;
-#$diag = 10;
+
 	if ($diag>9) { print "Make Keylist <br>"; }
 
    	my $vars = ();
@@ -3994,7 +3838,7 @@ sub upload_file {
 	# Name of input field:  myfile
   my ($upload_file_name) = @_;
 	$upload_file_name ||= "myfile";
-
+	#print "upload file name  $upload_file_name  :   ",$query->param($upload_file_name);
 	my $file = gRSShopper::File->new();
 	$file->{file_title} = $query->param($upload_file_name);
 
@@ -4153,7 +3997,7 @@ sub file_upload_dir {
 	my $filetype = "";
 	my $dir = "";
 
-	if ($ff =~ /\.jpg|\.jpeg|\.gif|\.png|\.bmp|\.tif|\.tiff|\.webp/i) {
+	if ($ff =~ /\.jpg|\.jpeg|\.gif|\.png|\.bmp|\.tif|\.tiff/i) {
 		$filetype = "image"; $dir = $Site->{up_image} || "files/images/";
 	} elsif ($ff =~ /\.doc|\.txt|\.pdf/i) {
 		$filetype = "doc"; $dir = $Site->{up_docs} || "files/documents/";
@@ -4161,7 +4005,7 @@ sub file_upload_dir {
 		$filetype = "slides"; $dir = $Site->{up_slides} || "files/slides/";
 	} elsif ($ff =~ /\.mp3|\.wav/i) {
 		$filetype = "audio"; $dir = $Site->{up_audio} || "files/audio/";
-	} elsif ($ff =~ /\.flv|\.mp4|\.avi|\.mov|\.webm/i) {
+	} elsif ($ff =~ /\.flv|\.mp4|\.avi|\.mov/i) {
 		$filetype = "video"; $dir = $Site->{up_video} || "files/video/";
 	} else {
 		$filetype = "other"; $dir = $Site->{up_files} || "files/files/";
@@ -6228,7 +6072,6 @@ sub form_file_select {
         var index = data.index,
             file = data.files[index],
             node = \$(data.context.children()[index]);
-
         if (file.preview) {
             node
                 .prepend('<br>')
@@ -6253,7 +6096,6 @@ sub form_file_select {
     }).on('fileuploaddone', function (e, data) {
         \$.each(data.result.files, function (index, file) {
             if (file.url) {
-						
                 var link = \$('<a>')
                     .attr('target', '_blank')
                     .prop('href', file.url);
@@ -6270,7 +6112,7 @@ sub form_file_select {
         });
     }).on('fileuploadfail', function (e, data) {
         \$.each(data.files, function (index) {
-					alert("File upload failed"+data);
+					alert("hit it"+data);
             var error = \$('<span class="text-danger"/>').text('File upload failed.');
             \$(data.context.children()[index])
                 .append('<br>')
@@ -6450,7 +6292,7 @@ sub form_graph_list {
 
 	my ($table,$id,$key,$type) = @_;
 	my $output = "";
-	my $admin = 1 if ($Person->{person_status} eq "Admin");
+	my $admin = 1 if ($Person->{person_status} eq "admin");
 
 	my @keylist = &find_graph_of($table,$id,$key,$type);
   my $onclickurl = $Site->{st_cgi}."api.cgi";
@@ -7739,6 +7581,7 @@ sub db_get_record_list {
 	$sth -> execute(@value_vals);
 
 
+
 	my @record_list;
 	while (my $hash_ref = $sth->fetchrow_hashref) {
 		push @record_list,$hash_ref->{$field};
@@ -7747,8 +7590,6 @@ sub db_get_record_list {
 
 	return @record_list;
 }
-
-
 
 	# -------   Get Text --------------------------------------------------------
 	#
@@ -8503,7 +8344,7 @@ sub db_count {
 
 	my $stmtc = "SELECT COUNT(*) AS items FROM $table $where";
 	my $sthc = $dbh -> prepare($stmtc);
-	$sthc -> execute()  || die "Error: " . $dbh->errstr . " -- ".$stmtc;
+	$sthc -> execute()  || die "Error: " . $dbh->errstr . " -- ".$sql;
 	my $refc = $sthc -> fetchrow_hashref();
 	my $count = $refc->{items};
 	$sthc->finish( );
@@ -10202,7 +10043,7 @@ sub show_login {
     my $session = shift;
     # Logged In
     if ($session->param("~logged-in")) { 
-        return "OK Username: ".$session->param("~profile")->{username}.qq| [<a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|?action=logout">Logout</a>]<p>
+        return "Username: ".$session->param("~profile")->{username}.qq| [<a href="//|.$ENV{'SERVER_NAME'}.$ENV{'SCRIPT_NAME'}.qq|?action=logout">Logout</a>]<p>
 		<script>window.scrollTo(0,document.body.scrollHeight);</script'>|;
     } 
 
@@ -10286,7 +10127,7 @@ sub _load_profile {
     my $persondata = &db_get_record($dbh,"person",{person_title=>$lg_name});
     
     unless ($persondata) {		                   # User does not exist
-    	my $count = &db_count($dbh,"person");
+    	my $count = 0; #&db_count($dbh,"person");
     	if ($query->param("action") eq "Create an New Profile" || $count == 0) { &_make_profile(); }    # Make a new one if asked
         print "Content-type: text/html\n\n";               # Or exit
         print "User does not exist. $count users exist";
@@ -10560,7 +10401,7 @@ sub log_cron {
 
 	my ($level,$log) = @_;
 
- # return unless ($Site->{context} eq "cron");
+  return unless ($Site->{context} eq "cron");
   my $entry = sprintf("%s ", $Site->{context});
 
 	# Get the time

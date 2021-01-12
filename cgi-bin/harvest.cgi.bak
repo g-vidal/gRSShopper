@@ -55,7 +55,7 @@
 
 # Load Site
 
-	our ($Site,$dbh) = &get_site("harvest");
+	our ($Site,$dbh) = &get_site("admin");
   $Site->{cgif} ||= './';
 
 	if ($vars->{context} eq "cron") { $Site->{context} = "cron"; }				# Allows the user to toggle cron reports on/off manually
@@ -75,7 +75,7 @@
 	&show_login($session);
 	print "Content-type:text/html\n\n";
 	print "Running Harvester<p>";
-	
+
 # Initialize system variables
 
 	my $options = {}; bless $options;
@@ -217,7 +217,7 @@ sub harvest_feed {
 		exit;
 	};
 
-	&log_cron(1,sprintf("Now Harvesting feed %s %s %s",$feedid,$feedrecord->{feed_title},$feedrecord->{feed_link}));
+	&log_cron(1,sprintf("Harvesting feed %s %s %s",$feedid,$feedrecord->{feed_title},$feedrecord->{feed_link}));
 
 	my $dirname = dirname(__FILE__);
 	$feedrecord->{crdate} = time;

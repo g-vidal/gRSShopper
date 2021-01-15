@@ -40,7 +40,7 @@ use CGI::Carp qw(fatalsToBrowser);
 
 		use File::Basename;
 		use CGI::Carp qw(fatalsToBrowser);
-	      use local::lib; # sets up a local lib at ~/perl5
+	    
 		my $dirname = dirname(__FILE__);
 		require $dirname . "/grsshopper.pl";
 

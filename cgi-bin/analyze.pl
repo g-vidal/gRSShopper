@@ -82,11 +82,11 @@ sub analysis_buttons {
 
 		# Find last table (for drawing graph)
 		my $lasttable;
-		while (my($gtable,$gy) = each $graph) {	if (@{$graph->{$gtable}}) { $lasttable = $gtable; } }
+		while (my($gtable,$gy) = each %$graph) {	if (@{$graph->{$gtable}}) { $lasttable = $gtable; } }
 
 		# Show it
 		print "$table $id <br>";
-		while (my($gtable,$gy) = each $graph) {
+		while (my($gtable,$gy) = each %$graph) {
 			if (@{$graph->{$gtable}}) {
 				print qq|&nbsp;&nbsp;|;
 				if ($gtable eq $lasttable) { print qq|&#9492;|; } else { print qq|&#9500;|; }

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="https://www.downes.ca/assets/ico/favicon.ico">
+    <link rel="icon" href="assets/ico/favicon.ico">
 
     <title>gRSShopper</title>
 
@@ -21,7 +21,7 @@
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
 
 <!-- JQuery ToggleButton -->
-<script src="https://www.downes.ca/assets/js/select-togglebutton.js"></script>
+<script src="assets/js/select-togglebutton.js"></script>
 
 <!-- CK Editor -->
 <script src="//cdn.ckeditor.com/4.7.0/standard/ckeditor.js"></script>
@@ -39,18 +39,18 @@
 <script src="https://hayageek.github.io/jQuery-Upload-File/4.0.11/jquery.uploadfile.min.js"></script>
 
 <!-- DateTime Picker -->
-<script src="https://www.downes.ca/assets/js/jquery.datetimepicker.full.min.js"></script>
-<link rel="stylesheet" href="https://www.downes.ca/assets/css/jquery.datetimepicker.min.css">
+<script src="assets/js/jquery.datetimepicker.full.min.js"></script>
+<link rel="stylesheet" href="assets/css/jquery.datetimepicker.min.css">
 
 <!-- Font-Awesome -->
-<link rel="stylesheet" href="https://www.downes.ca/assets/css/font-awesome.4.7.0.min.css">
-<link rel="stylesheet" href="https://www.downes.ca/assets/css/font-awesome.5.0.6.all.css">
+<link rel="stylesheet" href="assets/css/font-awesome.4.7.0.min.css">
+<link rel="stylesheet" href="assets/css/font-awesome.5.0.6.all.css">
   
 
 <!-- gRSShopper -->
-<script src="https://www.downes.ca/assets/js/gRSShopper_dataTemplates.js"></script>
-<script src="https://www.downes.ca/assets/js/grsshopper_admin.js"></script>
-<link rel="stylesheet" href="https://www.downes.ca/assets/css/grsshopper_admin.css">
+<script src="assets/js/gRSShopper_dataTemplates.js"></script>
+<script src="assets/js/grsshopper_admin.js"></script>
+<link rel="stylesheet" href="assets/css/grsshopper_admin.css">
 
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mini.css/3.0.1/mini-default.min.css">
@@ -58,7 +58,7 @@
 </head>
  
 
-<body onload="startUp('https://www.downes.ca/cgi-bin/api.cgi');">
+<body onload="startUp('cgi-bin/api.cgi');">
 <!-- End Template test_top --><!-- ---------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
 <script>
 var modalLoaded = 0;
@@ -146,7 +146,7 @@ read_into({div:'findSchool',cmd:'list',table:'course',tab:'findSchool'});">Cours
   <button class="small" onclick="closeTalkNav()">»</button>
   <button class="small" onclick="openTab(event, 'Myself','sociallinks')">Myself</button>
   <button class="small" onclick="openTab(event, 'Discuss','sociallinks')">Discuss</button>
-  <button class="small" onclick="$('#chatframe').attr('src','https://www.downes.ca/cgi-bin/cchat.cgi');openTab(event, 'Chatter','sociallinks')">Chatter</button>
+  <button class="small" onclick="$('#chatframe').attr('src','cgi-bin/cchat.cgi');openTab(event, 'Chatter','sociallinks')">Chatter</button>
   <button class="small" onclick="openTab(event, 'Email','sociallinks')">Email</button>
 
 </div>
@@ -161,22 +161,22 @@ read_into({div:'findSchool',cmd:'list',table:'course',tab:'findSchool'});">Cours
       <div style="background-color:#cecece;width:100%;height:50px;padding:12px;">
 
       Personal Profile: 
-      <button class="small" type="button" onClick="openDiv('https://www.downes.ca/page/Profile','main');">View</button> 
-      <button class="small"  type="button" onClick="openDiv('https://www.downes.ca/cgi-bin/api.cgi','main','edit','person','me','n','Identity');">Edit</button>
-      <button class="small"  type="button" onClick="openDiv('https://www.downes.ca/cgi-bin/api.cgi','main','publish','vcard','vcard','vcard');">Publish VCard</button><br>
+      <button class="small" type="button" onClick="openDiv('page/Profile','main');">View</button> 
+      <button class="small"  type="button" onClick="openDiv('cgi-bin/api.cgi','main','edit','person','me','n','Identity');">Edit</button>
+      <button class="small"  type="button" onClick="openDiv('cgi-bin/api.cgi','main','publish','vcard','vcard','vcard');">Publish VCard</button><br>
       </div>
    </div>
 
    <div style="width:100%;padding:15px;">
       <div style="background-color:#cecece;width:100%;height:50px;padding:12px;">
-      Publishing: <button type="button" onClick="openDiv('https://www.downes.ca/cgi-bin/api.cgi','main','publishing','','','','Newsletters');">Options</button><br>
+      Publishing: <button type="button" onClick="openDiv('cgi-bin/api.cgi','main','publishing','','','','Newsletters');">Options</button><br>
       </div>
    </div>
 
    <div style="width:100%;padding:15px;">
       <div style="background-color:#cecece;width:100%;height:50px;padding:12px;">
       Personal Portfolio: 
-      <button class="small"  type="button" onClick="openDiv('https://www.downes.ca/page/Portfolio','main');">View</button> 
+      <button class="small"  type="button" onClick="openDiv('page/Portfolio','main');">View</button> 
       <button class="small"  type="button" onClick="#">Edit</button><br>
       </div>
    </div>
@@ -184,9 +184,9 @@ read_into({div:'findSchool',cmd:'list',table:'course',tab:'findSchool'});">Cours
    <div style="width:100%;padding:15px;">
       <div style="background-color:#cecece;width:100%;height:50px;padding:12px;">
       Social Network: 
-      <button class="small"  type="button" onClick="openDiv('https://www.downes.ca/cgi-bin/api.cgi','main','admin','users','','','','Users');">Users</button>
+      <button class="small"  type="button" onClick="openDiv('cgi-bin/api.cgi','main','admin','users','','','','Users');">Users</button>
 
-      <button class="small"  type="button" onClick="openDiv('https://www.downes.ca/cgi-bin/api.cgi','main','social','','','','Accounts');">Options</button>
+      <button class="small"  type="button" onClick="openDiv('cgi-bin/api.cgi','main','social','','','','Accounts');">Options</button>
       <button class="small"  type="button" onClick="#">View</button>
       </div>
    </div>
@@ -194,7 +194,7 @@ read_into({div:'findSchool',cmd:'list',table:'course',tab:'findSchool'});">Cours
    <div style="width:100%;padding:15px;">
       <div style="background-color:#cecece;width:100%;height:50px;padding:12px;">
       Account: 
-      <button class="small"  type="button" id="logout" onClick="window.location = 'https://www.downes.ca/cgi-bin/login.cgi?action=Logout';">Logout</button>
+      <button class="small"  type="button" id="logout" onClick="window.location = 'cgi-bin/login.cgi?action=Logout';">Logout</button>
       <button class="small"  type="button" id="logout">Change Password</button>
       </div>
    </div>
@@ -235,7 +235,7 @@ read_into({div:'findSchool',cmd:'list',table:'course',tab:'findSchool'});">Cours
  onclick="openTalkNav()"><i class="fa fa-user" style="color:green;font-size:1.2em;"></i></span>
 
      <span class="nav-link" style="cursor:pointer;float:right!important;" data-toggle="tab" 
- onclick="openDiv('https://www.downes.ca/cgi-bin/api.cgi','main','admin','general','general','');"><i class="fa fa-gear" style="color:green;font-size:1.2em;"></i></span>
+ onclick="openDiv('cgi-bin/api.cgi','main','admin','general','general','');"><i class="fa fa-gear" style="color:green;font-size:1.2em;"></i></span>
 
    <ul class="nav nav-tabs" id="myTab" role="tablist">
 
@@ -243,7 +243,7 @@ read_into({div:'findSchool',cmd:'list',table:'course',tab:'findSchool'});">Cours
  onclick="openNav();"><i class="fa fa-database" style="color:green;font-size:1.2em;"></i></span></li>
 
 <!-- Reader Tab -->
-<li class="nav-item"><span class="nav-link" style="cursor:pointer" data-toggle="modal" data-target="#readerModal" onclick="if (modalLoaded !== 1) { $('#reader-modal-content').load('https://www.downes.ca/cgi-bin/viewer.cgi?action=viewer&table=link'); modalLoaded = 1;}"><img src="https://www.downes.ca/assets/icons/grssicon.JPG" border=0 width=20 alt="Open Reader" title="Open Reader"></span></li>
+<li class="nav-item"><span class="nav-link" style="cursor:pointer" data-toggle="modal" data-target="#readerModal" onclick="if (modalLoaded !== 1) { $('#reader-modal-content').load('cgi-bin/viewer.cgi?action=viewer&table=link'); modalLoaded = 1;}"><img src="assets/icons/grssicon.JPG" border=0 width=20 alt="Open Reader" title="Open Reader"></span></li>
 
      <li class="nav-item">
         <a class="nav-link active" id="Reader-tab" data-toggle="tab" href="#Reader" role="tab" aria-controls="Reader" aria-selected="true">Reader</a>
@@ -272,12 +272,12 @@ read_into({div:'findSchool',cmd:'list',table:'course',tab:'findSchool'});">Cours
 <h1>Welcome to gRSShopper</h1>
 
 <div style="margin:10px;">
-<iframe src="https://www.downes.ca/cgi-bin/login_widget.cgi" height="40" width="500" title="Iframe Example"></iframe>
+<iframe src="cgi-bin/login_widget.cgi" height="40" width="500" title="Iframe Example"></iframe>
 
 
 </div>
 <div style="width:800px;max-width:100%;">
-<button class="small"   type="button" class="btn btn-outline-secondary  btn-block"  data-toggle="modal"  data-target="#readerModal" onClick="$('#reader-modal-content').load('https://www.downes.ca/cgi-bin/viewer.cgi?action=viewer&table=link');modalLoaded = 1;">
+<button class="small"   type="button" class="btn btn-outline-secondary  btn-block"  data-toggle="modal"  data-target="#readerModal" onClick="$('#reader-modal-content').load('cgi-bin/viewer.cgi?action=viewer&table=link');modalLoaded = 1;">
 Read what's new
 </button>
 
@@ -290,31 +290,31 @@ Find online courses
 </button>
 
 <button class="small"   type="button" class="btn btn-outline-secondary  btn-block" onClick="
-   openDiv('https://www.downes.ca/cgi-bin/api.cgi','main','edit','feed','new','','Edit');
-   read_into({div:'List',url:'https://www.downes.ca/cgi-bin/api.cgi',cmd:'list',table:'feed'});">
+   openDiv('cgi-bin/api.cgi','main','edit','feed','new','','Edit');
+   read_into({div:'List',url:'cgi-bin/api.cgi',cmd:'list',table:'feed'});">
 Add a new content source
 </button>
 
 <button class="small"   type="button" class="btn btn-outline-secondary  btn-block" onClick="
-   openDiv('https://www.downes.ca/cgi-bin/api.cgi','main','edit','post','new','','Edit');
-   read_into({div:'List',url:'https://www.downes.ca/cgi-bin/api.cgi',cmd:'list',table:'post'});">
+   openDiv('cgi-bin/api.cgi','main','edit','post','new','','Edit');
+   read_into({div:'List',url:'cgi-bin/api.cgi',cmd:'list',table:'post'});">
 Write a new post
 </button>
 
 <button class="small"   type="button" class="btn btn-outline-secondary  btn-block" onClick="
-   openDiv('https://www.downes.ca/cgi-bin/api.cgi','main','edit','page','new','','Edit');
-   read_into({div:'List',url:'https://www.downes.ca/cgi-bin/api.cgi',cmd:'list',table:'page'});">
+   openDiv('cgi-bin/api.cgi','main','edit','page','new','','Edit');
+   read_into({div:'List',url:'cgi-bin/api.cgi',cmd:'list',table:'page'});">
 Make a new web page
 </button>
 
 
 <button class="small"   type="button" class="btn btn-outline-secondary  btn-block" onClick="
-   openDiv('https://www.downes.ca/cgi-bin/api.cgi','main','edit','person','me','','Identity');">
+   openDiv('cgi-bin/api.cgi','main','edit','person','me','','Identity');">
 Edit personal profile
 </button>
 
 <button class="small"   type="button" class="btn btn-outline-secondary  btn-block" onClick="
-   openDiv('https://www.downes.ca/cgi-bin/api.cgi','main','social','','','','Accounts');">
+   openDiv('cgi-bin/api.cgi','main','social','','','','Accounts');">
 Configure Social Media Accounts
 </button>
 </div>
@@ -363,12 +363,12 @@ Configure Social Media Accounts
         <h5 class="modal-title" id="loginModalLabel">Login</h5>
       </div>
       <div class="modal-body">
-	<form id="login_form_input" action="https://www.downes.ca/cgi-bin/api.cgi" method="post">
+	<form id="login_form_input" action="cgi-bin/api.cgi" method="post">
 	<input name="cmd" type="hidden" value="login">
   <input name="person_title" type="text" placeholder="Userid or email"><br>
 	<input name="person_password" type="password" placeholder="Password">
   <input type="Submit" value="Login">
-	</form>[<a  href="https://www.downes.ca/cgi-bin/login.cgi?refer=https://www.downes.ca/[*page_location*]">More</a>]
+	</form>[<a  href="cgi-bin/login.cgi?refer=[*page_location*]">More</a>]
   <script type="text/javascript">
     var frm = $('#login_form_input');
     frm.submit(function (e) {
@@ -442,7 +442,7 @@ Configure Social Media Accounts
         </button>
       </div>
       <div class="modal-body">
-<img src="https://www.downes.ca/assets/images/loader.gif">
+<img src="assets/images/loader.gif">
       </div>
       <div class="modal-footer">
         <button class="small"  type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

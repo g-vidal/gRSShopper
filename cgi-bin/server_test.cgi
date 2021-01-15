@@ -67,9 +67,8 @@ print " <span style='color:green;'> OK</span>$newline";
 $|++;
 my $missing = 0;
 my @lissing_list;
-my @modules = qw(CGI CGI::Carp CGI::Session Crypt::Eksblowfish::Bcrypt Fcntl DateTime DateTime::TimeZone DBI
-Digest::SHA Email::Stuffer Email::Sender::Transport::SMTP File::Basename File::Slurp File::stat File::Find HTML::Entities HTTP::Request::Common
-Image::Resize JSON JSON::Parse JSON::XS Lib Lingua::EN::Inflect LWP LWP::UserAgent LWP::Simple MIME::Types Mastodon::Client MIME::Lite::TT::HTML
+my @modules = qw(CGI CGI::Carp CGI::Session Crypt::Eksblowfish::Bcrypt Fcntl DateTime DateTime::TimeZone DBI DBD::mysql Digest::SHA Email::Stuffer Email::Sender::Transport::SMTP File::Basename File::Slurp File::stat File::Find HTML::Entities HTTP::Request::Common
+Image::Resize JSON JSON::Parse JSON::XS Lingua::EN::Inflect LWP LWP::UserAgent LWP::Simple MIME::Types Mastodon::Client MIME::Lite::TT::HTML
 Net::Twitter::Lite::WithAPIv1_1 REST::Client Scalar::Util Text::ParseWords Time::Local URI::Escape vCard XML::OPML);
 
 print "Checking: ";
@@ -94,7 +93,7 @@ if ($missing eq "1") {
 
 
 
-	print qq|$newline You are missing the following required Perl modules.<ul>|;
+	print qq|$newline$newline You are missing the following required Perl modules.<ul>|;
   foreach my $module (@missing_list) { print qq|<li>$module</li>|; }
 
   print qq|</ul>		$newline$newline
@@ -150,7 +149,7 @@ print "<p>Note that this may create a new Admin user is one is needed; please be
 
 print qq|<iframe src="login_widget.cgi" height="40" width="500" title="Iframe Example"></iframe>|;
 
-
+print qq|<p>Once you have logged in, try out <a href="../PLE.htm">your new PLE</a></p>|;
 
 
 exit;

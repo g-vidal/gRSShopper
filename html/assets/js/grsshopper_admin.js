@@ -1,4 +1,4 @@
-var url = 'https://www.downes.ca/cgi-bin/api.cgi';
+var url = 'cgi-bin/api.cgi';
 
 // Stores current status of the Reader
 var readerTable;
@@ -31,7 +31,7 @@ function startUp(url) {
 //
 
 function loadList(request) {
-var whatitis = `Cmd ${request.cmd} Status ${request.status}`; alert(whatitis);
+var whatitis = `Cmd ${request.cmd} Status ${request.status}`; 
     var mainContainer = document.getElementById(request.div);
     mainContainer.innerHTML = '';  // Clear previous content from list container
     loadListHeaders(request);
@@ -77,7 +77,7 @@ var panel = this.nextElementSibling;
 
 function loadData(request) {
 
-    fetch('https://www.downes.ca/cgi-bin/api.cgi',{
+    fetch('cgi-bin/api.cgi',{
         method: 'POST', // or 'PUT'
         headers: {
           'Content-Type': 'application/json',
@@ -226,7 +226,7 @@ function read_into(args) {
       $('#'+args.div).load(args.url,function(response, status, xhr){
         if (status == "error") {
              var msg = "Sorry but there was an error loading "+args.url+" into "+args.div;
-             alert(msg + xhr.status + " " + xhr.statusText);
+             // alert(msg + xhr.status + " " + xhr.statusText);
              return;
            }
       });
@@ -346,7 +346,7 @@ function openColumns(url,db) {
     $("#columns_table").load(url, function(response, status, xhr) {
         if (status == "error") {
             var msg = "Sorry but there was an error showing columns: ";
-            alert(msg + xhr.status + " " + xhr.statusText);
+            // alert(msg + xhr.status + " " + xhr.statusText);
         }
      });
 }
@@ -473,7 +473,7 @@ function api_submit(url,div,cmd,obj,table,id,col,content) {
                 $('#'+div+'_result').html("<div class=\"success\">"+value+"</div>");
                 $('#'+div+'_liveupdate').html(value);
                 $('#'+div+'_result').show();
-alert(previewURL);
+// alert(previewURL);
                 var previewUrl= url+"?cmd=show&table="+table+"&id="+id+"&format=summary";
                 $('#Preview').load(previewUrl);
                 $('.empty-after').val("");

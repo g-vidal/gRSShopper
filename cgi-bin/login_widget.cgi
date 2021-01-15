@@ -29,7 +29,7 @@
 
 #print "Content-type: text/html\n\n";
 
-	use lib LIST;
+
 	use File::Basename;
 	use CGI::Carp qw(fatalsToBrowser);	
 	my $dirname = dirname(__FILE__);

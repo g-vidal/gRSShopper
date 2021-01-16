@@ -10365,9 +10365,13 @@ exit;
 	# Encrypt a password 
 sub _encrypt_password {
 
+	my $encryption_scheme;
+#       use local::lib; # sets up a local lib at ~/perl5
+	
     #sudo apt-get install libcrypt-eksblowfish-perl
-    use Crypt::Eksblowfish::Bcrypt qw(bcrypt_hash);
-
+    # use Crypt::Eksblowfish::Bcrypt qw(bcrypt_hash);
+	if (&new_module_load($query,"Crypt::Eksblowfish::Bcrypt")) { $encryption_scheme="blowfish";}
+	else { die "Can't find an encryption scheme: $?"; }
     my $password = shift;
 
     # Generate a salt if one is not passed
@@ -11827,8 +11831,9 @@ sub mastodon_post {
 
     $tweet = &compose_microcontent($dbh,$table,$id,$tweet,500);
 
-    use Mastodon::Client;
 
+	return "Content information not defined" unless (&new_module_load($query,"Mastodon::Client"));
+	
     my $client = Mastodon::Client->new(
       instance        => $Site->{mas_instance},
       name            => 'gRSShopper',
@@ -11857,8 +11862,8 @@ sub mastodon_harvest {
   }      # Harvest ONLY if there is a tag
   my $tag = "#".$channel->{channel_tag}; $tag =~ s/##/#/;
 
-	use Mastodon::Client;
-
+	return "Content information not defined" unless (&new_module_load($query,"Mastodon::Client"));
+	
 	my $client = Mastodon::Client->new(
 	  instance        => $Site->{mas_instance},
 	  name            => 'gRSShopper',

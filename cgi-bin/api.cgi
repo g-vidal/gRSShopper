@@ -1757,11 +1757,15 @@ sub api_publish {
     # Format the badge image
 		my $filerecord = &item_images("badge",$id,"smallest");
 		my $imagestr;
+
+	return "Module File::Slurp not loaded" unless (&new_module_load($query,"File::Slurp"));
+	return "Module MIME::Base64 not loaded" unless (&new_module_load($query,"MIME::Base64"));
+
 		if ($filerecord->{file_mime} eq "image/png") {
 			my $imgfilename =  $Site->{st_urlf}.$filerecord->{file_dirname};
-    	use File::Slurp;
-    	use MIME::Base64 qw|encode_base64|;
-    	$imagestr = encode_base64( read_file( $imgfilename ) );
+    	#use File::Slurp;
+    	#use MIME::Base64 qw|encode_base64|;
+    	$imagestr = MIME::Base64::encode_base64( read_file( $imgfilename ) );
     	$imagestr =~ s/\n//g;$imagestr =~ s/\n//g;						# because they get inserted somehow and Badgr chokes on them
     	$imagestr = "data:image/png;base64,".$imagestr;
 		} else {

@@ -82,7 +82,7 @@ RUN rm -f /etc/apache2/conf-available/serve-cgi-bin.conf
 RUN a2ensite default-ssl
 RUN mkdir /var/www/html/cgi-bin
 RUN a2enconf cgi-enabled 
-RUN a2enconf ssl-params
+
 
 
 COPY html/index.html /var/www/html/index.html

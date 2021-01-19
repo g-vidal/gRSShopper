@@ -37,16 +37,17 @@ cd grsshopper
 
 docker build --tag grsshopper .
 
-docker run --publish 80:80 --detach --name gr1 grsshopper
+docker run --publish 80:80 -p 443:443 --detach --name gr2 grsshopper
 ```
 
-Testing the server
+Testing the server on localhost
 
 http://localhost  (should show gRSShopper start page)
 
 http://localhost/cgi-bin/server_test.cgi  (should show Perl test page)     
 
- 
+(Note: on localhost you will run into CORS problems running the PLE
+engine at PLE.htm - the Docker image should be placed in the cloud and run under SSL) 
 
 If Perl CGI isn't running properly, try:
 ```
@@ -61,6 +62,8 @@ Open a shell inside
 ```
 docker exec -i -t gr1 bash
 ```
+
+(A lot of sites say ```docker exec -it gr1 bash``` but I find it generates an error)
 
 Credits
 =======

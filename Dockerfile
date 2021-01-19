@@ -70,13 +70,15 @@ ENV ALLOW_OVERRIDE All
 ENV DATE_TIMEZONE UTC
 ENV TERM dumb
 
+COPY cgi-enabled.conf /etc/apache2/conf-available/
+COPY ssl-params.conf /etc/apache2/conf-available/
+COPY default-ssl.conf /etc/apache2/conf-available/
+
 RUN a2enmod rewrite
 RUN a2enmod ssl
 RUN a2enmod headers 
 RUN a2enmod cgid 
 RUN rm -f /etc/apache2/conf-available/serve-cgi-bin.conf 
-COPY cgi-enabled.conf /etc/apache2/conf-available/
-COPY ssl-params.conf /etc/apache2/conf-available/
 RUN a2ensite default-ssl
 RUN mkdir /var/www/html/cgi-bin
 RUN a2enconf cgi-enabled 

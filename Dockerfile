@@ -76,6 +76,7 @@ RUN a2enmod headers
 RUN a2enmod cgid 
 RUN rm -f /etc/apache2/conf-available/serve-cgi-bin.conf 
 COPY cgi-enabled.conf /etc/apache2/conf-available/
+COPY ssl-params.conf /etc/apache2/conf-available/
 RUN a2ensite default-ssl
 RUN mkdir /var/www/html/cgi-bin
 RUN a2enconf cgi-enabled 

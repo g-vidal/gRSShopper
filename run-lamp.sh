@@ -54,7 +54,7 @@ fi
 /bin/sed -i "s/\;date\.timezone\ \=/date\.timezone\ \=\ ${DATE_TIMEZONE}/" /etc/php/7.0/apache2/php.ini
 
 # Run Postfix
-/usr/sbin/postfix start
+# /usr/sbin/postfix start
 
 # Run MariaDB
 /usr/bin/mysqld_safe --timezone=${DATE_TIMEZONE}&

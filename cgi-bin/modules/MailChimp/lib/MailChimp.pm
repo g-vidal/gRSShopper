@@ -4,7 +4,9 @@ use 5.010001;
 use strict;
 use warnings;
 
-use local::lib; # sets up a local lib at ~/perl5
+use lib '/var/www/html/cgi-bin/modules/MailChimp/lib';
+use lib '/var/www/html/cgi-bin/modules/MailChimp/lib/MailChimp';
+
 use warnings;
 
 use WWW::Curl::Easy;

@@ -1,6 +1,14 @@
 #!/usr/bin/perl
 use CGI::Carp qw(fatalsToBrowser);
 
+
+
+  #  use lib '/home/downesca/public_html/cgi-bin/modules/MailChimp/lib';
+	# use lib '/home/downesca/public_html/cgi-bin/modules/MailChimp/lib/MailChimp';
+
+   use lib '/var/www/html/cgi-bin/modules/MailChimp/lib';
+	 use lib '/var/www/html/cgi-bin/modules/MailChimp/lib/MailChimp';
+
 #    gRSShopper 0.7  Admin  0.62  -- gRSShopper administration module
 #    05 June 2017 - Stephen Downes
 
@@ -264,6 +272,8 @@ use CGI::Carp qw(fatalsToBrowser);
 			/test_rest/ && do { api_send_rest($dbh,$query); last; };
 			/cstats/ && do { &calculate_cstats($dbh,$query); last; };
 
+			/mailchimp/ && do { &mailchimp($dbh,$query); last; };
+
 		}
 
 	# Output Record, or
@@ -506,6 +516,10 @@ print "Admin General";
 		$content .= &admin_configtable($dbh,$query,"Mastodon",
 			("Mastodon Instance:mas_instance","Post to Mastodon:mas_post:yesno","Use Site Hashtag:mas_use_tag:yesno","Client ID:mas_cli_id","Client Secret:mas_cli_secret","Access Token:mas_acc_token"));
 		$content .= qq|To fill this form, login to Mastodon and then <a href="https://takahashim.github.io/mastodon-access-token/">get access token</a><br>|;
+
+		$content .= &admin_configtable($dbh,$query,"MailChimp",
+			("MailChimp Account:mailchimp_account","API Key:mailchimp_apikey","Datacenter:mailchimp_datacenter","API URL:mailchimp_url","API Version:mailchimp_version","Test List ID:mailchimp_test"));
+
 
 		$content .= &admin_configtable($dbh,$query,"Badgr",
 			("Badgr API base URL:badgr_url","Badgr Account ID (email):badgr_account","Badgr Account Password:badgr_password","Access Key:badgr_cckey","Issuer ID:badgr_issuerid"));
@@ -3135,17 +3149,29 @@ print "$hn <p>\n\n";
 		# return unless (&is_allowed("send","newsletter"));	# Admin Only
 
 		$page_id ||= $vars->{page_id};				# ID of page to send
-		$send_list ||= $vars->{send_list};				# Send to admin or subscribers
+		$send_list ||= $vars->{send_list};			# Send to admin or subscribers
 		$verbose ||= $vars->{verbose};				# Silent (0) (for cron) or verbose (1)
 		my $date = &nice_date(time);
 		my $today = &day_today;
 
 
-		# Get newsletter page data
+		# Publish page and get newsletter page data
 		my $record = &db_get_record($dbh,"page",{page_id=>$page_id});
-		my ($pgcontent,$pgtitle,$pgformat,$pgarchive,$keyword_count) = &publish_page($dbh,$query,$page_id,0);
+		my ($pgcontent,$pgtitle,$pgformat,$pgarchive,$keyword_count) 
+			= &publish_page($dbh,$query,$page_id,0);
 		$pgtitle .= " ~ $date";
 
+		if ($record->{page_type} eq "mailchimp")	{	# send to mailchimp list
+
+			if ($send_list =~ /admin/i) { $send_list = $Site->{mailchimp_test}; }
+			else { $send_list = $record->{page_subsend}; }
+			my $result = &send_mailchimp_email($pgcontent,$pgtitle,$send_list);
+			exit;
+
+		} else {						# send to email subscription list
+
+
+		}
 
 		print qq|
 			  <h2>Send Newsletter</h2>
@@ -3153,6 +3179,7 @@ print "$hn <p>\n\n";
 			  Today is $today, $date.</p>
 		| if ($verbose);
 
+		
 
 									# Do not send empty newsletters
 	#	unless ($keyword_count) {
@@ -3208,7 +3235,76 @@ print "$hn <p>\n\n";
 
 	}
 
+	sub send_mailchimp_email {
+		my ($pgcontent,$pgtitle,$listid) = @_;
+		my $response;
 
+	    use lib './modules/MailChimp/lib';
+		use lib './modules/MailChimp/lib/MailChimp';
+		use MailChimp;
+	
+		# Initialize account
+		print "Initializing account... <br>";
+		my $account = MailChimp->new({
+			datacenter => $Site->{mailchimp_datacenter},
+			version => $Site->{mailchimp_version},
+			url => $Site->{mailchimp_url},
+			apikey => $Site->{mailchimp_apikey}
+		});
+
+		#username => 'stephen@downes.ca',
+		#password => 'PSAF_rout3riff8yet',
+
+		my $template_id = 69461;
+
+		# Create a campaign
+		my $email = 'stephen@downes.ca';
+		my $ago = qq|<a href="admin.cgi">admin general options</a>|;
+		unless ($Site->{st_crea}) { $response .= qq|<warn>Site Creator's name should be defined in $ago<br></warn>|;}
+		unless ($Site->{st_crea}) { $response .= qq|<warn>Site email should be defined in $ago<br></warn>|;}
+
+		print "Defining campaign... <br>";
+		my $campaign = MailChimp::Campaigns->new({
+			account => $account,
+			type => 'regular',
+			recipients => {
+		    	list_id => $listid
+	   	 	},
+				settings => {
+				subject_line => $pgtitle,
+				preview_text => 'Text',
+				title => $pgtitle,
+				from_name => $Site->{st_crea},
+				reply_to => $Site->{st_email},
+				to_name => "",
+				folder_id => "",
+				auto_fb_post => [],
+				template_id => $template_id
+			},
+			content_type => 'template',
+		});
+
+		print "Creating campaign... <br>";
+		$campaign->create();
+		print "Campaign created. ";
+
+		print "Getting campaign info from Mailchimp<br>";
+		print $campaign->to_string();
+		print "<br>";	
+
+		print "Adding content.<br>";
+		# Assign content to a campaign
+		my $data = {
+			html => $pgcontent,
+		};
+		$campaign->add_content($data);	
+		print "Content added.<p>";
+
+		# Send a campaign
+		$campaign->send();	
+		return $response."Sent $pgtitle to MailChimp list $listid <p>";
+
+	}
 
 	# -------   Admin Report -------------------------------------------------------
 
@@ -3581,6 +3677,501 @@ print "$hn <p>\n\n";
 	    $listener->start;
 
 	}
+
+sub mailchimp {
+
+	my $vars = $query->Vars;
+	print "Content-type: text/html\n\n";
+	print "Mailchimp running<p>";
+	print "Mailchimpaction: ",$vars->{mailchimpaction},"<br>";
+
+
+use MailChimp;
+	
+	# Initialize account
+print "Initializing account... <br>";
+	my $account = MailChimp->new({
+
+		datacenter => $Site->{mailchimp_datacenter},
+		version => $Site->{mailchimp_version},
+		url => $Site->{mailchimp_url},
+		apikey => $Site->{mailchimp_apikey}
+	});
+
+		#username => 'stephen@downes.ca',
+		#password => 'PSAF_rout3riff8yet',
+
+	my $template_id = 69461;
+
+	# Create a campaign
+
+    my $listid = "375520a149";
+	my $template_id = 69461;
+	# = 69461;
+	my $email = 'stephen@downes.ca';
+
+print "Defining campaign... <br>";
+	my $campaign = MailChimp::Campaigns->new({
+		account => $account,
+		type => 'regular',
+		recipients => {
+		    list_id => $listid
+	    },
+		settings => {
+		    subject_line => 'Test',
+		    preview_text => 'Text',
+		    title => '',
+		    from_name => 'moi',
+		    reply_to => $email,
+		    to_name => "",
+		    folder_id => "",
+		    auto_fb_post => [],
+		    template_id => $template_id
+		},
+		content_type => 'template'
+	});
+print "Creating campaign... <br>";
+	$campaign->create();
+	#	my $campaign = $account->campaigns('01ad44eaa8');
+	# my $campaign_id = $campaign->{id};   # eg. 6d864615e5
+
+	print "Campaign created. ";
+
+	print "Getting campaign info from Mailchimp<br>";
+
+	print $campaign->to_string();
+	print "<br>";	
+
+    print "Adding content.<br>";
+	# Assign content to a campaign
+	my $data = {
+		html => "Some test HTML content",
+		plain_text => "Some test text content"
+	};
+#	my $campaign = MailChimp::Campaigns->new({account=>$account,id=>$campaign_id});
+	$campaign->add_content($data);	
+
+    print "Content added.<p>";
+
+	# Send a campaign
+	#my $id = '785aef91c6';	
+	#my $campaign = MailChimp::Campaigns->new({account=>$account,id=>$id});	
+	$campaign->send();	
+	print "Sent <p>";
+exit;	
+
+
+# fbb57afe8e
+
+# 69461
+
+	# Get a template
+#	my $id = '01ad44eaa8';
+	my $id = 69461;
+	my $template = MailChimp::Templates->new({account=>$account,id=>$id});
+	$template->get();
+	print $template->to_string();
+
+					use Data::Dumper;
+				print "<pre>";
+				print Dumper($template);
+				print "</pre>";	
+
+
+exit;
+
+	# Get a campaign
+#	my $id = '01ad44eaa8';
+	my $id = 'fbb57afe8e';
+	my $campaign = MailChimp::Campaigns->new({account=>$account,id=>$id});
+	$campaign->get();
+	print $campaign->to_string();
+
+					use Data::Dumper;
+				print "<pre>";
+				print Dumper($campaign);
+				print "</pre>";	
+
+exit;
+
+# List Campaigns
+	my $response = $account->campaigns(999);
+	my @info = @{$response->{'campaigns'}};
+
+
+my @sorted =  sort { $b->{create_time} <=> $a->{create_time} } @info;
+			foreach my $object (@sorted) {
+				if ( $object->{create_time} =~ /2021-01-22/) {
+				print $object->{create_time}," : ",$object->{name}," : ",$object->{id},"<br>";
+				}
+			}
+
+		
+exit;
+
+
+
+
+	# Send a campaign
+	my $id = '785aef91c6';	
+	my $campaign = MailChimp::Campaigns->new({account=>$account,id=>$id});	
+	$campaign->send();	
+exit;	
+
+	# Assign content to a campaign
+	my $id = '785aef91c6';
+	my $data = {
+		html => "Some test HTML content",
+		plain_text => "Some test text content"
+	};
+	my $campaign = MailChimp::Campaigns->new({account=>$account,id=>$id});
+	$campaign->add_content($data);	
+
+exit;
+
+
+	# Create a campaign
+
+    my $listid = "375520a149";
+	my $template_id = 135722;
+	# = 69461;
+	my $email = 'stephen@downes.ca';
+
+
+	my $campaign = MailChimp::Campaigns->new({
+		account => $account,
+		type => 'regular',
+		recipients => {
+		    list_id => $listid
+	    },
+		settings => {
+		    subject_line => 'Test',
+		    preview_text => 'Text',
+		    title => '',
+		    from_name => 'moi',
+		    reply_to => $email,
+		    to_name => "",
+		    folder_id => "",
+		    auto_fb_post => [],
+		    template_id => $template_id
+		},
+		content_type => 'template'
+	});
+
+	$campaign->create();
+	#	my $campaign = $account->campaigns('01ad44eaa8');
+	$campaign_id = $campaign->{id};   # eg. 6d864615e5
+
+	print $campaign->to_string();
+
+
+				use Data::Dumper;
+				print "<pre>";
+				print Dumper($campaign);
+				print "</pre>";		
+			exit;
+
+				use Data::Dumper;
+				print "<pre>";
+				#print Dumper($campaigns);
+				print "</pre>";		
+			
+
+
+
+
+	print "OK";	
+			exit;
+
+
+exit;
+
+
+
+# List Templates
+	my $response = $account->templates(25);
+	use Data::Dumper;
+	print "<pre>";
+	print Dumper($response);
+	print "</pre>";			
+exit;
+
+
+	#$account->request({test => 'hash'});
+
+exit;
+	my $username = 'stephen@downes.ca';
+	my $password = 'PSAF_rout3riff8yet';
+	my $template = 69461;
+
+	my $listid = 'xxxx';
+	my $email = 'andy@test.co.uk';
+	my $endpoint = "https://us18.api.mailchimp.com/3.0/";
+
+
+	my $command = "ping";
+	if ($vars->{object}) { $command = $vars->{object} }
+
+	# Working with a specific object
+
+	if ($vars->{mailchimpaction}) {
+
+		if ($vars->{mailchimpaction} eq "create") {
+
+
+			my $listid = "375520a149";
+			my $email = 'stephen@downes.ca';
+
+			my $url = $endpoint.$command."/".$id;
+
+			# ."/".$campaignid."/".$commandactions;
+
+			# Perform an Action
+			print "Creating campaign: ",$url,"<p>";
+
+			# Create a campaign
+			$command = "campaigns";
+			my $campaign = {
+				type => 'regular',
+				recipients => {
+					list_id => $listid
+				},
+				settings => {
+					subject_line => 'Test',
+					preview_text => 'Text',
+					title => '',
+					from_name => 'moi',
+					reply_to => $email,
+					to_name => "",
+					folder_id => "",
+					auto_fb_post => [],
+					template_id => $template
+				},
+				content_type => 'template'
+			};
+
+			use JSON;
+			my $json = encode_json $campaign;
+			my $method = "POST";
+			my $url = $endpoint.$command;
+			print $url,"<p>";
+
+			my ($response_code,$response) = &mailchimp_request($method,$url,$json);
+			print "Response code: $response_code";
+				use Data::Dumper;
+				print "<pre>";
+				print Dumper($response);
+				print "</pre>";		
+			exit;
+
+
+		} if ($vars->{mailchimpaction} eq "content") {
+
+			print "Creating content<p>";
+			my $data = {
+				html => "test"
+			};
+
+			my $id = "fbb57afe8e";	# campaign id
+			my $url = $endpoint.$command."/".$id. "/content";
+			use JSON;
+			my $json = encode_json $data;
+			my $method = "PUT";
+			print $url,"<p>";
+			my ($response_code,$response) = &mailchimp_request($method,$url,$json);
+		print "Response code: $response_code";
+			use Data::Dumper;
+			print "<pre>";
+			print Dumper($response);
+			print "</pre>";		
+		exit;
+
+		} elsif ($vars->{mailchimpaction} eq "send") {
+			print "Sending campaign<p>";
+			my $id = "fbb57afe8e";	# campaign id
+			my $url = $endpoint.$command."/".$id. "/actions/send";
+			my $method = "POST";
+			my ($response_code,$response) = &mailchimp_request($method,$url);
+		print "Response code: $response_code";
+			use Data::Dumper;
+			print "<pre>";
+			print Dumper($response);
+			print "</pre>";		
+		exit;
+		}
+
+	}
+
+
+
+	if ($vars->{id}) {
+
+		# Just display the object
+
+			my $method = "GET";
+			my $url = $endpoint.$command."/".$id;
+			print $url,"<p>";
+
+			my ($response_code,$response) = &mailchimp_request($method,$url);
+			use Data::Dumper;
+			print "<pre>";
+			print Dumper($response);
+			print "</pre>";
+
+
+		exit;
+
+
+	# No specific object, just list them
+	} else {
+
+		my $url = $endpoint.$command;
+
+	
+
+		my $method = "GET";
+		$url .= "?count=999";
+		print $url,"<p>";
+
+		my ($response_code,$response) = &mailchimp_request($method,$url);
+		my @info = @{$response->{$command}};
+
+	
+		# campaigns
+		if ($command eq "campaigns") {   # because mailchimp attributes aren't consistent}
+			my @sorted =  sort { $b->{create_time} <=> $a->{create_time} } @info;
+			foreach my $object (@sorted) {
+				print $object->{create_time}," : ",$object->{name}," : ",$object->{id},"<br>";
+			}
+
+		}
+
+		#lists 
+		elsif ($command eq "lists") { 
+			my @sorted =  sort { uc($b->{name}) <=> uc($a->{name}) } @info;
+			foreach my $object (@sorted) {
+				print $object->{date_created}," : ",$object->{id}," : ",
+				qq|<a href="admin.cgi?action=mailchimp&object=$command&id=|,$object->{id},qq|">|,
+				$object->{name}, "</a> (",$object->{stats}->{member_count},")<br>";
+			}
+		}
+
+		# templates 
+		elsif ($command eq "templates") { 
+			use Data::Dumper;
+			print "<pre>";
+			print Dumper($response);
+			print "</pre>";
+		}
+
+		exit;
+
+	}
+
+
+
+
+	my $commandactions = "actions/send";
+
+	my $campaignid = "63a79cf24e";
+
+	my $json = JSON::encode_json([
+		'email_address' => $email,
+		'status'        => 'pending',
+		'merge_fields'  => [
+			'FNAME'     => "andy",
+			'LNAME'     => "newby"
+		]
+	]);
+
+
+
+	#my $url = "$endpoint/$listid/members/" . Digest::MD5::md5(lc($email));
+
+
+
+
+
+
+
+
+
+        
+
+
+
+
+	exit;
+
+}
+
+# method can be GET or POST
+# url is API url
+# body is JSON encoded payload for POST requests
+
+sub mailchimp_request {
+
+	my ($method,$url,$body) = @_;
+
+	use local::lib; # sets up a local lib at ~/perl5
+	use warnings;
+
+    use WWW::Curl::Easy;
+    use JSON;
+    use Digest::MD5;
+
+	my $apikey = "228cedbb12c0726efc050ae0e565f371-us18";
+    my $listid = 'xxxx';
+    my $email = 'andy@testr.co.uk';
+   # my $endpoint = "https://us18.api.mailchimp.com/3.0/lists";
+
+
+    my $curl = WWW::Curl::Easy->new;
+
+    #my $url = $endpoint;
+	#/$listid/members/" . Digest::MD5::md5(lc($email));
+
+    $curl->setopt(CURLOPT_HEADER,0);
+    $curl->setopt(CURLOPT_URL, $url);
+
+    $curl->setopt(CURLOPT_VERBOSE, 1);
+    $curl->setopt(CURLOPT_USERPWD, 'user:' . $apikey);
+    #$curl->setopt(CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    $curl->setopt(CURLOPT_TIMEOUT, 20);
+    $curl->setopt(CURLOPT_CUSTOMREQUEST, $method);
+    $curl->setopt(CURLOPT_SSL_VERIFYPEER, 0);
+    if ($body) { $curl->setopt(CURLOPT_POSTFIELDS, $body); }
+
+    # A filehandle, reference to a scalar or reference to a typeglob can be used here.
+    my $response_body;
+    $curl->setopt(CURLOPT_WRITEDATA,\$response_body);
+
+    # Starts the actual request
+    my $retcode = $curl->perform;
+
+    # Looking at the results...
+    if ($retcode == 0) {
+
+		# print("Transfer went ok<p>");
+		my $response_code = $curl->getinfo(CURLINFO_HTTP_CODE);
+
+		# print "Received response: $response_body\n";
+
+		use JSON::Parse 'parse_json';
+		my $json = $response_body;
+		if ($json) {
+			my $perl = parse_json ($json);
+			return ($response_code,$perl);
+		} else {
+			return ($response_code);
+		}
+    } else {
+        # Error code, type of error, error message
+        my $message = "An error happened: $retcode ".$curl->strerror($retcode)." ".$curl->errbuf."\n";
+		return ($message);
+	}
+
+}
 
    sub republish {
 

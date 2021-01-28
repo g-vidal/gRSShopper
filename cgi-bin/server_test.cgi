@@ -98,8 +98,8 @@ if ($missing eq "1") {
 
   print qq|</ul>		$newline$newline
 		<b>Getting Perl Modules</b>$newlineFor more information, please see:$newline
-		<a href="http://www.cpan.org/modules/INSTALL.html">http://www.cpan.org/modules/INSTALL.html</a> $newline
-		<a href="http://www.rcbowen.com/imho/perl/modules.html">http://www.rcbowen.com/imho/perl/modules.html</a> $newline|;
+		<a href="https://www.cpan.org/modules/INSTALL.html">https://www.cpan.org/modules/INSTALL.html</a> $newline
+		<a href="https://www.rcbowen.com/imho/perl/modules.html">https://www.rcbowen.com/imho/perl/modules.html</a> $newline|;
 
 }
 
@@ -147,7 +147,7 @@ use DBI;
 print "<p><b>Testing user authentication</b></p>";
 print "<p>Note that this may create a new Admin user is one is needed; please be sure to take note of the admin user name and password for later logins.</p>";
 
-print qq|<iframe src="login_widget.cgi" height="40" width="500" title="Iframe Example"></iframe>|;
+print qq|<iframe src="login_widget.cgi" height="100" width="500" title="Iframe Example"></iframe>|;
 
 print qq|<p>Once you have logged in, try out <a href="../PLE.htm">your new PLE</a></p>|;
 

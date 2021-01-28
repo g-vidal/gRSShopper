@@ -992,7 +992,7 @@ sub publish_page {
 		print $Site->{footer};
 	}
 
-	return ($pgcontent,$pgtitle,$pgformat,$archive_url,$keyword_count,$wp->{page_location});
+	return ($pgcontent,$pgtitle,$pgformat,$archive_url,$keyword_count,$wp->{page_location},$wp->{page_type});
 
 
 }

@@ -488,7 +488,7 @@ if ($vars->{table} eq "media") {
   # ADMIN
   elsif ($vars->{cmd} eq "admin") {
 		my $starting_tab = $vars->{starting_tab} || "Database";
-		print &main_window(['Database','Harvester','Users','Permissions','Logs','General'],$starting_tab);
+		print &main_window(['Database','Harvester','Newsletters','Users','Permissions','Logs','General'],$starting_tab);
 	 	exit;
 	}
 

@@ -103,6 +103,8 @@ if ($missing eq "1") {
 
 }
 
+
+
 # -------------
 # Test database access (from default config in Dockerfile)
 

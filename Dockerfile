@@ -1,5 +1,11 @@
 FROM ubuntu:20.10
 
+# You should change these four values to improve security
+ARG DATABASE_NAME = 'grsshopper'
+ARG DATABASE_URL = 'localhost'
+ARG DATABASE_USER = 'grsshopper_user'
+ARG DATABASE_PWD = 'user_password'
+
 LABEL Description="Cutting-edge LAMP stack, based on Ubuntu 20.10 LTS. Includes .htaccess support and popular PHP7 features, including composer and mail() function." \
 	License="Apache License 2.0" \
 	Usage="docker run -d -p [HOST WWW PORT NUMBER]:80 -p [HOST DB PORT NUMBER]:3306 -v [HOST WWW DOCUMENT ROOT]:/var/www/html -v [HOST DB DOCUMENT ROOT]:/var/lib/mysql fauria/lamp" \
@@ -84,8 +90,6 @@ RUN a2ensite default-ssl
 RUN mkdir /var/www/html/cgi-bin
 RUN a2enconf cgi-enabled 
 
-
-
 COPY html/index.html /var/www/html/index.html
 COPY html/index.html /var/www/html/index.htm
 COPY html/PLE.html /var/www/html/PLE.htm
@@ -99,10 +103,13 @@ COPY run-lamp.sh /usr/sbin/
 COPY cgi-bin/sql/gRSShopper-ple.sql /var/www/html/cgi-bin/grsshopper.sql
 RUN /bin/bash -c "/usr/bin/mysqld_safe &" && \
   sleep 5 && \
-  mysql -u root -e "CREATE DATABASE grsshopper" && \
-  mysql -u root -e "grant all privileges on grsshopper.* TO 'grsshopper_user'@'localhost' identified by 'user_password'" && \
-  mysql -u root grsshopper < /var/www/html/cgi-bin/grsshopper.sql
-  
+  mysql -u root -e "CREATE DATABASE ${DATABASE_NAME}" && \
+  mysql -u root -e "grant all privileges on ${DATABASE_NAME}.* TO '${DATABASE_USER}'@'${DATABASE_URL}' identified by '${DATABASE_PWD}'" && \
+  mysql -u root ${DATABASE_NAME} < /var/www/html/cgi-bin/grsshopper.sql
+
+RUN echo "localhost\t${DATABASE_NAME}\t${DATABASE_URL}\t${DATABASE_USER}\t${DATABASE_PWD}\tEN" > multisite.txt  
+COPY multisitee.txt /var/www/html/cgi-bin/data/multisite.txt   
+
 RUN chmod +x /usr/sbin/run-lamp.sh
 RUN chown -R www-data:www-data /var/www/html
 

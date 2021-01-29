@@ -1,1 +1,1 @@
-domain.name.ca	grsshopper	localhost	grsshopper_user	user_password	en	/var/www/html/	/var/www/html/cgi-bin/
+www.downes.ca	downesca_downes	localhost	downesca_downes	reclaimD2vidhume	en	/home/downesca/public_html/	/home/downesca/public_html/cgi-bin/

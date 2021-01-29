@@ -12456,7 +12456,7 @@ package gRSShopper::Site;
 	# Open the multisite configuration file,
 	# Initialize if file can't be found or opened
 
-  	my $data_file = "data/multisite.txt";
+  	my $data_file = "/var/www/html/cgi-bin/data/multisite.txt";
 	unless (-e $data_file) { $data_file = $ARGV[2]; }    # try a backup option (nneded for cron)
 
 	open IN,"$data_file" or die qq|Cannot find multisite.txt or website information in crom task.|; 

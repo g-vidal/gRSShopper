@@ -39,6 +39,7 @@ RUN apt-get install -y	  libcgi-xml-perl
 RUN apt-get install -y	  libxml-opml-perl
 RUN apt-get install -y    libtemplate-plugin-gd-perl 
 RUN apt-get install -y    libwww-curl-perl
+RUN apt-get install -y    libwww-mechanize-perl
 
 RUN cpanm Image::Resize
 RUN cpanm Mastodon::Client

@@ -321,7 +321,7 @@ print "Admin General";
 		$content .= &admin_cron($dbh,$query);
 
 		$content .= &admin_configtable($dbh,$query,"Site Information",
-			("Site Name:st_name","Site Tag:st_tag","Email:st_email","Description:st_desc","Publisher:st_pub","Creator:st_crea","License:st_license","Time Zone:st_timezone","Reset Key:reset_key","Cron Key:cronkey"));
+			("Site Name:st_name","Site Tag:st_tag","Email:st_email","Description:st_desc","Publisher:st_pub","Creator:st_crea","License:st_license","Time Zone:st_timezone","Reset Key:reset_key"));
 
 
 		$content .= &admin_api($dbh,$query);
@@ -560,7 +560,7 @@ print "Admin General";
 		 <a href="|.$Site->{st_cgi}.qq|admin.cgi?action=logview&logfile=cronlog">
 		 View Cron Log</a></td></tr></table></ul>|;
 
-		$content .= &admin_configtable($dbh,$query,"",("Cron Key:cronkey"));
+		
 
 
 	    return $content;
@@ -2897,19 +2897,10 @@ sub admin_update_grsshopper{
 		&update_config_table($dbh,{cronrun=>time});
 		&update_config_table($dbh,{cronerr=>"none"});
 
-		my $loglevel = 10;
+		my $loglevel = 0;
 
         if ($loglevel > 5) { $log .= sprintf("Context:%s, Args 0:%s, %s, 1:%s, 2:%s, 3:%s\n",
 			$Site->{context},$ARGV[0],$ARGV[1],$ARGV[2],$ARGV[3]); }
-
-		# Confirm cron key
-		my $cronkey = $ARGV[1] || $vars->{cronkey};
-		unless ($Site->{cronkey} eq $cronkey) {
-			update_config_table($dbh,{cronerr=>"Cron key mismatch"});
-			&log_cron(0,$log.sprintf("Error: Cron key mismatch. Cron key in Cron table must match the value of the cronkey set in %s admin.",
-				$Site->{st_name}));
-			exit;
-		}
 
 		# Get the time
 		my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);

@@ -102,7 +102,22 @@ RUN /bin/bash -c "/usr/bin/mysqld_safe &" && \
   mysql -u root -e "CREATE DATABASE grsshopper" && \
   mysql -u root -e "grant all privileges on grsshopper.* TO 'grsshopper_user'@'localhost' identified by 'user_password'" && \
   mysql -u root grsshopper < /var/www/html/cgi-bin/grsshopper.sql
-  
+
+# Copy cron file to the cron.d directory
+COPY cronfile /etc/cron.d/cronfile
+
+# Give execution rights on the cron job
+RUN chmod 0644 /etc/cron.d/cronfile
+
+# Apply cron job
+RUN crontab /etc/cron.d/cronfile
+
+# Create the log file to be able to run tail
+RUN touch /var/log/cron.log
+
+# Run the command on container startup
+CMD cron && tail -f /var/log/cron.log
+
 RUN chmod +x /usr/sbin/run-lamp.sh
 RUN chown -R www-data:www-data /var/www/html
 

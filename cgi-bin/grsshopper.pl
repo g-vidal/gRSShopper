@@ -143,7 +143,6 @@ sub filter_input {
 		$vars->{action} = $ARGV[1];		# Command
 		if ($vars->{action} eq "publish") { $vars->{page} = $ARGV[2]; }
 		$vars->{preview} = $ARGV[2];		# Preview Option
-		$cronkey = $ARGV[3];
 		$vars->{person_status} = "cron";
 		$vars->{mode} = "silent";
 	}
@@ -222,21 +221,10 @@ sub get_person {
 	if ($Site->{context} eq "cron") { 			# Create cron person, if applicable,
 								# and exit
 
-										# Confirm cron key
-		my $cronkey = $ARGV[1] || $vars->{cronkey};
-		unless ($Site->{cronkey} eq $cronkey) {
-
-			print &printlang("Cron key ".$Site->{cronkey}." mismatch",$vars->{cronkey},$Site->{st_name});
-			&send_email("stephen\@downes.ca","stephen\@downes.ca",
-				&printlang("Cron Error",$Site->{st_name}),
-				"Cron key mismatch between $Site->{cronkey} and  $cronkey in get_person() - Args: $ARGV[0] - $ARGV[1] - $ARGV[2] - $ARGV[3]");
-			exit;
-		}
-
 		$Person->{person_title} = $Site->{st_name};
 		$Person->{person_name} = $Site->{st_name};
 		$Person->{person_email} = $Site->{em_from};
-		$Person->{person_status} = "admin";
+		$Person->{person_status} = "Admin";
 		return;
 
 	}

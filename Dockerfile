@@ -59,6 +59,7 @@ RUN apt-get install tree -y
 RUN apt-get install vim -y
 RUN apt-get install curl -y
 RUN apt-get install ftp -y
+RUN apt-get install cron -y
 
 RUN npm install -g bower
 RUN npm install -g grunt-cli

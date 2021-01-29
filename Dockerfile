@@ -1,10 +1,10 @@
 FROM ubuntu:20.10
 
 # You should change these four values to improve security
-ARG DATABASE_NAME = 'grsshopper'
-ARG DATABASE_URL = 'localhost'
-ARG DATABASE_USER = 'grsshopper_user'
-ARG DATABASE_PWD = 'user_password'
+ENV DATABASE_NAME = 'grsshopper'
+ENV DATABASE_URL = 'localhost'
+ENV DATABASE_USER = 'grsshopper_user'
+ENV DATABASE_PWD = 'user_password'
 
 LABEL Description="Cutting-edge LAMP stack, based on Ubuntu 20.10 LTS. Includes .htaccess support and popular PHP7 features, including composer and mail() function." \
 	License="Apache License 2.0" \

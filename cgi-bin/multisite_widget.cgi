@@ -58,16 +58,64 @@
 
 	if ($vars->{action} eq "Submit") {
 
-		if ($vars->{st_url} && $vars->{db_name} && $vars->{db_host} && $vars->{db_name} && $vars->{db_user}
-			&& $vars->{db_pwd} && $vars->{st_lang} ) {
-			# Basic cleaning, might change passwords, but it's still in multisite.txt
-			while (my ($vx,$vy) = each %$vars) { $vars->{$vx} =~ s/'|;|"|\t|\n//; }  
+		# Basic cleaning, might change passwords, but it's still in multisite.txt
+		while (my ($vx,$vy) = each %$vars) { $vars->{$vx} =~ s/'|;|"|\t|\n//; }  
+			
+    	# Make variables easy to read :)
+		my $siteurl = $vars->{st_url};
+    	my $dbname = $vars->{db_name};
+    	my $dbhost = $vars->{db_host};
+    	my $dbuser = $vars->{db_user};
+    	my $dbpwd = $vars->{db_pwd};
+		my $language = $vars->{st_lang};
+
+		if ($siteurl && $dbname && $dbhost && $dbuser && $dbpwd && $language ) {
 			my $multisite = $dirname."/data/multisite.txt";
 			open MULTI,">>$multisite" or die "Can't open $multisite: $?";
-			print MULTI $vars->{st_url}."\t".$vars->{db_name}."\t".$vars->{db_host}."\t".$vars->{db_name}.
-				"\t".$vars->{db_user}."\t".$vars->{db_pwd}."\t".$vars->{st_lang}."\n";
+			print MULTI "$siteurl\t$dbname\t$dbhost\t$dbuser\t$dbpwd\t$language\n";
 			
 			print "Form submitted<br>"; 
+
+			# Create the database locally, if needed
+			if ($dbhost eq "localhost") {
+				my $cmd = sprintf(qq|mysql -u %s -p%s -e "create database %s; GRANT ALL PRIVILEGES ON %s.* TO %s\@localhost IDENTIFIED BY '%s'"|,
+					$Site->{database}->{usr},$Site->{database}->{pwd},$dbname,$dbname,$dbuser,$dbpwd);
+				
+				print $cmd;
+
+				my $response = qx{$cmd};
+				print $response;
+			}
+
+			# Test database connection
+			# Connect to the Database
+			my $dbh = DBI->connect("DBI:mysql:database=$dbname;host=$dbhost;port=3306",$dbuser,$dbpwd);
+
+			# Catch connection error
+			if( ! $dbh ) {
+
+					print "Content-type: text/html\n\n";
+				print "Database connection error for db '$dbname'. Please contact the site administrator.<br>";   
+
+				# Print error report and exit
+				print "Error String Reported: $DBI::errstr <br>";
+				exit;
+
+			# I'll put more error-checking here
+			} else {
+			
+					print "<p>Database successfully connected.</p>";
+				eval {
+				#$dbh->do( whatever );
+				#$dbh->{dbh}->do( something else );
+				};
+
+				if( $@ ) {
+					print "Ugg, problem: $@\n";
+				}
+			}
+
+
 			exit;
 		} else {
 			print "The entire form must be filled before submitting.";

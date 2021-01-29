@@ -7,17 +7,21 @@ downes/grsshopper
 [![Docker Build Status](https://img.shields.io/docker/build/downes/grsshopper.svg?style=plastic)](https://hub.docker.com/r/downes/grsshopper-ple/builds/)
 [![](https://images.microbadger.com/badges/image/downes/grsshopper.svg)](https://microbadger.com/images/downes/grsshopper-ple "downes/grsshopper-ple")
 
-Note: still being set up, these instructions don't work yet
+
+
 
 gRSShopper is a tool that aggregates, organizes and distributes resources to support online learning. Read more here: https://grsshopper.downes.ca/
 
+
 Docker image is here: https://hub.docker.com/r/downes/grsshopper-ple
+
+Note: don't use Docker imagejust now, run from this GitHub repository 
 
 To run:
 ```
 docker pull downes/grsshopper
 
-docker run --publish 80:80 --detach --name gr1 grsshopper
+docker run -p 80:80 -p 443:443 --detach --name gr1 grsshopper
 ```
 
 
@@ -37,7 +41,7 @@ cd grsshopper
 
 docker build --tag grsshopper .
 
-docker run --publish 80:80 -p 443:443 --detach --name gr2 grsshopper
+docker run -p 80:80 -p 443:443 --detach --name gr1 grsshopper
 ```
 
 Testing the server on localhost
@@ -126,3 +130,4 @@ https://blog.ouseful.info/2020/06/09/first-forays-into-the-reclaim-cloud-beta-ru
 
 https://www.effectiveperlprogramming.com/2020/06/turn-off-indirect-object-notation/ - Perl - Turn off indirect object notation
 
+https://stackoverflow.com/questions/37458287/how-to-run-a-cron-job-inside-a-docker-container - How to run a cron job in Docker

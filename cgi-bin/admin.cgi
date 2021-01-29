@@ -3701,8 +3701,8 @@ print "$hn <p>\n\n";
 			} else { $reppub = 0; }
 
 			# Save item crdate
-			open FILE, ">$reppub_indexfile" or print $!;
-			print FILE $reppub or print $!;
+			open FILE, ">$reppub_indexfile" or print "Cannot open $reppub_indexfile : $! \n";
+			print FILE $reppub or  or print "Cannot print to $reppub_indexfile : $! \n";
 
 			close FILE;
             $count++;

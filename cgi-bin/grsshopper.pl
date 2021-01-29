@@ -10598,6 +10598,7 @@ sub log_view {
 		my $cronfile = &get_cookie_base("d");
 		$cronfile =~ s/\./_/g;
 		my $cronlog = $Site->{data_dir} . $cronfile. "_cron.log";
+		unless (-e $cronlog) { $cronlog = $Site->{data_dir} . "localhost"_cron.log"; }
 		if ($vars->{format} eq "tail") {
 			open my $pipe, "-|", "/usr/bin/tail", "-f", $cronlog
 				or die "could not start tail on SampleLog.log: $!";
@@ -12411,7 +12412,7 @@ package gRSShopper::Site;
   	elsif ($numArgs > 1) {
 			$self->{context} = "cron";
 			$self->{st_host} = $ARGV[0];			# Define Host
-			$self->{data_dir} = $ARGV[2];		  # For cron, define data dir relative to multisite.txt
+			$self->{data_dir} = $ARGV[1];		  # For cron, define data dir relative to multisite.txt
 			$self->{data_dir} =~ s/multisite\.txt//;
 			$self->{st_cgif} = $self->{data_dir}; # For cron, define cgif dir relative to data dir
 			$self->{st_cgif} =~ s/data\///i;  # For cron, define page dir relative to cgi-dir

@@ -180,7 +180,7 @@ use CGI::Carp qw(fatalsToBrowser);
 			/Delete/i && do	{ &record_delete($dbh,$query,$table,$id);last; };		#	- Delete Record
 			/Spam/i && do { &record_delete($dbh,$query,$table,$id);  last; };		#	- Delete Record and log creator IP to Spam
 			/multi/i && do { &admin_multi($dbh,$query); last;		};		#	- Multi-Delete Record (FIXME needs work)
-
+			/rcomment/i && do {&rcomment($dbh,$query); last; };					# Remote Comment
 
 
 															# Feed Functions
@@ -2278,6 +2278,15 @@ sub admin_update_grsshopper{
 
 	}
 
+	# -------   Remote Comment ----------------------------------------------------
+
+	sub rcomment {
+
+		print "Content-type: text/html\n\n";
+		print "Remote comment";
+		exit;
+
+	}
 
 	# -------   Update Record ------------------------------------------------------                                                   UPDATE
 
@@ -3702,7 +3711,7 @@ print "$hn <p>\n\n";
 
 			# Save item crdate
 			open FILE, ">$reppub_indexfile" or print "Cannot open $reppub_indexfile : $! \n";
-			print FILE $reppub or  or print "Cannot print to $reppub_indexfile : $! \n";
+			print FILE $reppub or print "Cannot print to $reppub_indexfile : $! \n";
 
 			close FILE;
             $count++;

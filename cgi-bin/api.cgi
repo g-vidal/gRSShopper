@@ -271,7 +271,7 @@ use CGI::Carp qw(fatalsToBrowser);
 		my $content = get($vars->{source});
     if ($content =~ /<a(.*?)href="$vars->{target}"(.*?)>/) {    # Found it
 
-				# If necessary, create link record_delete
+				# If necessary, create link record
 				my $link_id = &db_locate($dbh,"link",{link_link => $vars->{source}});
 				$link_id ||= "new";
 				my $link_link = $vars->{source}; $link_link =~ s/'//; #'
@@ -1877,34 +1877,6 @@ sub api_publish {
 
 }
 
-# Finds a WebMention wndpoint given the $lcontent of a web page
-sub find_webmention_endpoint {
-   my ($lcontent) = @_;
-	 my $endpoint = "";
-
-	 my @bodylinks = $lcontent =~ /<a (.*?)>/gis;
-	 foreach my $bl (@bodylinks) {	if ($bl =~ m/rel="webmention"/is) { $bl =~ m/href="(.*?)"/is; $endpoint=$1; last; }	}
-
-	 my @headlinks = $lcontent =~ /<link (.*?)>/gis;
-	 foreach my $hl (@headlinks) {	if ($hl =~ m/rel="webmention"/is) { $hl =~ m/href="(.*?)"/is; $endpoint=$1; last; }	}
-
-	 return $endpoint;
-}
-
-sub send_webmention {
-
-  my ($endpoint,$target,$source) = @_;
-	my $ua = new LWP::UserAgent;
-
-  print "Sending webmention update to $endpoint <br>";
-  my $req = new HTTP::Request 'POST',$endpoint;
-  $req->content_type('application/x-www-form-urlencoded');
-  $req->content("source=$source&target=$target");
-  my $res = $ua->request($req);
-  print $res->as_string; print "<br>";
-
-
-}
 # API UPDATE ----------------------------------------------------------
 # ------- Create Column -----------------------------------------------------
 #

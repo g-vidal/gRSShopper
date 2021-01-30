@@ -10170,7 +10170,11 @@ sub check_user {
 #	    -expires=>"Wed, 22 Oct 2025 07:28:00 GMT",
 #	    -secure=>0);
 
-    print $cgi->header(-cookie=>$cookie,-charset => 'utf-8');
+
+    unless ($Site->{context} eq "cron" || $Site->{context} eq "rcomment") {
+		print $cgi->header(-cookie=>$cookie,-charset => 'utf-8');
+	}
+
 #print "Content-type: text/html\n\n OK";
     my $profile = $session->param("~profile");
     my $username = $profile->{username};
@@ -10598,7 +10602,7 @@ sub log_view {
 		my $cronfile = &get_cookie_base("d");
 		$cronfile =~ s/\./_/g;
 		my $cronlog = $Site->{data_dir} . $cronfile. "_cron.log";
-		unless (-e $cronlog) { $cronlog = $Site->{data_dir} . "localhost"_cron.log"; }
+		unless (-e $cronlog) { $cronlog = $Site->{data_dir} . "localhost_cron.log"; }
 		if ($vars->{format} eq "tail") {
 			open my $pipe, "-|", "/usr/bin/tail", "-f", $cronlog
 				or die "could not start tail on SampleLog.log: $!";
@@ -11108,11 +11112,11 @@ sub record_sanitize_input {
 	}
 
 
-	return if ($Person->{person_status} eq "Admin");
+	unless ($Site->{context} eq "rcomment") { return if ($Person->{person_status} eq "Admin"); }
 
 	$vars->{$vkey} =~ s/<(\/|)(scr|if|ob|e|t)(.*?)>//sig;	# No scripts, iframes, embeds, tables
 
-	return if ($Person->{person_status} eq "Registered");
+	unless ($Site->{context} eq "rcomment") { return if ($Person->{person_status} eq "Registered"); }
 
 	$vars->{$vkey} =~ s/<(\/|)(a|img)(.*?)>//sig;	# No links, images
 
@@ -11220,6 +11224,39 @@ sub record_anti_spam {		# Checks input for spam content and kills on contact
 
 	return 1;
 }
+
+	# -------  Webmentions
+	#
+
+	
+# Finds a WebMention wndpoint given the $lcontent of a web page
+sub find_webmention_endpoint {
+   my ($lcontent) = @_;
+	 my $endpoint = "";
+
+	 my @bodylinks = $lcontent =~ /<a (.*?)>/gis;
+	 foreach my $bl (@bodylinks) {	if ($bl =~ m/rel="webmention"/is) { $bl =~ m/href="(.*?)"/is; $endpoint=$1; last; }	}
+
+	 my @headlinks = $lcontent =~ /<link (.*?)>/gis;
+	 foreach my $hl (@headlinks) {	if ($hl =~ m/rel="webmention"/is) { $hl =~ m/href="(.*?)"/is; $endpoint=$1; last; }	}
+
+	 return $endpoint;
+	}
+
+sub send_webmention {
+
+	my ($endpoint,$target,$source) = @_;
+		my $ua = new LWP::UserAgent;
+
+	#print "Sending webmention update to $endpoint <br>";
+	my $req = new HTTP::Request 'POST',$endpoint;
+	$req->content_type('application/x-www-form-urlencoded');
+	$req->content("source=$source&target=$target");
+	my $res = $ua->request($req);
+	#print $res->as_string; print "<br>";
+
+
+	}
 
 	# -------  Delete a Record -----------------------------------------------------
 	#
@@ -12457,7 +12494,7 @@ package gRSShopper::Site;
 	# Open the multisite configuration file,
 	# Initialize if file can't be found or opened
 
-  	my $data_file = "/var/www/html/cgi-bin/data/multisite.txt";
+  	my $data_file = $self->{st_cgif}."data/multisite.txt";
 	unless (-e $data_file) { $data_file = $ARGV[2]; }    # try a backup option (nneded for cron)
 
 	open IN,"$data_file" or die qq|Cannot find multisite.txt or website information in crom task.|; 

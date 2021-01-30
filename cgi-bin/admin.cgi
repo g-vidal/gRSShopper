@@ -1,8 +1,6 @@
 #!/usr/bin/perl
 use CGI::Carp qw(fatalsToBrowser);
 
-
-
   #  use lib '/home/downesca/public_html/cgi-bin/modules/MailChimp/lib';
 	# use lib '/home/downesca/public_html/cgi-bin/modules/MailChimp/lib/MailChimp';
 
@@ -39,6 +37,7 @@ use CGI::Carp qw(fatalsToBrowser);
 	if ($diag>0) { print "Content-type: text/html\n\n"; }
 	
 	
+	
 
 # Forbid bots
 
@@ -57,16 +56,18 @@ use CGI::Carp qw(fatalsToBrowser);
 # Load modules
 
 	our ($query,$vars) = &load_modules("admin");
-	
+
 	
 # Load Site
 	
 	our ($Site,$dbh) = &get_site("admin");	
 
 		
-	
+		
 # Load User
+	if ($vars->{action} eq "rcomment") { $Site->{context} = "rcomment"; }
 	my ($session,$username) = &check_user();
+
 	our $Person = {}; bless $Person;
 	&get_person($Person,$username);
 	my $person_id = $Person->{person_id};
@@ -81,6 +82,13 @@ use CGI::Carp qw(fatalsToBrowser);
 # Restrict to Admin and cron (which runs every 60 seconds)
 	if (time - $Site->{cronrun} > 120)	{ $Site->{cronerr} = "Cron not running"; }
 	if ($vars->{context} eq "cron") { &cron_tasks($dbh,$query,$ARGV); } else { &admin_only(); }
+
+# Restrict locally
+	unless ($vars->{action} eq "rcomment") {   # Exception for remote comments
+		my $refer = $ENV{HTTP_REFERER};
+		die "Invalid call from external website" unless 
+			($refer =~ /$Site->{st_url}/);
+	}
 	
 	
 # print "Admin";
@@ -155,7 +163,7 @@ use CGI::Carp qw(fatalsToBrowser);
 	if ($action) {
 
 		for ($action) {
-			print "Action: $action <p>";												# Main admin menu nav
+		#	print "Action: $action <p>";												# Main admin menu nav
 
 			/start/ && do { &admin_start($dbh,$query); last;			};	# 	- Start Menu
 			/general/ && do { &admin_general($dbh,$query); last;			};	# 	- General Menu
@@ -2282,9 +2290,119 @@ sub admin_update_grsshopper{
 
 	sub rcomment {
 
-		print "Content-type: text/html\n\n";
-		print "Remote comment";
+		&record_sanitize_input($vars);
+		while (my ($vkey,$vval) = each %$vars) {
+			$vars->{$vkey} =~ s/\0/,/g;	# Replace 'multi' delimiter with comma
+		}
+
+		die "Not allowwed to comment" unless (&is_allowed("create",$table));
+		# Do some stuff
+		my $refer = $ENV{HTTP_REFERER};		
+		my $table="post";
+		my $post = {
+			post_type => 'link',
+			post_link => $refer,
+			post_description => $vars->{description},
+			post_title => $vars->{title},
+			post_author => $vars->{author},
+			post_feed => $vars->{feed}, 
+			post_id => "new",
+			post_pub_date => &cal_date(time),
+			post_crdate => time,	
+			post_creator => $Person->{person_id},		
+		};
+
+		# Uniqueness Constraints
+		my $l;
+		if (($l = &db_locate($dbh,"post",{post_link => $post->{post_link}})) ||
+		    ($l = &db_locate($dbh,"post",{post_title => $post->{post_title}})) ) {
+			print "Content-type: text/html\n\n";
+			my $url = $Site->{st_url} . "post/" . $l;	
+			printf(qq|<p>Duplicate Entry: <a href="%s">Post %s</a></p>|,$url,$l);
+			exit;
+		}		
+
+		# Clean up
+		post->{post_description} =~ s/href=('|&#39;|&apos;)(.*?)"/href="$2"/ig; #'
+
+		# Submit and print record
+		my $id_number = &db_insert($dbh,$query,$table,$post) || die "Couldn't inset post";
+		&rcomment_keylist_update($id_number,"author",$post->{post_author}) || die "Couldn't associate author";
+		&rcomment_keylist_update($id_number,"feed",$post->{post_feed}) || die "Couldn't associate author";		
+		print_record($dbh,$query,"post",$id_number,"html",$Site->{context});
+
+		# Send WebMention
+
+		my $content = get($post->{post_link});
+		die "Source page is unreachable" unless ($content);
+		my $endpoint = &find_webmention_endpoint($content);
+		if ($endpoint) {
+			&send_webmention($endpoint,$post->{post_link},$Site->{st_url}."post/".$id_number);
+		}
+
+		print "Content-type: text/html\n";
+		print "Location: ".$refer."#$id_number!\n\n";
 		exit;
+
+	}
+
+	# -------   Remote Comment Author and Feed -----------------------------------------
+	
+	sub rcomment_keylist_update {
+
+		my ($id,$key,$value) = @_;
+		return unless ($id & $key & $value);
+
+print "Update for $id with $key $value <br>";
+
+
+		# Split list of input $value by ;
+		$value =~ s/&apos;|&#39;/'/g;   # ' Remove apostraphe escaping, just for the split
+		my @keynamelist = split /;/,$value;
+
+		# For each member of the list...
+		foreach my $keyname (@keynamelist) {
+
+		$keyname =~ s/'/&#39;/g;   # Replace apostraphe escaping
+
+			# Trim leading, trailing white spaces
+			$keyname =~ s/^ | $//g;
+
+			# Are we looking for _name, _title ...?
+			my $keyfield = &get_key_namefield($key);
+
+			# can we find a record with that name or title?
+			my $keyrecord = &db_get_record($dbh,$key,{$keyfield=>$keyname});
+
+			# Record wasn't found, create a new record, eg., a new 'author'
+			unless ($keyrecord) {
+
+				# Initialize values
+				$keyrecord = {
+					$key."_creator"=>$Person->{person_id},
+					$key."_crdate"=>time,
+					$keyfield=>$keyname
+				};
+
+				# Save the values and obtain new record id
+				$keyrecord->{$key."_id"} = &db_insert($dbh,$query,$key,$keyrecord);
+			}
+
+			# Error unless we have a new record id
+			print &error() unless $keyrecord->{$key."_id"};
+
+			# Save Graph Data
+			my $typeval;
+			if ($key eq "author") { $tytpeval = "Author wrote link";}
+			if ($key eq "feed") { $tytpeval = "Link on feed";}			
+			my $graphid = &db_insert($dbh,$query,"graph",{
+				graph_tableone=>$key, graph_idone=>$keyrecord->{$key."_id"}, graph_urlone=>$keyrecord->{$key."_url"},
+				graph_tabletwo=>"post", graph_idtwo=>$id, graph_urltwo=>"",
+				graph_creator=>$Person->{person_id}, graph_crdate=>time, graph_type=>"Comment", graph_typeval=>"$typeval"});
+			die "Error creating graph entry for $key $value" unless ($graphid > 0);
+		}
+
+		return 1;
 
 	}
 

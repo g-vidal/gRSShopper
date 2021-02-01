@@ -65,7 +65,7 @@ use CGI::Carp qw(fatalsToBrowser);
 		
 		
 # Load User
-	if ($vars->{action} eq "rcomment") { $Site->{context} = "rcomment"; }
+	if ($vars->{action} eq "add_rcomment") { $Site->{context} = "rcomment"; }
 	my ($session,$username) = &check_user();
 
 	our $Person = {}; bless $Person;
@@ -188,6 +188,7 @@ use CGI::Carp qw(fatalsToBrowser);
 			/Delete/i && do	{ &record_delete($dbh,$query,$table,$id);last; };		#	- Delete Record
 			/Spam/i && do { &record_delete($dbh,$query,$table,$id);  last; };		#	- Delete Record and log creator IP to Spam
 			/multi/i && do { &admin_multi($dbh,$query); last;		};		#	- Multi-Delete Record (FIXME needs work)
+			/add_rcomment/i && do {&add_rcomment($dbh,$query); last; };					# Remote Comment
 			/rcomment/i && do {&rcomment($dbh,$query); last; };					# Remote Comment
 
 
@@ -2291,13 +2292,42 @@ sub admin_update_grsshopper{
 	sub rcomment {
 
 		&record_sanitize_input($vars);
+		my $refer = $ENV{HTTP_REFERER};	
+		$vars->{link} = $refer;
 		while (my ($vkey,$vval) = each %$vars) {
-			$vars->{$vkey} =~ s/\0/,/g;	# Replace 'multi' delimiter with comma
+			$vars->{$vkey} =~ s/\0/;/g;	# Replace 'multi' delimiter with semi-colon
+		}
+
+		printf(qq|A <a href="%s">remote website</a> has sent a 
+			comment for you to submit:<br><br><table>
+			<form method="post" action="admin.cgi">
+			<input type="hidden" name="action" value="add_rcomment">|,
+			$refer);
+		
+		foreach my $vkey qw(title description link author feed) {
+			$vars->{$vkey} =~ s/\0/,/g;	# Replace 'multi' delimiter with semi-colon
+			printf(qq|<tr><td>%s</td><td>%s
+			<input type="hidden" name="%s" value="%s">
+			</td></tr>|,$vkey,$vars->{$vkey},$vkey,$vars->{$vkey});
+		}
+
+		printf(qq|</table><br><br>Do you wish to submit this comment? 
+			<input type="submit" value="Submit Comment"><br></form>|);
+
+		exit;
+	}
+
+	sub add_rcomment {
+
+		&record_sanitize_input($vars);
+		my $refer = $ENV{HTTP_REFERER};	
+		while (my ($vkey,$vval) = each %$vars) {
+			$vars->{$vkey} =~ s/\0/;/g;	# Replace 'multi' delimiter with semi-colon
 		}
 
 		die "Not allowwed to comment" unless (&is_allowed("create",$table));
 		# Do some stuff
-		my $refer = $ENV{HTTP_REFERER};		
+		my $refer = $vars->{link};		
 		my $table="post";
 		my $post = {
 			post_type => 'link',
@@ -2346,15 +2376,19 @@ sub admin_update_grsshopper{
 
 	}
 
+
+
+
+
+
+	
+
 	# -------   Remote Comment Author and Feed -----------------------------------------
 	
 	sub rcomment_keylist_update {
 
 		my ($id,$key,$value) = @_;
 		return unless ($id & $key & $value);
-
-print "Update for $id with $key $value <br>";
-
 
 		# Split list of input $value by ;
 		$value =~ s/&apos;|&#39;/'/g;   # ' Remove apostraphe escaping, just for the split

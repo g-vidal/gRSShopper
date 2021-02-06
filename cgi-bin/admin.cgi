@@ -4,8 +4,8 @@ use CGI::Carp qw(fatalsToBrowser);
   #  use lib '/home/downesca/public_html/cgi-bin/modules/MailChimp/lib';
 	# use lib '/home/downesca/public_html/cgi-bin/modules/MailChimp/lib/MailChimp';
 
-   use lib '/var/www/html/cgi-bin/modules/MailChimp/lib';
-	 use lib '/var/www/html/cgi-bin/modules/MailChimp/lib/MailChimp';
+  # use lib '/var/www/html/cgi-bin/modules/MailChimp/lib';
+#	 use lib '/var/www/html/cgi-bin/modules/MailChimp/lib/MailChimp';
 
 #    gRSShopper 0.7  Admin  0.62  -- gRSShopper administration module
 #    05 June 2017 - Stephen Downes
@@ -29,7 +29,8 @@ use CGI::Carp qw(fatalsToBrowser);
 #           Admin Functions
 #
 #-------------------------------------------------------------------------------
-# print "Content-type: text/html\n\n";
+ #print "Content-type: text/html\n\n";
+ #print "Running <p>";
 
 # Diagnostics
 
@@ -52,32 +53,29 @@ use CGI::Carp qw(fatalsToBrowser);
 		require $dirname . "/grsshopper.pl";
 
 
-
 # Load modules
 
 	our ($query,$vars) = &load_modules("admin");
 
-	
+
 # Load Site
 	
 	our ($Site,$dbh) = &get_site("admin");	
 
 		
-		
 # Load User
 	if ($vars->{action} eq "add_rcomment") { $Site->{context} = "rcomment"; }
 	my ($session,$username) = &check_user();
-
 	our $Person = {}; bless $Person;
 	&get_person($Person,$username);
+
 	my $person_id = $Person->{person_id};
 	&show_login($session);
 	
 # Set vars
 	my $vars = $query->Vars;
 	my $page_dir = "../";
-	if ($vars->{context} eq "cron") { $Site->{context} = "cron"; }
-	else { $Site->{context} = "admin"; }
+
 
 # Restrict to Admin and cron (which runs every 60 seconds)
 	if (time - $Site->{cronrun} > 120)	{ $Site->{cronerr} = "Cron not running"; }
@@ -86,8 +84,8 @@ use CGI::Carp qw(fatalsToBrowser);
 # Restrict locally
 	unless ($vars->{action} eq "rcomment") {   # Exception for remote comments
 		my $refer = $ENV{HTTP_REFERER};
-		die "Invalid call from external website" unless 
-			($refer =~ /$Site->{st_url}/);
+	#	die "Invalid call from external website" unless 
+	#		($refer =~ /$Site->{st_url}/ || $Site->{context} eq "cron");
 	}
 	
 	
@@ -2304,7 +2302,7 @@ sub admin_update_grsshopper{
 			<input type="hidden" name="action" value="add_rcomment">|,
 			$refer);
 		
-		foreach my $vkey qw(title description link author feed) {
+		foreach my $vkey (qw(title description link author feed)) {
 			$vars->{$vkey} =~ s/\0/,/g;	# Replace 'multi' delimiter with semi-colon
 			printf(qq|<tr><td>%s</td><td>%s
 			<input type="hidden" name="%s" value="%s">
@@ -3058,10 +3056,10 @@ sub admin_update_grsshopper{
 		&update_config_table($dbh,{cronrun=>time});
 		&update_config_table($dbh,{cronerr=>"none"});
 
-		my $loglevel = 0;
+		my $loglevel = 10;
 
-        if ($loglevel > 5) { $log .= sprintf("Context:%s, Args 0:%s, %s, 1:%s, 2:%s, 3:%s\n",
-			$Site->{context},$ARGV[0],$ARGV[1],$ARGV[2],$ARGV[3]); }
+        &log_cron(8,sprintf("Context:%s, Args 0:%s, %s, 1:%s, 2:%s, 3:%s",
+			$Site->{context},$ARGV[0],$ARGV[1],$ARGV[2],$ARGV[3]));
 
 		# Get the time
 		my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
@@ -3081,57 +3079,73 @@ sub admin_update_grsshopper{
 		}
 
 
-		# Autopublish
+											# Autopublish
+
+
 		my $asql=""; my $amode;
-		if ($weekday eq "Sunday" && $hour eq "23" && $min eq "54")
-			{ $amode = "Weekly"; 
+			# Weekly
+		if ($weekday eq "Sunday" && $hour eq "23" && $min eq "54") { 
+			$amode = "Weekly"; 
 			$asql = qq|SELECT * FROM page WHERE page_autopub='yes' AND page_autowhen='Weekly'|; }
+
+			# Daily
 		elsif ($hour eq "16" && $min eq "30") {
-			 $amode = "Daily";  
-			 $asql = qq|SELECT * FROM page WHERE page_autopub='yes' AND page_autowhen='Daily'|; }
-		elsif ($min eq "37") { $amode = "Hourly"; $asql = qq|SELECT * FROM page WHERE page_autopub='yes' AND page_autowhen='Hourly'|; }
-		if ($amode) { $log .= "Autopublish mode triggered: $amode \n"; }
-		if ($asql) {
+			$amode = "Daily";  
+			$asql = qq|SELECT * FROM page WHERE page_autopub='yes' AND page_autowhen='Daily'|; }
+
+			# Hourly
+		elsif ($min eq "37") { 
+			$amode = "Hourly"; 
+			$asql = qq|SELECT * FROM page WHERE page_autopub='yes' AND page_autowhen='Hourly'|; }
+
+		if ($amode) { 
+			&log_cron(7,"Autopublishing $amode pages\n");
 			my $asth = $dbh -> prepare($asql);
-			$asth->execute();
-&log_cron(0,"Autopublish executing");			
-			if ($dbh->errstr()) { &send_email("stephen\@downes.ca","stephen\@downes.ca","Autopublish Error",$dbh->errstr()); }
+			$asth->execute() or &log_cron(0,sprintf("Autopublish error: %s \n",$dbh->errstr()));
 			while (my $npage = $asth -> fetchrow_hashref()) {
 				&publish_page($dbh,$query,$npage->{page_id},0);
-&log_cron(0,"Published page: ".$npage->{page_title});				
-				if ($loglevel > 1) { $log .= "Autopublish $npage->{page_id} - $npage->{page_title}\n"; }
+				&log_cron(0,sprintf("Autopublished page: %s %s\n",$npage->{page_id},$npage->{page_title}));
 			}
 			$asth->finish;
 		}
 
-		# Newsletters
-		my $sql = qq|SELECT * FROM page WHERE page_subhour=? AND page_submin=? AND (page_subwday LIKE ? OR page_submday LIKE ?)|;
-		my $sth = $dbh -> prepare($sql);
+											# Newsletters
 
-		$sth -> execute($hour,$min,'%'.$weekday.'%','%'.$mday.'%');
-		# if ($loglevel > 1) { $log .= "Sending newsletter? - $npage->{page_title}\n"; }
+
+		&log_cron(9,"Checking for newsletters");
+		my $sql = qq|SELECT * FROM page WHERE page_subsend='yes' AND page_subhour=? AND page_submin=? AND (page_subwday LIKE ? OR page_submday LIKE ?)|;
+		my $sth = $dbh -> prepare($sql);
+		$sth -> execute($hour,$min,'%'.$weekday.'%','%'.$mday.'%') or 
+			&log_cron(0,sprintf("Newsletter Error: %s",$dbh->errstr()));;
+
 		while (my $npage = $sth -> fetchrow_hashref()) {
-				if ($loglevel > 1) { $log .= "Yes\n"; }
-			next unless ($npage->{page_subsend} eq "yes");
 			my $report = &send_nl($dbh,$query,$npage->{page_id},"subscribers",0);
-			if ($loglevel > 1) { $log .= "Sent newsletter - $npage->{page_title}\n"; }
+			&log_cron(0,sprintf("Sent newsletter: %s",$npage->{page_title}));
+			&log_cron(5,"$report");			
 		}
 		$sth->finish;
 
-$Site->{st_harvest_on} = "yes";
+
 											# Harvester
+
+
+
+$Site->{st_harvest_on} = "yes";
+$Site->{st_harvest_int} = 5;
+
 		if ($Site->{st_harvest_on} eq "yes") {
 
-			my $h = qq|Harvesting: |.$Site->{st_harvest_on};
-
+			# Calculate harvest interval trigger
 			my $dividend = ($mday * 24 * 60) + ($hour * 60) + $min;
 			my $divisor = $Site->{st_harvest_int}; $divisor ||= 60;
+			&log_cron(7,sprintf("Harvester Interval: %s/%s and harvester on = %s)",
+				$dividend,$divisor,$Site->{st_harvest_on}));
 
-			my $h = qq|Harvesting: $dividend $divisor |.$Site->{st_harvest_on};
-
-
-$divisor = 10;
 			if ($dividend % $divisor == 0) {  # Harvest timer
+
+				# This is convoluted, but the intent here is to allow an external process
+				# to actually do the harvesting, so I could later replace it witn Python or Erlang
+				# or whatever
 
 				# We need to get the actual directory of admin.cgi
 				use Cwd 'abs_path';
@@ -3139,31 +3153,21 @@ $divisor = 10;
 
 				# Now figure out the directory of harvest.cgi
 				$harvester =~ s/admin\.cgi/harvest\.cgi/i;
-
-				my $hn = "Harvesting $harvester <p>\n\n";
+				&log_cron(7,"Harvesting using process: $harvester");
 
 				my $siteurl = $Site->{site_url}; $siteurl =~ s|http://||;$siteurl =~ s|/||;
 				#my $status = system($harvester,$siteurl,$Site->{cronkey},"queue");
-        my @args = ($harvester,$ARGV[0],$ARGV[1],$ARGV[2],"queue");  # Making sure the call to harvester has the same args as the call to admin
-        system(@args) == 0
-		        or $hn .= "system @args failed: $?";
-				&send_email("stephen\@downes.ca","stephen\@downes.ca","Harvester result $hn - : $?","Args: $ARGV[0] 1 $ARGV[1] 2 $ARGV[2] 3 $ARGV[3] \n");
 
+				# Making sure the call to harvester has the same args as the call to admin
+        		my @args = ($harvester,$ARGV[0],$ARGV[1],$ARGV[2],"queue");  
 
-				if ($? == -1) {
-            $hn .= "failed to execute: $!\n";
-        }
-        elsif ($? & 127) {
-            $hn .= "child died with signal ".($? & 127);
-        }
-        else {
-            $hn .="child exited with value %d\n".($? >> 8);
-        }
-
-print "$hn <p>\n\n";
-&log_cron(0,$hn);
-				if ($loglevel > 5) { $log .= "\nHarvester run, Status: $status\n"; }
-
+				# Call the harvester
+        		system(@args) == 0 or &log_cron(0,"system @args failed: $?");
+				
+				# Catch and report errors
+				if ($? == -1) {	&log_cron(0,"Harvester failed to execute: $!");  }
+        		elsif ($? & 127) { &log_cron(0,sprintf("Harvester died with signal %s",($? & 127))); }
+		        else { &log_cron(5,sprintf("Harvester exited with value %d",($? >> 8))); } 
 
 			}
 
@@ -3172,11 +3176,12 @@ print "$hn <p>\n\n";
 		}
 
 
-		$Site->{log_items} eq "yes";
 
 											# Hourly Tasks
+
 		if ($min eq "33") {
-&log_cron(0,"Performing hourly tasks");
+			&log_cron(8,"Performing hourly tasks");
+
 	#		my $dsql = qq|select link_id FROM link WHERE link_link LIKE $deletelink|;
 #print $dsql;
 	#		my $sthl = $dbh->prepare($dsql);
@@ -3192,20 +3197,24 @@ print "$hn <p>\n\n";
 											# Daily Tasks
 
 
-		if ($hour eq "23" && $min eq "44") {					# Make Fresh Links Stale
+		if ($hour eq "23" && $min eq "44") {					
+			&log_cron(8,"Performing daily tasks\n");
+
+			# Make Fresh Links Stale
+
+			&log_cron(8,"Making fresh links stale \n");
 			my $staledate = time - (24 * 60 * 60);
 			my $dsql = qq|UPDATE link SET link_status = 'Stale' WHERE (link_status = 'Fresh'
 				OR link_status = 'RSS 0.91 Fresh' OR link_status = 'fresh') && link_crdate < '$staledate'|;
 
-			my $affected = $dbh->do($dsql);
-			if ($loglevel > 2) { $log .= "Making fresh links stale \n"; }
-			if ($loglevel > 0) {
-				$log .= "Error making links stale in cron_tasks() : $dbh->errstr" if (!affected); # report errors
-				$log .= "No links made stale in cron_tasks()" if ($affected eq '0E0'); # report no insert/update
-			}
-
-											# Clean Up Audio Downloads
-											# See Admin 'Harvester' screen for settings
+			my $affected = $dbh->do($dsql); 
+			&log_cron(0,sprintf("Error making links stale in cron_tasks()",$dbh->errstr)) unless $affected;
+			&log_cron(5,"No links made stale in cron_tasks()") if ($affected eq '0E0');
+			
+			# Clean Up Audio Downloads
+			# See Admin 'Harvester' screen for settings
+			
+			&log_cron(8,"Cleaning up audio downloads \n");
 			my $audio_dir = $Site->{st_urlf}.$Site->{audio_download_dir};
 			if (-d $audio_dir) {
 				my $audio_files_expire = $Site->{audio_files_expire} || 1;
@@ -3219,43 +3228,52 @@ print "$hn <p>\n\n";
 				}
 			}
 
-
-
-
-
 		}
 
-		if ($hour eq "23" && $min eq "30") {					# Make Stale Links Disappear
+		if ($hour eq "23" && $min eq "30") {					
+			&log_cron(8,"Performing daily tasks\n");
+			# Make Stale Links Disappear
+			
+			&log_cron(8,"Making stale links disappear \n");
+$Site->{st_stale_expire} = (72 * 60 * 60);
+			my $expires = $Site->{st_stale_expire};
+			my $disappeardate = time - $expires;
 
-			my $disappeardate = time; # - (72 * 60 * 60);
-	#my $msg = "Time:".time."\nDisp: $disappeardate \n\n";
-	#&send_email("stephen\@downes.ca","stephen\@downes.ca","Disappearing stale links","$msg");
 			my $dsql = qq|select link_id FROM link WHERE (link_status = 'Stale'
 				OR link_status = 'RSS 0.91 stale' OR link_status = 'stale') && link_crdate < '$disappeardate'|;
 			my $sthl = $dbh->prepare($dsql);
 			$sthl->execute();
 			while (my $stale_link = $sthl -> fetchrow_hashref()) {
+
+				# Need to filter so I don't delete links that are in the graph
 	#			&record_delete($dbh,$query,"link",$stale_link->{link_id});
-				if ($loglevel > 2) { $log .= "Deleted stale link $stale_link->{link_id} \n"; }
+				&log_cron(2,"Deleted stale link %s \n",$stale_link->{link_id}); 
 			}
 		}
 
 											# Clear the cache
 		if ($hour eq "02" && $min eq "10") {
+			&log_cron(8,"Performing daily tasks\n");
+			&log_cron(8,"Clearing the cache \n");
 			&cache_clear($dbh,$query);
 		}
 
 
 
 		if ($hour eq "23" && $min eq "50") {				# Reset Hits to 0
+			&log_cron(8,"Performing daily tasks\n");
 
+			&log_cron(8,"Rotating hit counters\n");
 			&rotate_hit_counters($dbh,$query,"post");			# Reset post hit counters
 			&rotate_hit_counters($dbh,$query,"page");			# Reset page hit counters
 
 		}
 
-    my $ltime = localtime(time);
-	  &log_cron(0,sprintf("%s cron completed for %s",$Site->{st_name},$ltime));
+		# Need to add a task to refresh the log file
+
+		# Report cron completed
+   		my $ltime = localtime(time);
+	  	&log_cron(5,sprintf("%s cron completed for %s\n",$Site->{st_name},$ltime));
 		exit;
 	}
 
@@ -3391,9 +3409,9 @@ print "$hn <p>\n\n";
 		my ($pgcontent,$pgtitle,$listid) = @_;
 		my $response;
 
-	    use lib './modules/MailChimp/lib';
-		use lib './modules/MailChimp/lib/MailChimp';
-		use MailChimp;
+	    use lib $Site->{st_cgif}.'./modules/MailChimp/lib';
+		use lib $Site->{st_cgif}.'./modules/MailChimp/lib/MailChimp';
+		eval("use MailChimp;");  # eval so it doesn't try to load before st_cgif is defined
 	
 		# Initialize account
 		print "Initializing account... <br>";
@@ -3474,7 +3492,7 @@ print "$hn <p>\n\n";
 
 
 		my ($oc,$op,$of,$ol,$ot,$om);
-		open FSAVEIN,"/var/www/cgi-bin/data/".$Site->{st_name}."_fsave.txt";
+		open FSAVEIN,$Site->{cgif}."data/".$Site->{st_name}."_fsave.txt";
 		while (<FSAVEIN>) {
 			chomp;
 			($oc,$op,$of,$ol,$ot,$om) = split "\t",$_;
@@ -3880,7 +3898,8 @@ sub make_search_forms($dbh,$query) {
 	my $vars = $query->Vars;
 
 print "Content-type: text/html\n\n";
-print "<p>Making Search forms templates<p>";		
+print "<p>Making Search forms templates<p>";
+		
 
 
 	my $doptions; my $templ="";
@@ -3907,7 +3926,7 @@ print "<p>Making Search forms templates<p>";
 		}
 
 		# Get options from fields that might not be in optlist
-		my @miscfieldlist = qw(category genre type class status);
+		my @miscfieldlist = qw(category genre section type class status);
 
 		# Get the list of columns from the database
 		my @columns = ();
@@ -3945,18 +3964,24 @@ print "<p>Making Search forms templates<p>";
 	while (my($table,$ty) = each %$doptions){	# For each table
 
 		# Write the template
+		my $formname = $table."SearchForm";
+		my $panelname = $table."Panel";
 		$templ .= qq|
 	function |.$table.qq|SearchTemplate(request) {	
 		return `<button class="accordion" onClick="togglePanel(this.nextElementSibling);">Filter \${request.table}</button>
-		<div class="panel">
+		<div class="panel" id="$panelname">
+
+		<form method="post" action="#" id="$formname">
+		<input type="hidden" name="div" value="\${request.div}">
+		<input type="hidden" name="cmd" value="\${request.cmd}">
+		<input type="hidden" name="table" value="\${request.table}">		
 		|;
 
 		while (my($column,$cy) = each %$ty) {		# For each column
 			$templ .= sprintf(qq|
-				<p>%s <select name="%s" id="%s%s" 
-				onChange="alert(this.value);loadList({div:'\${request.div}',cmd:'\${request.cmd}',table:'\${request.table}',%s:this.value});">
+				<p>%s <select name="%s" id="%s%s">
 				    <option value="all" selected>All</a>
-			|,$column,$column,$column,$table,$column);
+			|,$column,$column,$column,$table);
 
 			while (my($fname,$fval) = each %$cy) {   #For each option
 				$templ .= qq|
@@ -3967,12 +3992,29 @@ print "<p>Making Search forms templates<p>";
 							</select></p>|;
 		}
 		$templ .= qq|
-		</div>`;
+		<select name="qkey">
+		<option value="id"> ID</option>
+		<option value="title"> Title </option>
+		<option value="description"> Description </option>
+		<option value="link"> Description </option>
+		</option>
+		<input type="text" name="qval" placeholder="search term">
+		<input type="button" value="Submit" 
+			onClick="alert(JSON.stringify({div:'\${request.div}',cmd:'\${request.cmd}',table:'\${request.table}',formid:'$formname'}));
+			
+			loadDataFromForm({div:'\${request.div}',cmd:'\${request.cmd}',table:'\${request.table}',formid:'$formname'}); 
+
+			document.getElementById('$panelname').style.display = 'none';
+
+			return false;
+
+			">
+			</div>`;
 	};
 
 	|;
 
-		
+
 
 	}
 
@@ -4009,7 +4051,11 @@ print "<p>Making Search forms templates<p>";
 
 		return unless (&is_viewable("admin","logs")); 		# Permissions
 
-		my $content = qq|<h2>View Logs</h2><p>
+
+		my $content .= &admin_configtable($dbh,$query,"Logging Options",
+			("Log Level (0-10):st_log_level","Refresh interval (days):st_log_refresh"));
+
+		$content .= qq|<h2>View Logs</h2><p>
 			General Statistics -
 			[<a href="admin.cgi?action=logview&logfile=General Stats&format=table">Table</a>]
 			[<a href="admin.cgi?action=logview&logfile=General Stats&format=tsv">TSV</a>]

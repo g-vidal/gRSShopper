@@ -53,10 +53,18 @@ use CGI::Carp qw(fatalsToBrowser);
 
 
 
+
+
+
+
+
+
 # Get Post Data
   our $request_data; our $request_type;
-	my $postdata = $query->param('POSTDATA');
+  my $postdata = $query->param('POSTDATA');
+	#my $postdata = $query->param('POSTDATA');
 	if ($postdata) {
+		
 			$request_type = "post";
 			# Parse the JSON Data
 			use JSON;
@@ -66,6 +74,7 @@ use CGI::Carp qw(fatalsToBrowser);
 
 			#exit;
 	}
+
 
 # Load Site
 
@@ -94,10 +103,10 @@ use CGI::Carp qw(fatalsToBrowser);
 #die "Made it here 94 Cmd=".$vars->{cmd};
   # TEST
 
-	if ($vars->{cmd} eq "show" && $vars->{table} eq "link") {
+	if ($vars->{cmd} eq "show" && ($vars->{table} eq "link" || $vars->{table} eq "feed")) {
 		print "Content-type: text/json\n\n";
    		$vars->{format} = "json";
-		my $data = &list_records($dbh,$query,"link",{link_id=>$vars->{id}});
+		my $data = &list_records($dbh,$query,$vars->{table},{id=>$vars->{id}});
    		my $json = encode_json $data;
    		print $json;exit;
 	}
@@ -106,16 +115,23 @@ use CGI::Carp qw(fatalsToBrowser);
 	if ($vars->{cmd} eq "list") {
 		
 		while (my($vx,$vy) = each %$vars) {
-			if ($vx =~ /category|genre|status|section/) {  # filter parameters
+			if ($vx =~ /category|genre|status|section|class|type/) {  # filter parameters
 				$listsearch->{$vx} = $vy; }
 		}
-
+		if ($vars->{qkey} && $vars->{qval}) {
+			$listsearch->{$vars->{qkey}} = $vars->{qval};
+		}
 	}
 
-	if ($vars->{cmd} eq "list" && $vars->{table} eq "link") {
+	if ($vars->{cmd} eq "list" && ($vars->{table} eq "link" || $vars->{table} eq "feed")) {
+
+
+
 		print "Content-type: text/json\n\n";
    		$vars->{format} = "json";
-   		my $data = &list_records($dbh,$query,"link",$listsearch);
+
+   		my $data = &list_records($dbh,$query,$vars->{table},$listsearch);
+
    		my $json = encode_json $data;
    		print $json;exit;
 	}

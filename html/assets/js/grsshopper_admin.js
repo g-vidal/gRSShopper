@@ -27,7 +27,7 @@ function startUp(url) {
 //
 //  loadList
 //
-//  Sets up and loads liust results page, including search form and next n results
+//  Sets up and loads list results page, including search form and next n results
 //
 
 function loadList(request) {
@@ -47,14 +47,25 @@ var whatitis = `Cmd ${request.cmd} Status ${request.status}`;
 
 function loadListHeaders(request) {
 
+    // create context object
+ 
     var mainContainer = document.getElementById(request.div);
     var headers = document.createElement("div");
     var panel = this.nextElementSibling;
-    var templatetext = linkSearchTemplate(request,panel);
+
+    // sure, there is probably a more concise way to do this....
+
+    var templatetext;
+    switch (request.table) {
+        case 'link': templatetext = linkSearchTemplate(request,panel); break;
+        case 'feed': templatetext = feedSearchTemplate(request,panel); break;        
+    }
     headers.innerHTML = templatetext;
     mainContainer.appendChild(headers);
 
 }
+
+
 
 function togglePanel(panel) {
     if (panel.style.display === "block") {
@@ -72,11 +83,11 @@ var panel = this.nextElementSibling;
 //  loadData
 //
 //  Obtain data from the API and load into selected div
+//  The input var 'request' expects 'table','div' and 'cmd' plus any search parameters
 //
 
 
 function loadData(request) {
-
     fetch('cgi-bin/api.cgi',{
         method: 'POST', // or 'PUT'
         headers: {
@@ -94,9 +105,47 @@ function loadData(request) {
 
 }
 
+//
+//  loadDataFromForm
+//
+//  Use form data to get the request body
+//  Obtain data from the API and load into selected div
+//  The input var 'request' expects 'table','div' and 'cmd' 
+//  as well as 'formid' (which should also specify table and cmd)
+//
+
+
+
+function loadDataFromForm(request) {
+
+    var formData = new FormData(document.getElementById(request.formid));
+    const plainFormData = Object.fromEntries(formData.entries());
+    const formDataJsonString = JSON.stringify(plainFormData);
+
+    alert(formDataJsonString);
+    
+    // Submit data and then do actions
+    fetch('cgi-bin/api.cgi',{
+        method: 'POST', // or 'PUT'
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(plainFormData),
+      })
+        .then(response => response.json())
+        .then(function (data) {
+            alert(data);
+            appendData(request,data);
+          })
+        .catch((error) => {
+            console.error('Error:', error);}
+      );
+}
+
 function appendData(request,data) {
 
     var mainContainer = document.getElementById(request.div);
+    removeElementsByClass('table-list-element');  // clear previous list data
     for (var i = 0; i < data.length; i++) {
       var div = document.createElement("div");
       var templ = selectTemplate(request,data,i);
@@ -105,13 +154,22 @@ function appendData(request,data) {
     }
 }
 
+function removeElementsByClass(className){
+    var elements = document.getElementsByClassName(className);
+    while(elements.length > 0){
+        elements[0].parentNode.removeChild(elements[0]);
+    }
+}
+
 function selectTemplate(request,data,i) {
 
     if (request.cmd == 'list') {
        if (request.table == 'link') { return linkListTemplate(data,i); }
        if (request.table == 'media') { return mediaListTemplate(data,i); }
+       if (request.table == 'feed') { return feedListTemplate(data,i); }       
     } else if (request.cmd == 'show') {
        if (request.table == 'link') { return linkShowTemplate(request,data,i); }
+       if (request.table == 'feed') { return feedShowTemplate(request,data,i); }       
     }
 }
 //
@@ -122,6 +180,14 @@ function mediaListTemplate(data,i) {
    return `<a href="${data[i].url}">${data[i].title}</a>${data[i].mimetype} `;
 }
 
+function feedListTemplate(data,i) {
+    return `<div class="table-list-element">
+    <a href="#" onClick="loadData({div:'Reader',cmd:'show',table:'feed',id:'${data[i].id}'});">
+    <img src="assets/img/${data[i].status}.jpg"> ${data[i].title}
+    <span style="font-size:8pt;"><br/>
+    ${data[i].section} - ${data[i].genre} - ${data[i].category} - ${data[i].status}</span></div>`;
+ }
+
 function linkListTemplate(data,i) {
     return `<div class="table-list-element">
     <a href="#" onClick="loadData({div:'Reader',cmd:'show',table:'link',id:'${data[i].id}'});">
@@ -129,6 +195,26 @@ function linkListTemplate(data,i) {
     <span style="font-size:8pt;"><br/>
     ${data[i].section} - ${data[i].genre} - ${data[i].category} - ${data[i].status}</span></div>`;
 }
+
+function feedShowTemplate(request,data,i) {
+
+    // Clear previous content
+    var mainContainer = document.getElementById(request.div);
+    mainContainer.innerHTML='';
+
+    // return new content
+    return prevTemplate(request,data,i)+
+           nextTemplate(request,data,i)+
+            `Title: ${data[i].title} <br>
+            Link: ${data[i].link} <br>
+            URL: ${data[i].url} <br>            
+            ID: ${data[i].id} <br>
+            Category: ${data[i].feed_category}    Genre:  ${data[i].feed_genre}
+            Category: ${data[i].feed_status}    Genre:  ${data[i].feed_class}
+            Description: ${data[i].description}<br>
+            `;
+}
+
 
 function linkShowTemplate(request,data,i) {
 
@@ -152,7 +238,7 @@ function nextTemplate(request,data,i) {
 
     return `<span class="next" 
        onClick="loadData({div:'${request.div}',cmd:'show',table:'${request.table}',id:'${data[i].next}'});">
-       Next
+       Next: ${data[i].next}
        </span>`;
 
 }
@@ -161,7 +247,7 @@ function prevTemplate(request,data,i) {
 
     return `<span class="next" 
     onClick="loadData({div:'${request.div}',cmd:'show',table:'${request.table}',id:'${data[i].prev}'});">
-       Prev
+       Prev: ${data[i].prev}
     </span>`;
 
 }

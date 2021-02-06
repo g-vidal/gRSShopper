@@ -25,14 +25,14 @@
 #
 #-------------------------------------------------------------------------------
 
-  $|=1;
-  use strict;
+	$|=1;
+	use strict;
 
 #  print "Content-type: text/html; charset=utf-8\n\n";
 
 
-  use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
-  our $DEBUG = 1;							# Toggle debug
+	use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
+	our $DEBUG = 1;							# Toggle debug
 
 # Forbid bots
 
@@ -42,7 +42,7 @@
 
 	use File::Basename;
 	use CGI::Carp qw(fatalsToBrowser);
-  use local::lib; # sets up a local lib at ~/perl5
+ # 	use local::lib; # sets up a local lib at ~/perl5
 	my $dirname = dirname(__FILE__);
 	require $dirname . "/grsshopper.pl";
 
@@ -56,15 +56,15 @@
 # Load Site
 
 	our ($Site,$dbh) = &get_site("harvest");
-  $Site->{cgif} ||= './';
-
-	if ($vars->{context} eq "cron") { $Site->{context} = "cron"; }				# Allows the user to toggle cron reports on/off manually
+  	$Site->{st_cgif} ||= './';
 	our $analyze = $vars->{analyze};
-	$Site->{diag_level} = 1;
+	
+$Site->{diag_level} = 10;	# Separate diagnostics level for harvester
 	if ($vars->{diag_level} && $vars->{analyze} eq "on") { $Site->{diag_level} = $vars->{diag_level}; }
-  &diag(1,&harvester_stylsheet());
-  &diag(1,"<h1><center>gRSShopper HARVESTER</h1>\n\n");
-  &log_cron(9,"Harvester activated");
+  	&diag(1,&harvester_stylsheet());
+
+  	&diag(1,"<h1><center>gRSShopper HARVESTER</h1>\n\n");
+  	&log_cron(9,"Harvester activated");
 
 	
 # Load User
@@ -268,7 +268,11 @@ my @urls = (
     $url
 );
 print "Scraping ".$url."<p>";
-use WWW::Mechanize;
+unless (&new_module_load($query,"WWW::Mechanize")) { 
+	&log_cron(0,"Couln't load WWW::Mechanize for content scraping");
+	$vars->{warnings} .= "WWW::Mechanize"; 
+}
+
 my $mech = WWW::Mechanize->new(
 	 autocheck         => 0,
    protocols_allowed => ['http','https',],
@@ -605,6 +609,7 @@ sub clean_feed_input {
 	my $feed = $feedrecord->{processed};
 	unless ($feed->{items}) {
 		&diag(0,"Feed has no items<br>\n");
+		&log_cron(8,"Feed has no items<br>\n");
 		return;
 	}
 	my @items = @{$feed->{items}};

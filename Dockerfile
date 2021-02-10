@@ -60,7 +60,7 @@ RUN apt-get install tree -y
 RUN apt-get install vim -y
 RUN apt-get install curl -y
 RUN apt-get install ftp -y
-RUN apt-get install cron -y
+
 
 RUN npm install -g bower
 RUN npm install -g grunt-cli
@@ -105,6 +105,10 @@ RUN /bin/bash -c "/usr/bin/mysqld_safe &" && \
   mysql -u root -e "grant all privileges on grsshopper.* TO 'grsshopper_user'@'localhost' identified by 'user_password'" && \
   mysql -u root grsshopper < /var/www/html/cgi-bin/grsshopper.sql
 
+# Install and enable cron
+RUN apt-get install cron -y
+RUN systemctl enable cron
+
 # Copy cron file to the cron.d directory
 COPY cronfile /etc/cron.d/cronfile
 
@@ -120,6 +124,9 @@ RUN touch /var/log/cron.log
 # Run the command on container startup
 CMD cron && tail -f /var/log/cron.log
 
+
+
+# Run startup script
 RUN chmod +x /usr/sbin/run-lamp.sh
 RUN chown -R www-data:www-data /var/www/html
 

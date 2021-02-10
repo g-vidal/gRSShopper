@@ -106,6 +106,7 @@ RUN /bin/bash -c "/usr/bin/mysqld_safe &" && \
   mysql -u root grsshopper < /var/www/html/cgi-bin/grsshopper.sql
 
 # Install and enable cron
+RUN apt-get install systemd -y
 RUN apt-get install cron -y
 RUN systemctl enable cron
 

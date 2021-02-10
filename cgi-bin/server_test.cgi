@@ -107,6 +107,14 @@ if ($missing eq "1") {
 
 }
 
+# 
+# Test local libraries and require gRSShopper.pl
+#
+
+my $dirname = dirname(__FILE__);
+use lib $dirname or print "Error using local lib: $! <br>";
+print "Local directory: $dirname <br>";
+require $dirname . "/grsshopper.pl";
 
 
 # -------------

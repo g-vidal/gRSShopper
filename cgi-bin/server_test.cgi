@@ -155,7 +155,7 @@ print "<p>Note that this may create a new Admin user is one is needed; please be
 
 print qq|<iframe src="login_widget.cgi" height="100" width="500" title="Iframe Example"></iframe>|;
 
-print qq|<p>Once you have logged in, try out <a href="../PLE.htm">your new PLE</a></p>|;
+print qq|<p>Once you have logged in, try out <a href="../PLE.html">your new PLE</a></p>|;
 
 
 exit;

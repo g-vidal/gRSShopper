@@ -1,6 +1,12 @@
 RewriteEngine On
 RewriteCond %{HTTPS} off
 RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}
-RewriteRule ^(post|presentation|link|module|event|page|media)/([0-9]+)/rd$ http://plenk.mooc.ca/cgi-bin/page.cgi?$1=$2&action=rd
-RewriteRule ^(post|event|presentation|page|feed|author|link)/(.*)$ http://plenlk.mooc.ca/cgi-bin/page.cgi?$1=$2
-RewriteRule ^feed$ https://plenk.mooc.ca/news/OLDaily.xml
+RewriteRule ^(chat)$ https://www.downes.ca/cgi-bin/cchat.cgi
+RewriteRule ^(rcomment)$ https://www.downes.ca/cgi-bin/admin.cgi
+RewriteRule ^(now)$ https://docs.google.com/document/d/1HG3gUJlT8Wg-GvOL_FCCtUHVqSIYy6dZZ44FYdnq8AU/edit?usp=sharing
+RewriteRule ^(test)/(.*?)$ https://www.downes.ca/post/$2
+RewriteRule ^(post|page|presentation|link)/([0-9]+)/rd$ https://www.downes.ca/cgi-bin/page.cgi?$1=$2&action=rd
+RewriteRule ^(search)/(.*?)$ https://www.downes.ca/cgi-bin/page.cgi?action=$1&q=$2
+RewriteRule ^(search|page|link)/(.*?)$ https://www.downes.ca/cgi-bin/page.cgi?$1=$2
+RewriteRule ^feed$ https://www.downes.ca/news/OLDaily.xml
+ErrorDocument 404 https://www.downes.ca/error/404.htm

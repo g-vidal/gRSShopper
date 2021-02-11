@@ -68,7 +68,7 @@ sub load_modules {
 		use Lingua::EN::Inflect qw ( PL );
 	}
 
-
+						
 
 							# Optional Modules
 	unless (&new_module_load($query,"MIME::Types")) { $vars->{warnings} .= "MIME::Types;"; }
@@ -143,7 +143,6 @@ sub filter_input {
 		$vars->{action} = $ARGV[1];		# Command
 		if ($vars->{action} eq "publish") { $vars->{page} = $ARGV[2]; }
 		$vars->{preview} = $ARGV[2];		# Preview Option
-		$cronkey = $ARGV[3];
 		$vars->{person_status} = "cron";
 		$vars->{mode} = "silent";
 	}
@@ -172,7 +171,6 @@ sub get_site {
 
 	});
 
-
 	# Open Site Database
 	my $dbh = $Site->{dbh};
 
@@ -191,6 +189,9 @@ sub get_site {
 	$CGI::POST_MAX = 1024 * $upload_limit;
 #&send_email("stephen\@downes.ca","stephen\@downes.ca","Returning $context... $Site,$dbh  ","Args: $ARGV[0] 1 $ARGV[1] 2 $ARGV[2] 3 $ARGV[3] \n");
 
+	# Local::Lib (for cpanel sites)
+	if ($Site->{st_url} =~ /downes\.ca/) { eval("use local::lib"); }
+
 	return ($Site,$dbh);
 
 }
@@ -201,7 +202,7 @@ sub get_config {
 	my $sth = $dbh->prepare("SELECT * FROM config");
 	$sth -> execute() or die "Failed to load site configuration data";
 	while (my $c = $sth -> fetchrow_hashref()) {
-		next if ($c->{config_noun} =~ /script|st_home|st_url|st_urlf|st_cgif|st_cgi|co_host|msg/ig);	# Can't change basic site data
+		next if ($c->{config_noun} =~ /context|script|st_home|st_url|st_urlf|st_cgif|st_cgi|co_host|msg/ig);	# Can't change basic site data
 		next unless ($c->{config_value});
 		$Site->{$c->{config_noun}} = $c->{config_value};
 	}
@@ -222,21 +223,10 @@ sub get_person {
 	if ($Site->{context} eq "cron") { 			# Create cron person, if applicable,
 								# and exit
 
-										# Confirm cron key
-		my $cronkey = $ARGV[1] || $vars->{cronkey};
-		unless ($Site->{cronkey} eq $cronkey) {
-
-			print &printlang("Cron key ".$Site->{cronkey}." mismatch",$vars->{cronkey},$Site->{st_name});
-			&send_email("stephen\@downes.ca","stephen\@downes.ca",
-				&printlang("Cron Error",$Site->{st_name}),
-				"Cron key mismatch between $Site->{cronkey} and  $cronkey in get_person() - Args: $ARGV[0] - $ARGV[1] - $ARGV[2] - $ARGV[3]");
-			exit;
-		}
-
 		$Person->{person_title} = $Site->{st_name};
 		$Person->{person_name} = $Site->{st_name};
 		$Person->{person_email} = $Site->{em_from};
-		$Person->{person_status} = "admin";
+		$Person->{person_status} = "Admin";
 		return;
 
 	}
@@ -992,7 +982,7 @@ sub publish_page {
 		print $Site->{footer};
 	}
 
-	return ($pgcontent,$pgtitle,$pgformat,$archive_url,$keyword_count,$wp->{page_location});
+	return ($pgcontent,$pgtitle,$pgformat,$archive_url,$keyword_count,$wp->{page_location},$wp->{page_type});
 
 
 }
@@ -1252,11 +1242,9 @@ sub list_records {
 	my $onclickurl = $Site->{st_cgi}."api.cgi";
 
 
+
 	$vars->{where} =~ s/[^\w\s]//ig;	# chars only, no SQL injection for you
-
-
-	# Output Format
-	# my $format = $vars->{format};
+	my $format = $vars->{format};		# Output Format
 
 	# Set Sort, Start, Number values
 	my ($sort,$start,$number,$limit) = &sort_start_number($query,$table);
@@ -1275,6 +1263,7 @@ sub list_records {
 	else { $titname = "title"; }
 	my $p = $table."_"; unless ($titname =~ m/$p/) { $titname = $p. $titname; }
 
+
 	if ($vars->{where}) {
 		my $w = "where ".$titname." LIKE '%".$vars->{where}."%'";
 		if ($where) {
@@ -1284,19 +1273,27 @@ sub list_records {
 		}
 	}
 
+
+
 	if ($parms) {
 		my @wherelist;
 		while (my ($px,$py) = each %$parms) {
+
+			next if ($py eq "" || $py eq "all");		# Don't filter by nothing or everything
+		
 			my $tablelead = $table."_";
+			
 			unless ($px =~ /$tablelead/) { $px = $tablelead.$px; }
-			push @wherelist,qq|($px = "$py")|;
+			push @wherelist,qq|($px = '$py')|;
+
+
+
 		}
-		$where = join / AND /,@wherelist;
+		$where = join ' AND ',@wherelist;
+		
 		if ($where) { $where = "WHERE ".$where; }
 	}
 	
-
-
 
 	# Count Total Number of Items
 	my $count;
@@ -1304,12 +1301,15 @@ sub list_records {
 
 	# Execute SQL search
 	my $stmt = qq|SELECT * FROM $table $where $sort $limit|;
-	
+
+
 	my $sthl = $dbh->prepare($stmt);
 	$sthl->execute();
 	if ($sthl->errstr) { print "Content-type: text/html\n\n";print "DB LIST ERROR: ".$sthl->errstr." <p>"; exit; }
 
-	if ($table eq "media" || $table eq "link") {
+
+
+	if ($table eq "media" || $table eq "link" || $table eq "feed") {
 		my $listarray;
 		my $feeds_data;	# Cache, so we don't reload feed info for each item
 		while (my $list_record = $sthl -> fetchrow_hashref()) {
@@ -1336,12 +1336,19 @@ sub list_records {
 				# Content
 				foreach my $field (qw(description content)) {
 					$itemdata->{$field} = $list_record->{$table."_".$field};
+
+					# Some formatting, to make it easier to read
+					$itemdata->{$field} =~ s/\n\n/\n/g;				# Eliminate double line feeds
+					$itemdata->{$field} =~ s/\n/<\/p>\n<p>/ig;		# Add some paragraphs
+					$itemdata->{$field} = "<p>".$itemdata->{$field}."</p>";  # wrap it
+
 				}
 
 				# Get the previous and next records
  				my $nextdata = &get_next($dbh,$table,$id,$sort,$where,$list_record);
 				foreach my $field (qw(first last prev next)) {
 					$itemdata->{$field} = $nextdata->{$field};
+					#$itemdata->{$table."_".$field} = $nextdata->{$field};
 				}
 
 				# Get the linked data from feed
@@ -1397,7 +1404,7 @@ sub list_records {
 			 <a href="http://www.downes.ca/$list_record->{author_list_table}/$list_record->{author_list_item}">$list_record->{author_list_item}</a>
 			 <br>|; next;
 		}
-
+	$format = "";
 		# Format Record 
 		if ($format) {
 			$record_text = &format_record($dbh,$query,$table,$format,$list_record,1);
@@ -2538,6 +2545,7 @@ sub get_next {
 
 		# Define and execute search for first,last,next,prev record id	
 		my $nextsql = sprintf("SELECT %s FROM %s WHERE %s%s ",$idfield,$table,$rwhere,$sort_by);
+		unless ($search_value) { $search_value = '0'; }  # Make sure search value has a value for search
 		if ($direction eq "first") { $nextsql .= sprintf("<= '%s' ORDER BY %s ",$search_value,$sort_by); }
 		elsif ($direction eq "last") { $nextsql .= sprintf(">= '%s' ORDER BY %s DESC",$search_value,$sort_by);}
 		elsif ($direction eq "next") { $nextsql .= sprintf("> '%s' ORDER BY %s ",$search_value,$sort_by); }
@@ -2547,6 +2555,7 @@ sub get_next {
 		# Will fail if $table or $id don't exist or if $sort isn't a valid field
 		my ($newnextid) = $dbh->selectrow_array($nextsql) 
 			or die "Can't execute SQL statement (will fail if table or id don't exist or if sort isn't a valid field) $nextsql: $dbh::errstr\n"; 
+		#$results->{$direction} = $nextsql; 
 		$results->{$direction} = $newnextid; 
 		
 	}
@@ -7705,7 +7714,7 @@ sub db_get_record {
 	my @value_list; my @value_vals;
 	while (my($kx,$ky) = each %$value_arr) { push @value_list,"$kx=?"; push @value_vals,$ky; }
 	my $value_str = join " AND ",@value_list;
-	unless ($value_vals[0]) { warn "No value input to db_get_record"; return; }
+	unless ($value_vals[0]) { warn "No value input to db_get_record from $table"; return; }
 	my $stmt = "SELECT * FROM $table WHERE $value_str LIMIT 1";
 	my $sth = $dbh -> prepare($stmt);
 	$sth -> execute(@value_vals);
@@ -10182,7 +10191,11 @@ sub check_user {
 #	    -expires=>"Wed, 22 Oct 2025 07:28:00 GMT",
 #	    -secure=>0);
 
-    print $cgi->header(-cookie=>$cookie,-charset => 'utf-8');
+
+    unless ($Site->{context} eq "cron" || $Site->{context} eq "rcomment") {
+		print $cgi->header(-cookie=>$cookie,-charset => 'utf-8');
+	}
+
 #print "Content-type: text/html\n\n OK";
     my $profile = $session->param("~profile");
     my $username = $profile->{username};
@@ -10366,6 +10379,7 @@ exit;
 sub _encrypt_password {
 
 	my $encryption_scheme;
+
 #       use local::lib; # sets up a local lib at ~/perl5
 	
     #sudo apt-get install libcrypt-eksblowfish-perl
@@ -10564,8 +10578,11 @@ sub log_cron {
 
 	my ($level,$log) = @_;
 
- # return unless ($Site->{context} eq "cron");
-  my $entry = sprintf("%s ", $Site->{context});
+	return unless ($level <= $Site->{st_log_level});
+
+
+ 	return unless ($Site->{context} eq "cron");
+  	my $entry = sprintf("%s ", $Site->{context});
 
 	# Get the time
 	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
@@ -10576,15 +10593,15 @@ sub log_cron {
 	my $logtime="$mon/$mday $hour:$min ";
 	$entry .= "$logtime $log\n";
 
-  # Define Cron Log Location
+  	# Define Cron Log Location
 	my $cronfile = &get_cookie_base("b");
 	$cronfile =~ s/\./_/g;
 	my $cronlog = $Site->{data_dir} . $cronfile. "_cron.log";
 
 	# Print Cron Jobs Log
 	open CRONLOG,">>$cronlog" or die "Error opening Cron Logfile\n $cronlog: $!";
-  print CRONLOG $entry  or die "Error printing Cron Log $cronlog : $! \nLog: $log";
-  close CRONLOG;
+  	print CRONLOG $entry  or die "Error printing Cron Log $cronlog : $! \nLog: $log";
+  	close CRONLOG;
 	return 1;
 
 }
@@ -10610,6 +10627,7 @@ sub log_view {
 		my $cronfile = &get_cookie_base("d");
 		$cronfile =~ s/\./_/g;
 		my $cronlog = $Site->{data_dir} . $cronfile. "_cron.log";
+		unless (-e $cronlog) { $cronlog = $Site->{data_dir} . "localhost_cron.log"; }
 		if ($vars->{format} eq "tail") {
 			open my $pipe, "-|", "/usr/bin/tail", "-f", $cronlog
 				or die "could not start tail on SampleLog.log: $!";
@@ -11119,11 +11137,11 @@ sub record_sanitize_input {
 	}
 
 
-	return if ($Person->{person_status} eq "Admin");
+	unless ($Site->{context} eq "rcomment") { return if ($Person->{person_status} eq "Admin"); }
 
 	$vars->{$vkey} =~ s/<(\/|)(scr|if|ob|e|t)(.*?)>//sig;	# No scripts, iframes, embeds, tables
 
-	return if ($Person->{person_status} eq "Registered");
+	unless ($Site->{context} eq "rcomment") { return if ($Person->{person_status} eq "Registered"); }
 
 	$vars->{$vkey} =~ s/<(\/|)(a|img)(.*?)>//sig;	# No links, images
 
@@ -11231,6 +11249,39 @@ sub record_anti_spam {		# Checks input for spam content and kills on contact
 
 	return 1;
 }
+
+	# -------  Webmentions
+	#
+
+	
+# Finds a WebMention wndpoint given the $lcontent of a web page
+sub find_webmention_endpoint {
+   my ($lcontent) = @_;
+	 my $endpoint = "";
+
+	 my @bodylinks = $lcontent =~ /<a (.*?)>/gis;
+	 foreach my $bl (@bodylinks) {	if ($bl =~ m/rel="webmention"/is) { $bl =~ m/href="(.*?)"/is; $endpoint=$1; last; }	}
+
+	 my @headlinks = $lcontent =~ /<link (.*?)>/gis;
+	 foreach my $hl (@headlinks) {	if ($hl =~ m/rel="webmention"/is) { $hl =~ m/href="(.*?)"/is; $endpoint=$1; last; }	}
+
+	 return $endpoint;
+	}
+
+sub send_webmention {
+
+	my ($endpoint,$target,$source) = @_;
+		my $ua = new LWP::UserAgent;
+
+	#print "Sending webmention update to $endpoint <br>";
+	my $req = new HTTP::Request 'POST',$endpoint;
+	$req->content_type('application/x-www-form-urlencoded');
+	$req->content("source=$source&target=$target");
+	my $res = $ua->request($req);
+	#print $res->as_string; print "<br>";
+
+
+	}
 
 	# -------  Delete a Record -----------------------------------------------------
 	#
@@ -12364,7 +12415,7 @@ package gRSShopper::Site;
   	#   data_dir =>	'/var/www/cgi-bin/data/',
   	#   secure => 1,
 
-   	while (my ($ax,$ay) = each %$args) { $self->{$ax} = $ay; }
+   	while (my ($ax,$ay) = each %$args) { $self->{$ax} = $ay;  }
 
 
    	# Make process name
@@ -12421,10 +12472,11 @@ package gRSShopper::Site;
   	# Determine site host for cron
 		# Assumes directory structure is /htdocs/cgi-dir/data/multisite.txt
   	elsif ($numArgs > 1) {
+
 			$self->{context} = "cron";
 			$self->{st_host} = $ARGV[0];			# Define Host
-			$self->{data_dir} = $ARGV[2];		  # For cron, define data dir relative to multisite.txt
-			$self->{data_dir} =~ s/multisite\.txt//;
+			$self->{data_dir} = $ARGV[1];		  # For cron, define data dir relative to multisite.txt
+			$self->{data_dir} =~ s/multisite\.txt//;	
 			$self->{st_cgif} = $self->{data_dir}; # For cron, define cgif dir relative to data dir
 			$self->{st_cgif} =~ s/data\///i;  # For cron, define page dir relative to cgi-dir
 			$self->{st_urlf} = $self->{st_cgif};
@@ -12438,7 +12490,7 @@ package gRSShopper::Site;
 
   	# Set derived URLs based on st_host
    	$self->{st_url} = $http . $self->{st_host} . "/";
-	  $self->{st_cgi} = $self->{st_url} . "cgi-bin/";
+	$self->{st_cgi} = $self->{st_url} . "cgi-bin/";
 
   	# Set cookie host
  	  $self->{co_host} = $self->{st_host};
@@ -12468,7 +12520,7 @@ package gRSShopper::Site;
 	# Open the multisite configuration file,
 	# Initialize if file can't be found or opened
 
-  	my $data_file = "data/multisite.txt";
+  	my $data_file = $self->{st_cgif}."data/multisite.txt";
 	unless (-e $data_file) { $data_file = $ARGV[2]; }    # try a backup option (nneded for cron)
 
 	open IN,"$data_file" or die qq|Cannot find multisite.txt or website information in crom task.|; 
@@ -12490,20 +12542,27 @@ package gRSShopper::Site;
 		  $self->{database}->{loc},
 		  $self->{database}->{usr},
 		  $self->{database}->{pwd},
-		  $self->{site_language} ) = split "\t",$line;   # Assign defualts with first line
+		  $self->{site_language},
+		  $self->{urlf},
+		  $self->{cgif} ) = split "\t",$line;   # Assign defualts with first line
 		if ($line =~ /^$self->{st_host}/) {
 			( $self->{st_home},
 			  $self->{database}->{name},
 			  $self->{database}->{loc},
 			  $self->{database}->{usr},
 			  $self->{database}->{pwd},
-			  $self->{site_language} ) = split "\t",$line;
+			  $self->{site_language},
+			  $self->{urlf},
+		  	  $self->{cgif} ) = split "\t",$line;
 			$url_located = 1;
 			last;
 		}
 	}
 	close IN;
 
+	# If the line defines html and cgi directories, set those names
+	if ($self->{urlf}) { $self->{st_urlf} = $self->{urlf}; }
+	if ($self->{cgif}) { $self->{st_cgif} = $self->{cgif}; }
 
 	# Initialize if line beginning with site URL can't be found
 	unless ($self->{database}->{name}) { 
@@ -12516,6 +12575,7 @@ package gRSShopper::Site;
 	$self->{site_language}  ||= 'en';
 	$self->{st_urlf}  ||= '../';
 	$self->{st_cgif}  ||= './';
+	
 	return;
   }
 
@@ -14179,11 +14239,11 @@ package gRSShopper::Badgr;
 	  my $uri = $self->{badgr_url}."/v2/badgeclasses";
 	  my $header = ['Authorization' => 'Bearer '.$self->{access_token},"Content-Type" => "application/json",'username' => $self->{badgruserid}];
 		my $data = {foo => 'bar', baz => 'quux'};
-		my $req = HTTP::Request->new('POST', $uri, $header, $badge_json);
+		my $reqb = HTTP::Request->new('POST', $uri, $header, $badge_json);
 
     # Execute Request
     my $ua = LWP::UserAgent->new;
-	  my $response = $ua->request($req);
+	  my $response = $ua->request($reqb);
 		if ($response->is_success) {
 			my $hashref  = decode_json $response->decoded_content;
 			foreach my $r (@{$hashref->{result}}) {

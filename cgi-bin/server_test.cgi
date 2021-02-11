@@ -67,9 +67,13 @@ print " <span style='color:green;'> OK</span>$newline";
 $|++;
 my $missing = 0;
 my @lissing_list;
-my @modules = qw(CGI CGI::Carp CGI::Session Crypt::Eksblowfish::Bcrypt Fcntl DateTime DateTime::TimeZone DBI DBD::mysql Digest::SHA Email::Stuffer Email::Sender::Transport::SMTP File::Basename File::Slurp File::stat File::Find HTML::Entities HTTP::Request::Common
-Image::Resize JSON JSON::Parse JSON::XS Lingua::EN::Inflect LWP LWP::UserAgent LWP::Simple MIME::Types Mastodon::Client MIME::Lite::TT::HTML
-Net::Twitter::Lite::WithAPIv1_1 REST::Client Scalar::Util Text::ParseWords Time::Local URI::Escape vCard XML::OPML);
+my @modules = qw(CGI CGI::Carp CGI::Session Crypt::Eksblowfish::Bcrypt Cwd DateTime DateTime::TimeZone 
+DBI DBD::mysql Digest::MD5 Digest::SHA Email::Stuffer Email::Sender::Transport::SMTP Fcntl 
+File::Basename File::Slurp File::stat File::Find HTML::Entities HTTP::Request::Common
+Image::Resize JSON JSON::Parse JSON::XS Lingua::EN::Inflect LWP LWP::UserAgent LWP::Simple MIME::Types 
+Mastodon::Client MIME::Lite::TT::HTML Net::Twitter::Lite::WithAPIv1_1 REST::Client Scalar::Util 
+Text::ParseWords Time::Local URI::Escape vCard WWW::Curl::Easy WWW::Mechanize XML::OPML);
+
 
 print "Checking: ";
 foreach my $module (@modules) {
@@ -98,10 +102,20 @@ if ($missing eq "1") {
 
   print qq|</ul>		$newline$newline
 		<b>Getting Perl Modules</b>$newlineFor more information, please see:$newline
-		<a href="http://www.cpan.org/modules/INSTALL.html">http://www.cpan.org/modules/INSTALL.html</a> $newline
-		<a href="http://www.rcbowen.com/imho/perl/modules.html">http://www.rcbowen.com/imho/perl/modules.html</a> $newline|;
+		<a href="https://www.cpan.org/modules/INSTALL.html">https://www.cpan.org/modules/INSTALL.html</a> $newline
+		<a href="https://www.rcbowen.com/imho/perl/modules.html">https://www.rcbowen.com/imho/perl/modules.html</a> $newline|;
 
 }
+
+# 
+# Test local libraries and require gRSShopper.pl
+#
+
+my $dirname = dirname(__FILE__);
+use lib $dirname or print "Error using local lib: $! <br>";
+print "Local directory: $dirname <br>";
+require $dirname . "/grsshopper.pl";
+
 
 # -------------
 # Test database access (from default config in Dockerfile)
@@ -147,9 +161,9 @@ use DBI;
 print "<p><b>Testing user authentication</b></p>";
 print "<p>Note that this may create a new Admin user is one is needed; please be sure to take note of the admin user name and password for later logins.</p>";
 
-print qq|<iframe src="login_widget.cgi" height="40" width="500" title="Iframe Example"></iframe>|;
+print qq|<iframe src="login_widget.cgi" height="100" width="500" title="Iframe Example"></iframe>|;
 
-print qq|<p>Once you have logged in, try out <a href="../PLE.htm">your new PLE</a></p>|;
+print qq|<p>Once you have logged in, try out <a href="../PLE.html">your new PLE</a></p>|;
 
 
 exit;

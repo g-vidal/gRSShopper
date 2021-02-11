@@ -210,8 +210,11 @@ sub save_item {
 		if ($item->{link_link}) {
 			if ($analyze eq "on") {  $item->{link_id} = "[Not Inserted]"; }
 			else { $item->{link_id} = &db_insert($dbh,$query,"link",$item); }
-			&diag(1,qq|Save Item
-				<a href="$Site->{st_url}link/$item->{link_id}">$item->{link_title}</a><br/>\n|);
+			if ($item->{link_id}) {
+				my $newurl = $Site->{st_url}."link/".$item->{link_id};
+				&diag(1,qq|Save Item <a href="$newurl">$item->{link_title}</a><br/>\n|);
+				&log_cron(1,sprintf("New link inserted: %s : %s",$newurl,$item->{link_title}));
+			} 
 		}
 
 
